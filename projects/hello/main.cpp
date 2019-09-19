@@ -7,7 +7,6 @@
 // Include files
 // ********************************************************************************
 
-#include <boost/assert.hpp>
 #include <memory>
 
 #include "scene_hello_triangle.hpp"

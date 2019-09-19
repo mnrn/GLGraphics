@@ -10,8 +10,10 @@
 // Include files
 // ********************************************************************************
 
-#include <boost/format.hpp>
 #include <iostream>
+
+#define FMT_HEADER_ONLY
+#include <fmt/printf.h>
 
 // ********************************************************************************
 // Namespace
@@ -105,9 +107,8 @@ namespace debug {
     break;
   }
 
-  std::cout << boost::format("%s:%s[%s](%d): %s") % srcstr.c_str() %
-                   typestr.c_str() % sevstr.c_str() % id % msg
-            << std::endl;
+  fmt::printf("%s:%s[%s](%d): %s\n", srcstr.c_str(),
+                   typestr.c_str(), sevstr.c_str(), id, msg);
 }
 
 [[maybe_unused]] static int32_t check_error(const char *filepath, int32_t line) {
@@ -137,9 +138,7 @@ namespace debug {
       break;
     }
 
-    std::cout << boost::format("glError in file %s @line %d: %s\n") % filepath %
-                     line % msg
-              << std::endl;
+    fmt::printf("glError in file %s @line %d: %s\n", filepath, line, msg);
     retcode = 1;
     glErr = glGetError();
   }
@@ -161,12 +160,11 @@ static void dump_info() {
   std::cout
       << "------------------------------------------------------------------"
       << std::endl;
-  std::cout << boost::format("GL Renderer  : %s") % renderer << std::endl;
-  std::cout << boost::format("GL Vendor    : %s") % vendor << std::endl;
-  std::cout << boost::format("GL Version   : %s") % version << std::endl;
-  std::cout << boost::format("GL Version   : %d.%d") % major % minor
-            << std::endl;
-  std::cout << boost::format("GLSL Version : %s") % glslver << std::endl;
+  fmt::printf("GL Renderer  : %s\n", renderer);
+  fmt::printf("GL Vendor    : %s\n", vendor);
+  fmt::printf("GL Version   : %s\n", version);
+  fmt::printf("GL Version   : %d.%d\n",  major, minor);
+  fmt::printf("GLSL Version : %s\n", glslver);
   std::cout
       << "------------------------------------------------------------------"
       << std::endl;
