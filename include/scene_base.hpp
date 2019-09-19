@@ -10,7 +10,7 @@
 // Namespace
 // ********************************************************************************
 
-namespace Scene {
+namespace scene {
 
 // ********************************************************************************
 // Class
@@ -19,9 +19,9 @@ namespace Scene {
 /**
  * @brief Scene Base Class
  */
-class Base {
+class base {
 public:
-  virtual ~Base() = default;
+  virtual ~base() = default;
   virtual void update(float d) = 0;
   virtual void render() const = 0;
 

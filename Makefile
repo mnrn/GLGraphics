@@ -123,33 +123,6 @@ hello/fast:
 	$(MAKE) -f CMakeFiles/hello.dir/build.make CMakeFiles/hello.dir/build
 .PHONY : hello/fast
 
-projects/hello/SceneHelloTriangle.o: projects/hello/SceneHelloTriangle.cpp.o
-
-.PHONY : projects/hello/SceneHelloTriangle.o
-
-# target to build an object file
-projects/hello/SceneHelloTriangle.cpp.o:
-	$(MAKE) -f CMakeFiles/hello.dir/build.make CMakeFiles/hello.dir/projects/hello/SceneHelloTriangle.cpp.o
-.PHONY : projects/hello/SceneHelloTriangle.cpp.o
-
-projects/hello/SceneHelloTriangle.i: projects/hello/SceneHelloTriangle.cpp.i
-
-.PHONY : projects/hello/SceneHelloTriangle.i
-
-# target to preprocess a source file
-projects/hello/SceneHelloTriangle.cpp.i:
-	$(MAKE) -f CMakeFiles/hello.dir/build.make CMakeFiles/hello.dir/projects/hello/SceneHelloTriangle.cpp.i
-.PHONY : projects/hello/SceneHelloTriangle.cpp.i
-
-projects/hello/SceneHelloTriangle.s: projects/hello/SceneHelloTriangle.cpp.s
-
-.PHONY : projects/hello/SceneHelloTriangle.s
-
-# target to generate assembly for a file
-projects/hello/SceneHelloTriangle.cpp.s:
-	$(MAKE) -f CMakeFiles/hello.dir/build.make CMakeFiles/hello.dir/projects/hello/SceneHelloTriangle.cpp.s
-.PHONY : projects/hello/SceneHelloTriangle.cpp.s
-
 projects/hello/main.o: projects/hello/main.cpp.o
 
 .PHONY : projects/hello/main.o
@@ -177,6 +150,33 @@ projects/hello/main.cpp.s:
 	$(MAKE) -f CMakeFiles/hello.dir/build.make CMakeFiles/hello.dir/projects/hello/main.cpp.s
 .PHONY : projects/hello/main.cpp.s
 
+projects/hello/scene_hello_triangle.o: projects/hello/scene_hello_triangle.cpp.o
+
+.PHONY : projects/hello/scene_hello_triangle.o
+
+# target to build an object file
+projects/hello/scene_hello_triangle.cpp.o:
+	$(MAKE) -f CMakeFiles/hello.dir/build.make CMakeFiles/hello.dir/projects/hello/scene_hello_triangle.cpp.o
+.PHONY : projects/hello/scene_hello_triangle.cpp.o
+
+projects/hello/scene_hello_triangle.i: projects/hello/scene_hello_triangle.cpp.i
+
+.PHONY : projects/hello/scene_hello_triangle.i
+
+# target to preprocess a source file
+projects/hello/scene_hello_triangle.cpp.i:
+	$(MAKE) -f CMakeFiles/hello.dir/build.make CMakeFiles/hello.dir/projects/hello/scene_hello_triangle.cpp.i
+.PHONY : projects/hello/scene_hello_triangle.cpp.i
+
+projects/hello/scene_hello_triangle.s: projects/hello/scene_hello_triangle.cpp.s
+
+.PHONY : projects/hello/scene_hello_triangle.s
+
+# target to generate assembly for a file
+projects/hello/scene_hello_triangle.cpp.s:
+	$(MAKE) -f CMakeFiles/hello.dir/build.make CMakeFiles/hello.dir/projects/hello/scene_hello_triangle.cpp.s
+.PHONY : projects/hello/scene_hello_triangle.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -186,12 +186,12 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... edit_cache"
 	@echo "... hello"
-	@echo "... projects/hello/SceneHelloTriangle.o"
-	@echo "... projects/hello/SceneHelloTriangle.i"
-	@echo "... projects/hello/SceneHelloTriangle.s"
 	@echo "... projects/hello/main.o"
 	@echo "... projects/hello/main.i"
 	@echo "... projects/hello/main.s"
+	@echo "... projects/hello/scene_hello_triangle.o"
+	@echo "... projects/hello/scene_hello_triangle.i"
+	@echo "... projects/hello/scene_hello_triangle.s"
 .PHONY : help
 
 

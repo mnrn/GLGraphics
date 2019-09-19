@@ -77,7 +77,7 @@ namespace yr {
         }
 
 
-#include "yrTexture.ipp"
+#include "texture.ipp"
 
 
     }  // end namespace Texture

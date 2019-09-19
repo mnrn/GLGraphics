@@ -70,29 +70,29 @@ CMakeFiles/hello.dir/projects/hello/main.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/hello.dir/projects/hello/main.cpp.s"
 	/Applications/Xcode-beta.app/Contents/Developer/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/n/codes/graphics/opengl/simple-gl/projects/hello/main.cpp -o CMakeFiles/hello.dir/projects/hello/main.cpp.s
 
-CMakeFiles/hello.dir/projects/hello/SceneHelloTriangle.cpp.o: CMakeFiles/hello.dir/flags.make
-CMakeFiles/hello.dir/projects/hello/SceneHelloTriangle.cpp.o: projects/hello/SceneHelloTriangle.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/n/codes/graphics/opengl/simple-gl/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/hello.dir/projects/hello/SceneHelloTriangle.cpp.o"
-	/Applications/Xcode-beta.app/Contents/Developer/usr/bin/g++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/hello.dir/projects/hello/SceneHelloTriangle.cpp.o -c /Users/n/codes/graphics/opengl/simple-gl/projects/hello/SceneHelloTriangle.cpp
+CMakeFiles/hello.dir/projects/hello/scene_hello_triangle.cpp.o: CMakeFiles/hello.dir/flags.make
+CMakeFiles/hello.dir/projects/hello/scene_hello_triangle.cpp.o: projects/hello/scene_hello_triangle.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/n/codes/graphics/opengl/simple-gl/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/hello.dir/projects/hello/scene_hello_triangle.cpp.o"
+	/Applications/Xcode-beta.app/Contents/Developer/usr/bin/g++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/hello.dir/projects/hello/scene_hello_triangle.cpp.o -c /Users/n/codes/graphics/opengl/simple-gl/projects/hello/scene_hello_triangle.cpp
 
-CMakeFiles/hello.dir/projects/hello/SceneHelloTriangle.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/hello.dir/projects/hello/SceneHelloTriangle.cpp.i"
-	/Applications/Xcode-beta.app/Contents/Developer/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/n/codes/graphics/opengl/simple-gl/projects/hello/SceneHelloTriangle.cpp > CMakeFiles/hello.dir/projects/hello/SceneHelloTriangle.cpp.i
+CMakeFiles/hello.dir/projects/hello/scene_hello_triangle.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/hello.dir/projects/hello/scene_hello_triangle.cpp.i"
+	/Applications/Xcode-beta.app/Contents/Developer/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/n/codes/graphics/opengl/simple-gl/projects/hello/scene_hello_triangle.cpp > CMakeFiles/hello.dir/projects/hello/scene_hello_triangle.cpp.i
 
-CMakeFiles/hello.dir/projects/hello/SceneHelloTriangle.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/hello.dir/projects/hello/SceneHelloTriangle.cpp.s"
-	/Applications/Xcode-beta.app/Contents/Developer/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/n/codes/graphics/opengl/simple-gl/projects/hello/SceneHelloTriangle.cpp -o CMakeFiles/hello.dir/projects/hello/SceneHelloTriangle.cpp.s
+CMakeFiles/hello.dir/projects/hello/scene_hello_triangle.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/hello.dir/projects/hello/scene_hello_triangle.cpp.s"
+	/Applications/Xcode-beta.app/Contents/Developer/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/n/codes/graphics/opengl/simple-gl/projects/hello/scene_hello_triangle.cpp -o CMakeFiles/hello.dir/projects/hello/scene_hello_triangle.cpp.s
 
 # Object files for target hello
 hello_OBJECTS = \
 "CMakeFiles/hello.dir/projects/hello/main.cpp.o" \
-"CMakeFiles/hello.dir/projects/hello/SceneHelloTriangle.cpp.o"
+"CMakeFiles/hello.dir/projects/hello/scene_hello_triangle.cpp.o"
 
 # External object files for target hello
 hello_EXTERNAL_OBJECTS =
 
 bin/hello: CMakeFiles/hello.dir/projects/hello/main.cpp.o
-bin/hello: CMakeFiles/hello.dir/projects/hello/SceneHelloTriangle.cpp.o
+bin/hello: CMakeFiles/hello.dir/projects/hello/scene_hello_triangle.cpp.o
 bin/hello: CMakeFiles/hello.dir/build.make
 bin/hello: /usr/local/lib/libGLEW.dylib
 bin/hello: /usr/local/lib/libglfw.dylib

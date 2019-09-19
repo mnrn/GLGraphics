@@ -11,11 +11,11 @@
 
 #include <boost/noncopyable.hpp>
 
-#include "glInclude.hpp"
-#include "yrCommon.hpp"
+#include "glinclude.hpp"
+#include "common.hpp"
 
-#include "fwWindow.hpp"
-#include "glDebug.hpp"
+#include "window.hpp"
+#include "debug.hpp"
 
 // ********************************************************************************
 // Namespace
@@ -27,32 +27,32 @@ namespace yr {
 // Class
 // ********************************************************************************
 
-class YrGL : private boost::noncopyable {
+class yrgl : private boost::noncopyable {
 public:
-  YrGL(const char *appName) {
+  yrgl(const char *app_name) {
     glfwInit();
 
-    window_ = fw::Window::create(1280, 720, appName);
+    window_ = window::create(1280, 720, app_name);
 
-    initGLEW();
-    gl::Debug::setupInfo();
+    init_glew();
+    debug::setup_info();
   }
 
-  ~YrGL() {
+  ~yrgl() {
 
-    fw::Window::destroy(window_);
+    window::destroy(window_);
 
     glfwTerminate();
   }
 
   template <typename F> void run(F callback) {
-    fw::Window::loop(window_, callback);
+    window::loop(window_, callback);
   }
 
 private:
   GLFWwindow *window_ = nullptr;
 
-  static void initGLEW() {
+  static void init_glew() {
 
     // Initialize GLEW
     glewExperimental = GL_TRUE;

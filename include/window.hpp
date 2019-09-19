@@ -3,8 +3,8 @@
  * @date   2017/03/19
  */
 
-#ifndef FW_WINDOW_HPP
-#define FW_WINDOW_HPP
+#ifndef WINDOW_HPP
+#define WINDOW_HPP
 
 // ********************************************************************************
 // Include files
@@ -12,15 +12,14 @@
 
 #include <thread>
 
-#include "fwTimer.hpp"
-#include "glDebug.hpp"
+#include "timer.hpp"
+#include "debug.hpp"
 
 // ********************************************************************************
 // Namespace
 // ********************************************************************************
 
-namespace fw {
-namespace Window {
+namespace window {
 
 GLFWwindow *create(int w, int h, const char *title,
                    GLFWmonitor *monitor = nullptr,
@@ -65,17 +64,17 @@ template <typename F> void loop(GLFWwindow *handle, F callback) {
   // using precision_t = double;
   // static constexpr double periodic = 1.0 / 60.0;
 
-  Timer timer_;
+  timer timer;
   while (glfwWindowShouldClose(handle) == false &&
          glfwGetKey(handle, GLFW_KEY_ESCAPE) == false) {
 
-    timer_.start();
+    timer.start();
 
     callback();
     glfwSwapBuffers(handle);
     glfwPollEvents();
 
-    timer_.end();
+    timer.end();
 
     // precision_t elapsed = timer_.elapsed();
     // if (elapsed < periodic_) {
@@ -85,8 +84,6 @@ template <typename F> void loop(GLFWwindow *handle, F callback) {
   }
 }
 
-} // end namespace Window
+} // end namespace window
 
-} // end namespace fw
-
-#endif // FW_WINDOW_HPP
+#endif // WINDOW_HPP

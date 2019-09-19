@@ -10,7 +10,7 @@
 #include <boost/assert.hpp>
 #include <memory>
 
-#include "SceneHelloTriangle.hpp"
+#include "scene_hello_triangle.hpp"
 #include "yryr.hpp"
 
 // ********************************************************************************
@@ -24,16 +24,16 @@ int main(
     int argc, char **argv
 #endif
 ) {
-  yr::YrGL yryr("Hello Triangle!!!");
+  yr::yrgl yryr("Hello Triangle!!!");
 
   // Create scene
-  std::unique_ptr<Scene::Base> pScene =
-      std::make_unique<Scene::HelloTriangle>();
+  std::unique_ptr<scene::base> scene =
+      std::make_unique<scene::hello_triangle>();
 
   // Enter the main loop
-  yryr.run([&pScene]() {
-    pScene->update(0.0f);
-    pScene->render();
+  yryr.run([&scene]() {
+    scene->update(0.0f);
+    scene->render();
   });
 
   return 0;

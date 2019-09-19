@@ -2,8 +2,8 @@
  * @brief Common Definitions.
  */
 
-#ifndef YR_COMMON_HPP
-#define YR_COMMON_HPP
+#ifndef COMMON_HPP
+#define COMMON_HPP
 
 // ********************************************************************************
 // Include files
@@ -21,4 +21,4 @@
 
 namespace yr {}
 
-#endif // end ifndef YR_COMMON__HPP
+#endif // end ifndef COMMON__HPP

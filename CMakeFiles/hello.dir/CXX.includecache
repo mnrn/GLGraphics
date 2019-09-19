@@ -6,21 +6,29 @@
 
 #IncludeRegexTransform: 
 
-/Users/n/codes/graphics/opengl/simple-gl/projects/hello/SceneHelloTriangle.hpp
-SceneBase.hpp
-/Users/n/codes/graphics/opengl/simple-gl/projects/hello/SceneBase.hpp
-ShaderProgram.hpp
-/Users/n/codes/graphics/opengl/simple-gl/projects/hello/ShaderProgram.hpp
-
 /Users/n/codes/graphics/opengl/simple-gl/projects/hello/main.cpp
 boost/assert.hpp
 -
 memory
 -
-SceneHelloTriangle.hpp
-/Users/n/codes/graphics/opengl/simple-gl/projects/hello/SceneHelloTriangle.hpp
+scene_hello_triangle.hpp
+/Users/n/codes/graphics/opengl/simple-gl/projects/hello/scene_hello_triangle.hpp
 yryr.hpp
 /Users/n/codes/graphics/opengl/simple-gl/projects/hello/yryr.hpp
+
+/Users/n/codes/graphics/opengl/simple-gl/projects/hello/scene_hello_triangle.cpp
+boost/assert.hpp
+-
+iostream
+-
+scene_hello_triangle.hpp
+/Users/n/codes/graphics/opengl/simple-gl/projects/hello/scene_hello_triangle.hpp
+
+/Users/n/codes/graphics/opengl/simple-gl/projects/hello/scene_hello_triangle.hpp
+scene_base.hpp
+/Users/n/codes/graphics/opengl/simple-gl/projects/hello/scene_base.hpp
+shader_program.hpp
+/Users/n/codes/graphics/opengl/simple-gl/projects/hello/shader_program.hpp
 
 /usr/local/include/GLFW/glfw3.h
 stddef.h
@@ -7856,11 +7864,29 @@ GL/gl.h
 
 external/GL/glu_mangle.h
 
-include/SceneBase.hpp
+include/common.hpp
 
-include/ShaderProgram.hpp
-glInclude.hpp
-include/glInclude.hpp
+include/debug.hpp
+boost/format.hpp
+-
+iostream
+-
+
+include/glinclude.hpp
+GL/glew.h
+-
+GLFW/glfw3.h
+-
+GL/gl.h
+-
+glm/glm.hpp
+-
+
+include/scene_base.hpp
+
+include/shader_program.hpp
+glinclude.hpp
+include/glinclude.hpp
 fstream
 -
 memory
@@ -7876,45 +7902,27 @@ boost/filesystem.hpp
 boost/noncopyable.hpp
 -
 
-include/fwTimer.hpp
+include/timer.hpp
 chrono
 -
 
-include/fwWindow.hpp
+include/window.hpp
 thread
 -
-fwTimer.hpp
-include/fwTimer.hpp
-glDebug.hpp
-include/glDebug.hpp
-
-include/glDebug.hpp
-boost/format.hpp
--
-iostream
--
-
-include/glInclude.hpp
-GL/glew.h
--
-GLFW/glfw3.h
--
-GL/gl.h
--
-glm/glm.hpp
--
-
-include/yrCommon.hpp
+timer.hpp
+include/timer.hpp
+debug.hpp
+include/debug.hpp
 
 include/yryr.hpp
 boost/noncopyable.hpp
 -
-glInclude.hpp
-include/glInclude.hpp
-yrCommon.hpp
-include/yrCommon.hpp
-fwWindow.hpp
-include/fwWindow.hpp
-glDebug.hpp
-include/glDebug.hpp
+glinclude.hpp
+include/glinclude.hpp
+common.hpp
+include/common.hpp
+window.hpp
+include/window.hpp
+debug.hpp
+include/debug.hpp
 

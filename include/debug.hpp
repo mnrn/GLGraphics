@@ -1,10 +1,10 @@
 /**
- * @brief  Utility
+ * @brief  Debug Utility
  * @date   2017/03/18
  */
 
-#ifndef GL_DEBUG_HPP
-#define GL_DEBUG_HPP
+#ifndef DEBUG_HPP
+#define DEBUG_HPP
 
 // ********************************************************************************
 // Include files
@@ -17,14 +17,13 @@
 // Namespace
 // ********************************************************************************
 
-namespace gl {
-namespace Debug {
+namespace debug {
 
 // ********************************************************************************
 // Functions
 // ********************************************************************************
 
-static void APIENTRY callback(GLenum src, GLenum type, GLuint id,
+[[maybe_unused]] static void APIENTRY callback(GLenum src, GLenum type, GLuint id,
                               GLenum severity, GLsizei length,
                               const GLchar *msg, const void *param) {
 
@@ -111,7 +110,7 @@ static void APIENTRY callback(GLenum src, GLenum type, GLuint id,
             << std::endl;
 }
 
-[[maybe_unused]] static int32_t checkError(const char *filepath, int32_t line) {
+[[maybe_unused]] static int32_t check_error(const char *filepath, int32_t line) {
 
   GLenum glErr = glGetError();
   int32_t retcode = 0;
@@ -148,7 +147,7 @@ static void APIENTRY callback(GLenum src, GLenum type, GLuint id,
   return retcode;
 }
 
-static void dumpInfo() {
+static void dump_info() {
 
   const GLubyte *renderer = glGetString(GL_RENDERER);
   const GLubyte *vendor = glGetString(GL_VENDOR);
@@ -173,13 +172,13 @@ static void dumpInfo() {
       << std::endl;
 }
 
-static void setupInfo() {
+static void setup_info() {
   // Dump GL Info
-  gl::Debug::dumpInfo();
+  debug::dump_info();
 
   // Setup Debug Info
 #ifndef __APPLE__
-  glDebugMessageCallback(gl::Debug::callback, nullptr);
+  glDebugMessageCallback(debug::callback, nullptr);
   glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr,
                         GL_TRUE);
   glDebugMessageInsert(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_MARKER, 0,
@@ -187,8 +186,7 @@ static void setupInfo() {
 #endif
 }
 
-} // end namespace Debug
+} // end namespace debug
 
-} // end namespace gl
 
-#endif // GL_DEBUG_HPP
+#endif // DEBUG_HPP

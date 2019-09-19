@@ -4,8 +4,8 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "/Users/n/codes/graphics/opengl/simple-gl/projects/hello/SceneHelloTriangle.cpp" "/Users/n/codes/graphics/opengl/simple-gl/CMakeFiles/hello.dir/projects/hello/SceneHelloTriangle.cpp.o"
   "/Users/n/codes/graphics/opengl/simple-gl/projects/hello/main.cpp" "/Users/n/codes/graphics/opengl/simple-gl/CMakeFiles/hello.dir/projects/hello/main.cpp.o"
+  "/Users/n/codes/graphics/opengl/simple-gl/projects/hello/scene_hello_triangle.cpp" "/Users/n/codes/graphics/opengl/simple-gl/CMakeFiles/hello.dir/projects/hello/scene_hello_triangle.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "AppleClang")
 

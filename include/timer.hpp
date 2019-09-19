@@ -15,13 +15,11 @@
 // Namespace
 // ********************************************************************************
 
-namespace fw {
-
 // ********************************************************************************
 // Class
 // ********************************************************************************
 
-class Timer {
+class timer {
 public:
   // start timer
   void start() { start_ = std::chrono::high_resolution_clock::now(); }
@@ -38,7 +36,5 @@ private:
   std::chrono::high_resolution_clock::time_point start_;
   std::chrono::high_resolution_clock::time_point end_;
 };
-
-} // end namespace fw
 
 #endif // end of TIMER_HPP

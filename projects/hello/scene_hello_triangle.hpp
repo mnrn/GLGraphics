@@ -10,14 +10,14 @@
 // Include files
 // ********************************************************************************
 
-#include "SceneBase.hpp"
-#include "ShaderProgram.hpp"
+#include "scene_base.hpp"
+#include "shader_program.hpp"
 
 // ********************************************************************************
 // Namespace
 // ********************************************************************************
 
-namespace Scene {
+namespace scene {
 
 // ********************************************************************************
 // Class
@@ -26,20 +26,20 @@ namespace Scene {
 /**
  * @brief Scene Hello Triangle Class
  */
-class HelloTriangle : public Base {
+class hello_triangle : public base {
 public:
-  HelloTriangle();
-  ~HelloTriangle() override = default;
+  hello_triangle();
+  ~hello_triangle() override = default;
 
   void update(float d) override;
   void render() const override;
 
 private:
-  bool compileAndLinkShader();
-  void createVBO();
+  bool compile_and_link_shader();
+  void create_vbo();
 
-  GLuint hVBO_ = 0;
-  Shader::Program program_;
+  GLuint hvbo_ = 0;
+  shader::program prog_;
 };
 
 } // namespace Scene
