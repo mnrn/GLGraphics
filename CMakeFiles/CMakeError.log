@@ -1,0 +1,778 @@
+Determining if the pthread_create exist failed with the following output:
+Change Dir: /home/n/work/vulkan/shader/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_9f8e6/fast"
+/usr/bin/make -f CMakeFiles/cmTC_9f8e6.dir/build.make CMakeFiles/cmTC_9f8e6.dir/build
+make[1]: Entering directory '/home/n/work/vulkan/shader/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_9f8e6.dir/CheckSymbolExists.c.o
+/home/n/local/bin/clang     -o CMakeFiles/cmTC_9f8e6.dir/CheckSymbolExists.c.o   -c /home/n/work/vulkan/shader/CMakeFiles/CMakeTmp/CheckSymbolExists.c
+Linking C executable cmTC_9f8e6
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_9f8e6.dir/link.txt --verbose=1
+/home/n/local/bin/clang       CMakeFiles/cmTC_9f8e6.dir/CheckSymbolExists.c.o  -o cmTC_9f8e6 -rdynamic 
+CMakeFiles/cmTC_9f8e6.dir/CheckSymbolExists.c.o: In function `main':
+/home/n/work/vulkan/shader/CMakeFiles/CMakeTmp/CheckSymbolExists.c:(.text+0x19): undefined reference to `pthread_create'
+clang-5.0: error: linker command failed with exit code 1 (use -v to see invocation)
+CMakeFiles/cmTC_9f8e6.dir/build.make:97: recipe for target 'cmTC_9f8e6' failed
+make[1]: *** [cmTC_9f8e6] Error 1
+make[1]: Leaving directory '/home/n/work/vulkan/shader/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_9f8e6/fast' failed
+make: *** [cmTC_9f8e6/fast] Error 2
+
+File /home/n/work/vulkan/shader/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
+/* */
+#include <pthread.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef pthread_create
+  return ((int*)(&pthread_create))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+
+Determining if the function pthread_create exists in the pthreads failed with the following output:
+Change Dir: /home/n/work/vulkan/shader/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_6db87/fast"
+/usr/bin/make -f CMakeFiles/cmTC_6db87.dir/build.make CMakeFiles/cmTC_6db87.dir/build
+make[1]: Entering directory '/home/n/work/vulkan/shader/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_6db87.dir/CheckFunctionExists.c.o
+/home/n/local/bin/clang    -DCHECK_FUNCTION_EXISTS=pthread_create   -o CMakeFiles/cmTC_6db87.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-3.5/Modules/CheckFunctionExists.c
+Linking C executable cmTC_6db87
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_6db87.dir/link.txt --verbose=1
+/home/n/local/bin/clang   -DCHECK_FUNCTION_EXISTS=pthread_create    CMakeFiles/cmTC_6db87.dir/CheckFunctionExists.c.o  -o cmTC_6db87 -rdynamic -lpthreads 
+/usr/bin/ld: cannot find -lpthreads
+clang-5.0: error: linker command failed with exit code 1 (use -v to see invocation)
+CMakeFiles/cmTC_6db87.dir/build.make:97: recipe for target 'cmTC_6db87' failed
+make[1]: *** [cmTC_6db87] Error 1
+make[1]: Leaving directory '/home/n/work/vulkan/shader/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_6db87/fast' failed
+make: *** [cmTC_6db87/fast] Error 2
+
+
+Determining if the pthread_create exist failed with the following output:
+Change Dir: /home/n/code/vulkan/engine/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_69465/fast"
+/usr/bin/make -f CMakeFiles/cmTC_69465.dir/build.make CMakeFiles/cmTC_69465.dir/build
+make[1]: Entering directory '/home/n/code/vulkan/engine/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_69465.dir/CheckSymbolExists.c.o
+/home/n/local/bin/clang     -o CMakeFiles/cmTC_69465.dir/CheckSymbolExists.c.o   -c /home/n/code/vulkan/engine/CMakeFiles/CMakeTmp/CheckSymbolExists.c
+Linking C executable cmTC_69465
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_69465.dir/link.txt --verbose=1
+/home/n/local/bin/clang       CMakeFiles/cmTC_69465.dir/CheckSymbolExists.c.o  -o cmTC_69465 -rdynamic 
+CMakeFiles/cmTC_69465.dir/CheckSymbolExists.c.o: In function `main':
+/home/n/code/vulkan/engine/CMakeFiles/CMakeTmp/CheckSymbolExists.c:(.text+0x19): undefined reference to `pthread_create'
+clang-5.0: error: linker command failed with exit code 1 (use -v to see invocation)
+CMakeFiles/cmTC_69465.dir/build.make:97: recipe for target 'cmTC_69465' failed
+make[1]: *** [cmTC_69465] Error 1
+make[1]: Leaving directory '/home/n/code/vulkan/engine/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_69465/fast' failed
+make: *** [cmTC_69465/fast] Error 2
+
+File /home/n/code/vulkan/engine/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
+/* */
+#include <pthread.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef pthread_create
+  return ((int*)(&pthread_create))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+
+Determining if the function pthread_create exists in the pthreads failed with the following output:
+Change Dir: /home/n/code/vulkan/engine/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_5875b/fast"
+/usr/bin/make -f CMakeFiles/cmTC_5875b.dir/build.make CMakeFiles/cmTC_5875b.dir/build
+make[1]: Entering directory '/home/n/code/vulkan/engine/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_5875b.dir/CheckFunctionExists.c.o
+/home/n/local/bin/clang    -DCHECK_FUNCTION_EXISTS=pthread_create   -o CMakeFiles/cmTC_5875b.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-3.5/Modules/CheckFunctionExists.c
+Linking C executable cmTC_5875b
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_5875b.dir/link.txt --verbose=1
+/home/n/local/bin/clang   -DCHECK_FUNCTION_EXISTS=pthread_create    CMakeFiles/cmTC_5875b.dir/CheckFunctionExists.c.o  -o cmTC_5875b -rdynamic -lpthreads 
+/usr/bin/ld: cannot find -lpthreads
+clang-5.0: error: linker command failed with exit code 1 (use -v to see invocation)
+CMakeFiles/cmTC_5875b.dir/build.make:97: recipe for target 'cmTC_5875b' failed
+make[1]: *** [cmTC_5875b] Error 1
+make[1]: Leaving directory '/home/n/code/vulkan/engine/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_5875b/fast' failed
+make: *** [cmTC_5875b/fast] Error 2
+
+
+Determining if the pthread_create exist failed with the following output:
+Change Dir: /home/n/code/opengl/shader/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_78d18/fast"
+/usr/bin/make -f CMakeFiles/cmTC_78d18.dir/build.make CMakeFiles/cmTC_78d18.dir/build
+make[1]: Entering directory '/home/n/code/opengl/shader/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_78d18.dir/CheckSymbolExists.c.o
+/home/n/local/bin/clang     -o CMakeFiles/cmTC_78d18.dir/CheckSymbolExists.c.o   -c /home/n/code/opengl/shader/CMakeFiles/CMakeTmp/CheckSymbolExists.c
+Linking C executable cmTC_78d18
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_78d18.dir/link.txt --verbose=1
+/home/n/local/bin/clang       CMakeFiles/cmTC_78d18.dir/CheckSymbolExists.c.o  -o cmTC_78d18 -rdynamic 
+CMakeFiles/cmTC_78d18.dir/CheckSymbolExists.c.o: In function `main':
+/home/n/code/opengl/shader/CMakeFiles/CMakeTmp/CheckSymbolExists.c:(.text+0x19): undefined reference to `pthread_create'
+clang-5.0: error: linker command failed with exit code 1 (use -v to see invocation)
+CMakeFiles/cmTC_78d18.dir/build.make:97: recipe for target 'cmTC_78d18' failed
+make[1]: *** [cmTC_78d18] Error 1
+make[1]: Leaving directory '/home/n/code/opengl/shader/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_78d18/fast' failed
+make: *** [cmTC_78d18/fast] Error 2
+
+File /home/n/code/opengl/shader/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
+/* */
+#include <pthread.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef pthread_create
+  return ((int*)(&pthread_create))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+
+Determining if the function pthread_create exists in the pthreads failed with the following output:
+Change Dir: /home/n/code/opengl/shader/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_f9b08/fast"
+/usr/bin/make -f CMakeFiles/cmTC_f9b08.dir/build.make CMakeFiles/cmTC_f9b08.dir/build
+make[1]: Entering directory '/home/n/code/opengl/shader/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_f9b08.dir/CheckFunctionExists.c.o
+/home/n/local/bin/clang    -DCHECK_FUNCTION_EXISTS=pthread_create   -o CMakeFiles/cmTC_f9b08.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-3.5/Modules/CheckFunctionExists.c
+Linking C executable cmTC_f9b08
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_f9b08.dir/link.txt --verbose=1
+/home/n/local/bin/clang   -DCHECK_FUNCTION_EXISTS=pthread_create    CMakeFiles/cmTC_f9b08.dir/CheckFunctionExists.c.o  -o cmTC_f9b08 -rdynamic -lpthreads 
+/usr/bin/ld: cannot find -lpthreads
+clang-5.0: error: linker command failed with exit code 1 (use -v to see invocation)
+CMakeFiles/cmTC_f9b08.dir/build.make:97: recipe for target 'cmTC_f9b08' failed
+make[1]: *** [cmTC_f9b08] Error 1
+make[1]: Leaving directory '/home/n/code/opengl/shader/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_f9b08/fast' failed
+make: *** [cmTC_f9b08/fast] Error 2
+
+
+Determining if the pthread_create exist failed with the following output:
+Change Dir: /home/n/code/opengl/simple/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_edf4a/fast"
+/usr/bin/make -f CMakeFiles/cmTC_edf4a.dir/build.make CMakeFiles/cmTC_edf4a.dir/build
+make[1]: Entering directory '/home/n/code/opengl/simple/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_edf4a.dir/CheckSymbolExists.c.o
+/home/n/local/bin/clang     -o CMakeFiles/cmTC_edf4a.dir/CheckSymbolExists.c.o   -c /home/n/code/opengl/simple/CMakeFiles/CMakeTmp/CheckSymbolExists.c
+Linking C executable cmTC_edf4a
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_edf4a.dir/link.txt --verbose=1
+/home/n/local/bin/clang       CMakeFiles/cmTC_edf4a.dir/CheckSymbolExists.c.o  -o cmTC_edf4a -rdynamic 
+CMakeFiles/cmTC_edf4a.dir/CheckSymbolExists.c.o: In function `main':
+/home/n/code/opengl/simple/CMakeFiles/CMakeTmp/CheckSymbolExists.c:(.text+0x19): undefined reference to `pthread_create'
+clang-5.0: error: linker command failed with exit code 1 (use -v to see invocation)
+CMakeFiles/cmTC_edf4a.dir/build.make:97: recipe for target 'cmTC_edf4a' failed
+make[1]: *** [cmTC_edf4a] Error 1
+make[1]: Leaving directory '/home/n/code/opengl/simple/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_edf4a/fast' failed
+make: *** [cmTC_edf4a/fast] Error 2
+
+File /home/n/code/opengl/simple/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
+/* */
+#include <pthread.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef pthread_create
+  return ((int*)(&pthread_create))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+
+Determining if the function pthread_create exists in the pthreads failed with the following output:
+Change Dir: /home/n/code/opengl/simple/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_c897f/fast"
+/usr/bin/make -f CMakeFiles/cmTC_c897f.dir/build.make CMakeFiles/cmTC_c897f.dir/build
+make[1]: Entering directory '/home/n/code/opengl/simple/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_c897f.dir/CheckFunctionExists.c.o
+/home/n/local/bin/clang    -DCHECK_FUNCTION_EXISTS=pthread_create   -o CMakeFiles/cmTC_c897f.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-3.5/Modules/CheckFunctionExists.c
+Linking C executable cmTC_c897f
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_c897f.dir/link.txt --verbose=1
+/home/n/local/bin/clang   -DCHECK_FUNCTION_EXISTS=pthread_create    CMakeFiles/cmTC_c897f.dir/CheckFunctionExists.c.o  -o cmTC_c897f -rdynamic -lpthreads 
+/usr/bin/ld: cannot find -lpthreads
+clang-5.0: error: linker command failed with exit code 1 (use -v to see invocation)
+CMakeFiles/cmTC_c897f.dir/build.make:97: recipe for target 'cmTC_c897f' failed
+make[1]: *** [cmTC_c897f] Error 1
+make[1]: Leaving directory '/home/n/code/opengl/simple/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_c897f/fast' failed
+make: *** [cmTC_c897f/fast] Error 2
+
+
+Determining if the pthread_create exist failed with the following output:
+Change Dir: /home/n/code/opengl/simple/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_63b35/fast"
+make[1]: Entering directory '/home/n/code/opengl/simple/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTC_63b35.dir/build.make CMakeFiles/cmTC_63b35.dir/build
+make[2]: Entering directory '/home/n/code/opengl/simple/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_63b35.dir/CheckSymbolExists.c.o
+/home/n/local/bin/clang     -o CMakeFiles/cmTC_63b35.dir/CheckSymbolExists.c.o   -c /home/n/code/opengl/simple/CMakeFiles/CMakeTmp/CheckSymbolExists.c
+Linking C executable cmTC_63b35
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_63b35.dir/link.txt --verbose=1
+/home/n/local/bin/clang       CMakeFiles/cmTC_63b35.dir/CheckSymbolExists.c.o  -o cmTC_63b35 -rdynamic 
+CMakeFiles/cmTC_63b35.dir/CheckSymbolExists.c.o: In function `main':
+/home/n/code/opengl/simple/CMakeFiles/CMakeTmp/CheckSymbolExists.c:(.text+0x19): undefined reference to `pthread_create'
+clang-5.0: error: linker command failed with exit code 1 (use -v to see invocation)
+CMakeFiles/cmTC_63b35.dir/build.make:97: recipe for target 'cmTC_63b35' failed
+make[2]: *** [cmTC_63b35] Error 1
+make[2]: Leaving directory '/home/n/code/opengl/simple/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_63b35/fast' failed
+make[1]: *** [cmTC_63b35/fast] Error 2
+make[1]: Leaving directory '/home/n/code/opengl/simple/CMakeFiles/CMakeTmp'
+
+File /home/n/code/opengl/simple/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
+/* */
+#include <pthread.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef pthread_create
+  return ((int*)(&pthread_create))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+
+Determining if the function pthread_create exists in the pthreads failed with the following output:
+Change Dir: /home/n/code/opengl/simple/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_989b7/fast"
+make[1]: Entering directory '/home/n/code/opengl/simple/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTC_989b7.dir/build.make CMakeFiles/cmTC_989b7.dir/build
+make[2]: Entering directory '/home/n/code/opengl/simple/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_989b7.dir/CheckFunctionExists.c.o
+/home/n/local/bin/clang    -DCHECK_FUNCTION_EXISTS=pthread_create   -o CMakeFiles/cmTC_989b7.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-3.5/Modules/CheckFunctionExists.c
+Linking C executable cmTC_989b7
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_989b7.dir/link.txt --verbose=1
+/home/n/local/bin/clang   -DCHECK_FUNCTION_EXISTS=pthread_create    CMakeFiles/cmTC_989b7.dir/CheckFunctionExists.c.o  -o cmTC_989b7 -rdynamic -lpthreads 
+/usr/bin/ld: cannot find -lpthreads
+clang-5.0: error: linker command failed with exit code 1 (use -v to see invocation)
+CMakeFiles/cmTC_989b7.dir/build.make:97: recipe for target 'cmTC_989b7' failed
+make[2]: *** [cmTC_989b7] Error 1
+make[2]: Leaving directory '/home/n/code/opengl/simple/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_989b7/fast' failed
+make[1]: *** [cmTC_989b7/fast] Error 2
+make[1]: Leaving directory '/home/n/code/opengl/simple/CMakeFiles/CMakeTmp'
+
+
+Determining if the pthread_create exist failed with the following output:
+Change Dir: /home/n/code/opengl/simple/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_f39a9/fast"
+/usr/bin/make -f CMakeFiles/cmTC_f39a9.dir/build.make CMakeFiles/cmTC_f39a9.dir/build
+make[1]: Entering directory '/home/n/code/opengl/simple/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_f39a9.dir/CheckSymbolExists.c.o
+/home/n/local/bin/clang     -o CMakeFiles/cmTC_f39a9.dir/CheckSymbolExists.c.o   -c /home/n/code/opengl/simple/CMakeFiles/CMakeTmp/CheckSymbolExists.c
+Linking C executable cmTC_f39a9
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_f39a9.dir/link.txt --verbose=1
+/home/n/local/bin/clang       CMakeFiles/cmTC_f39a9.dir/CheckSymbolExists.c.o  -o cmTC_f39a9 -rdynamic 
+CMakeFiles/cmTC_f39a9.dir/CheckSymbolExists.c.o: In function `main':
+/home/n/code/opengl/simple/CMakeFiles/CMakeTmp/CheckSymbolExists.c:(.text+0x19): undefined reference to `pthread_create'
+clang-5.0: error: linker command failed with exit code 1 (use -v to see invocation)
+CMakeFiles/cmTC_f39a9.dir/build.make:97: recipe for target 'cmTC_f39a9' failed
+make[1]: *** [cmTC_f39a9] Error 1
+make[1]: Leaving directory '/home/n/code/opengl/simple/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_f39a9/fast' failed
+make: *** [cmTC_f39a9/fast] Error 2
+
+File /home/n/code/opengl/simple/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
+/* */
+#include <pthread.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef pthread_create
+  return ((int*)(&pthread_create))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+
+Determining if the function pthread_create exists in the pthreads failed with the following output:
+Change Dir: /home/n/code/opengl/simple/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_2e2b0/fast"
+/usr/bin/make -f CMakeFiles/cmTC_2e2b0.dir/build.make CMakeFiles/cmTC_2e2b0.dir/build
+make[1]: Entering directory '/home/n/code/opengl/simple/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_2e2b0.dir/CheckFunctionExists.c.o
+/home/n/local/bin/clang    -DCHECK_FUNCTION_EXISTS=pthread_create   -o CMakeFiles/cmTC_2e2b0.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-3.5/Modules/CheckFunctionExists.c
+Linking C executable cmTC_2e2b0
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_2e2b0.dir/link.txt --verbose=1
+/home/n/local/bin/clang   -DCHECK_FUNCTION_EXISTS=pthread_create    CMakeFiles/cmTC_2e2b0.dir/CheckFunctionExists.c.o  -o cmTC_2e2b0 -rdynamic -lpthreads 
+/usr/bin/ld: cannot find -lpthreads
+clang-5.0: error: linker command failed with exit code 1 (use -v to see invocation)
+CMakeFiles/cmTC_2e2b0.dir/build.make:97: recipe for target 'cmTC_2e2b0' failed
+make[1]: *** [cmTC_2e2b0] Error 1
+make[1]: Leaving directory '/home/n/code/opengl/simple/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_2e2b0/fast' failed
+make: *** [cmTC_2e2b0/fast] Error 2
+
+
+Determining if the pthread_create exist failed with the following output:
+Change Dir: /home/n/code/opengl/simple/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_7aa94/fast"
+/usr/bin/make -f CMakeFiles/cmTC_7aa94.dir/build.make CMakeFiles/cmTC_7aa94.dir/build
+make[1]: Entering directory '/home/n/code/opengl/simple/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_7aa94.dir/CheckSymbolExists.c.o
+/home/n/local/bin/clang     -o CMakeFiles/cmTC_7aa94.dir/CheckSymbolExists.c.o   -c /home/n/code/opengl/simple/CMakeFiles/CMakeTmp/CheckSymbolExists.c
+Linking C executable cmTC_7aa94
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_7aa94.dir/link.txt --verbose=1
+/home/n/local/bin/clang       CMakeFiles/cmTC_7aa94.dir/CheckSymbolExists.c.o  -o cmTC_7aa94 -rdynamic 
+CMakeFiles/cmTC_7aa94.dir/CheckSymbolExists.c.o: In function `main':
+/home/n/code/opengl/simple/CMakeFiles/CMakeTmp/CheckSymbolExists.c:(.text+0x19): undefined reference to `pthread_create'
+clang-5.0: error: linker command failed with exit code 1 (use -v to see invocation)
+CMakeFiles/cmTC_7aa94.dir/build.make:97: recipe for target 'cmTC_7aa94' failed
+make[1]: *** [cmTC_7aa94] Error 1
+make[1]: Leaving directory '/home/n/code/opengl/simple/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_7aa94/fast' failed
+make: *** [cmTC_7aa94/fast] Error 2
+
+File /home/n/code/opengl/simple/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
+/* */
+#include <pthread.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef pthread_create
+  return ((int*)(&pthread_create))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+
+Determining if the function pthread_create exists in the pthreads failed with the following output:
+Change Dir: /home/n/code/opengl/simple/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_cfb4f/fast"
+/usr/bin/make -f CMakeFiles/cmTC_cfb4f.dir/build.make CMakeFiles/cmTC_cfb4f.dir/build
+make[1]: Entering directory '/home/n/code/opengl/simple/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_cfb4f.dir/CheckFunctionExists.c.o
+/home/n/local/bin/clang    -DCHECK_FUNCTION_EXISTS=pthread_create   -o CMakeFiles/cmTC_cfb4f.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-3.5/Modules/CheckFunctionExists.c
+Linking C executable cmTC_cfb4f
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_cfb4f.dir/link.txt --verbose=1
+/home/n/local/bin/clang   -DCHECK_FUNCTION_EXISTS=pthread_create    CMakeFiles/cmTC_cfb4f.dir/CheckFunctionExists.c.o  -o cmTC_cfb4f -rdynamic -lpthreads 
+/usr/bin/ld: cannot find -lpthreads
+clang-5.0: error: linker command failed with exit code 1 (use -v to see invocation)
+CMakeFiles/cmTC_cfb4f.dir/build.make:97: recipe for target 'cmTC_cfb4f' failed
+make[1]: *** [cmTC_cfb4f] Error 1
+make[1]: Leaving directory '/home/n/code/opengl/simple/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_cfb4f/fast' failed
+make: *** [cmTC_cfb4f/fast] Error 2
+
+
+Determining if the pthread_create exist failed with the following output:
+Change Dir: /home/n/code/opengl/simple/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_87694/fast"
+/usr/bin/make -f CMakeFiles/cmTC_87694.dir/build.make CMakeFiles/cmTC_87694.dir/build
+make[1]: Entering directory '/home/n/code/opengl/simple/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_87694.dir/CheckSymbolExists.c.o
+/home/n/local/bin/clang     -o CMakeFiles/cmTC_87694.dir/CheckSymbolExists.c.o   -c /home/n/code/opengl/simple/CMakeFiles/CMakeTmp/CheckSymbolExists.c
+Linking C executable cmTC_87694
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_87694.dir/link.txt --verbose=1
+/home/n/local/bin/clang       CMakeFiles/cmTC_87694.dir/CheckSymbolExists.c.o  -o cmTC_87694 -rdynamic 
+CMakeFiles/cmTC_87694.dir/CheckSymbolExists.c.o: In function `main':
+/home/n/code/opengl/simple/CMakeFiles/CMakeTmp/CheckSymbolExists.c:(.text+0x19): undefined reference to `pthread_create'
+clang-5.0: error: linker command failed with exit code 1 (use -v to see invocation)
+CMakeFiles/cmTC_87694.dir/build.make:97: recipe for target 'cmTC_87694' failed
+make[1]: *** [cmTC_87694] Error 1
+make[1]: Leaving directory '/home/n/code/opengl/simple/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_87694/fast' failed
+make: *** [cmTC_87694/fast] Error 2
+
+File /home/n/code/opengl/simple/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
+/* */
+#include <pthread.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef pthread_create
+  return ((int*)(&pthread_create))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+
+Determining if the function pthread_create exists in the pthreads failed with the following output:
+Change Dir: /home/n/code/opengl/simple/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_8e264/fast"
+/usr/bin/make -f CMakeFiles/cmTC_8e264.dir/build.make CMakeFiles/cmTC_8e264.dir/build
+make[1]: Entering directory '/home/n/code/opengl/simple/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_8e264.dir/CheckFunctionExists.c.o
+/home/n/local/bin/clang    -DCHECK_FUNCTION_EXISTS=pthread_create   -o CMakeFiles/cmTC_8e264.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-3.5/Modules/CheckFunctionExists.c
+Linking C executable cmTC_8e264
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_8e264.dir/link.txt --verbose=1
+/home/n/local/bin/clang   -DCHECK_FUNCTION_EXISTS=pthread_create    CMakeFiles/cmTC_8e264.dir/CheckFunctionExists.c.o  -o cmTC_8e264 -rdynamic -lpthreads 
+/usr/bin/ld: cannot find -lpthreads
+clang-5.0: error: linker command failed with exit code 1 (use -v to see invocation)
+CMakeFiles/cmTC_8e264.dir/build.make:97: recipe for target 'cmTC_8e264' failed
+make[1]: *** [cmTC_8e264] Error 1
+make[1]: Leaving directory '/home/n/code/opengl/simple/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_8e264/fast' failed
+make: *** [cmTC_8e264/fast] Error 2
+
+
+Determining if the pthread_create exist failed with the following output:
+Change Dir: /home/n/code/opengl/simple/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_91377/fast"
+/usr/bin/make -f CMakeFiles/cmTC_91377.dir/build.make CMakeFiles/cmTC_91377.dir/build
+make[1]: Entering directory '/home/n/code/opengl/simple/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_91377.dir/CheckSymbolExists.c.o
+/home/n/local/bin/clang     -o CMakeFiles/cmTC_91377.dir/CheckSymbolExists.c.o   -c /home/n/code/opengl/simple/CMakeFiles/CMakeTmp/CheckSymbolExists.c
+Linking C executable cmTC_91377
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_91377.dir/link.txt --verbose=1
+/home/n/local/bin/clang       CMakeFiles/cmTC_91377.dir/CheckSymbolExists.c.o  -o cmTC_91377 -rdynamic 
+CMakeFiles/cmTC_91377.dir/CheckSymbolExists.c.o: In function `main':
+/home/n/code/opengl/simple/CMakeFiles/CMakeTmp/CheckSymbolExists.c:(.text+0x19): undefined reference to `pthread_create'
+clang-5.0: error: linker command failed with exit code 1 (use -v to see invocation)
+CMakeFiles/cmTC_91377.dir/build.make:97: recipe for target 'cmTC_91377' failed
+make[1]: *** [cmTC_91377] Error 1
+make[1]: Leaving directory '/home/n/code/opengl/simple/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_91377/fast' failed
+make: *** [cmTC_91377/fast] Error 2
+
+File /home/n/code/opengl/simple/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
+/* */
+#include <pthread.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef pthread_create
+  return ((int*)(&pthread_create))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+
+Determining if the function pthread_create exists in the pthreads failed with the following output:
+Change Dir: /home/n/code/opengl/simple/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_691ec/fast"
+/usr/bin/make -f CMakeFiles/cmTC_691ec.dir/build.make CMakeFiles/cmTC_691ec.dir/build
+make[1]: Entering directory '/home/n/code/opengl/simple/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_691ec.dir/CheckFunctionExists.c.o
+/home/n/local/bin/clang    -DCHECK_FUNCTION_EXISTS=pthread_create   -o CMakeFiles/cmTC_691ec.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-3.5/Modules/CheckFunctionExists.c
+Linking C executable cmTC_691ec
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_691ec.dir/link.txt --verbose=1
+/home/n/local/bin/clang   -DCHECK_FUNCTION_EXISTS=pthread_create    CMakeFiles/cmTC_691ec.dir/CheckFunctionExists.c.o  -o cmTC_691ec -rdynamic -lpthreads 
+/usr/bin/ld: cannot find -lpthreads
+clang-5.0: error: linker command failed with exit code 1 (use -v to see invocation)
+CMakeFiles/cmTC_691ec.dir/build.make:97: recipe for target 'cmTC_691ec' failed
+make[1]: *** [cmTC_691ec] Error 1
+make[1]: Leaving directory '/home/n/code/opengl/simple/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_691ec/fast' failed
+make: *** [cmTC_691ec/fast] Error 2
+
+
+Determining if the pthread_create exist failed with the following output:
+Change Dir: /home/n/code/opengl/simple/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_2708b/fast"
+/usr/bin/make -f CMakeFiles/cmTC_2708b.dir/build.make CMakeFiles/cmTC_2708b.dir/build
+make[1]: Entering directory '/home/n/code/opengl/simple/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_2708b.dir/CheckSymbolExists.c.o
+/home/n/local/bin/clang     -o CMakeFiles/cmTC_2708b.dir/CheckSymbolExists.c.o   -c /home/n/code/opengl/simple/CMakeFiles/CMakeTmp/CheckSymbolExists.c
+Linking C executable cmTC_2708b
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_2708b.dir/link.txt --verbose=1
+/home/n/local/bin/clang       CMakeFiles/cmTC_2708b.dir/CheckSymbolExists.c.o  -o cmTC_2708b -rdynamic 
+CMakeFiles/cmTC_2708b.dir/CheckSymbolExists.c.o: In function `main':
+/home/n/code/opengl/simple/CMakeFiles/CMakeTmp/CheckSymbolExists.c:(.text+0x19): undefined reference to `pthread_create'
+clang-5.0: error: linker command failed with exit code 1 (use -v to see invocation)
+CMakeFiles/cmTC_2708b.dir/build.make:97: recipe for target 'cmTC_2708b' failed
+make[1]: *** [cmTC_2708b] Error 1
+make[1]: Leaving directory '/home/n/code/opengl/simple/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_2708b/fast' failed
+make: *** [cmTC_2708b/fast] Error 2
+
+File /home/n/code/opengl/simple/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
+/* */
+#include <pthread.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef pthread_create
+  return ((int*)(&pthread_create))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+
+Determining if the function pthread_create exists in the pthreads failed with the following output:
+Change Dir: /home/n/code/opengl/simple/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_542fd/fast"
+/usr/bin/make -f CMakeFiles/cmTC_542fd.dir/build.make CMakeFiles/cmTC_542fd.dir/build
+make[1]: Entering directory '/home/n/code/opengl/simple/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_542fd.dir/CheckFunctionExists.c.o
+/home/n/local/bin/clang    -DCHECK_FUNCTION_EXISTS=pthread_create   -o CMakeFiles/cmTC_542fd.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-3.5/Modules/CheckFunctionExists.c
+Linking C executable cmTC_542fd
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_542fd.dir/link.txt --verbose=1
+/home/n/local/bin/clang   -DCHECK_FUNCTION_EXISTS=pthread_create    CMakeFiles/cmTC_542fd.dir/CheckFunctionExists.c.o  -o cmTC_542fd -rdynamic -lpthreads 
+/usr/bin/ld: cannot find -lpthreads
+clang-5.0: error: linker command failed with exit code 1 (use -v to see invocation)
+CMakeFiles/cmTC_542fd.dir/build.make:97: recipe for target 'cmTC_542fd' failed
+make[1]: *** [cmTC_542fd] Error 1
+make[1]: Leaving directory '/home/n/code/opengl/simple/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_542fd/fast' failed
+make: *** [cmTC_542fd/fast] Error 2
+
+
+Determining if the pthread_create exist failed with the following output:
+Change Dir: /home/n/code/opengl/simple/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_80acf/fast"
+/usr/bin/make -f CMakeFiles/cmTC_80acf.dir/build.make CMakeFiles/cmTC_80acf.dir/build
+make[1]: Entering directory '/home/n/code/opengl/simple/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_80acf.dir/CheckSymbolExists.c.o
+/home/n/local/bin/clang     -o CMakeFiles/cmTC_80acf.dir/CheckSymbolExists.c.o   -c /home/n/code/opengl/simple/CMakeFiles/CMakeTmp/CheckSymbolExists.c
+Linking C executable cmTC_80acf
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_80acf.dir/link.txt --verbose=1
+/home/n/local/bin/clang       CMakeFiles/cmTC_80acf.dir/CheckSymbolExists.c.o  -o cmTC_80acf -rdynamic 
+CMakeFiles/cmTC_80acf.dir/CheckSymbolExists.c.o: In function `main':
+/home/n/code/opengl/simple/CMakeFiles/CMakeTmp/CheckSymbolExists.c:(.text+0x19): undefined reference to `pthread_create'
+clang-5.0: error: linker command failed with exit code 1 (use -v to see invocation)
+CMakeFiles/cmTC_80acf.dir/build.make:97: recipe for target 'cmTC_80acf' failed
+make[1]: *** [cmTC_80acf] Error 1
+make[1]: Leaving directory '/home/n/code/opengl/simple/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_80acf/fast' failed
+make: *** [cmTC_80acf/fast] Error 2
+
+File /home/n/code/opengl/simple/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
+/* */
+#include <pthread.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef pthread_create
+  return ((int*)(&pthread_create))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+
+Determining if the function pthread_create exists in the pthreads failed with the following output:
+Change Dir: /home/n/code/opengl/simple/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_59d34/fast"
+/usr/bin/make -f CMakeFiles/cmTC_59d34.dir/build.make CMakeFiles/cmTC_59d34.dir/build
+make[1]: Entering directory '/home/n/code/opengl/simple/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_59d34.dir/CheckFunctionExists.c.o
+/home/n/local/bin/clang    -DCHECK_FUNCTION_EXISTS=pthread_create   -o CMakeFiles/cmTC_59d34.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-3.5/Modules/CheckFunctionExists.c
+Linking C executable cmTC_59d34
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_59d34.dir/link.txt --verbose=1
+/home/n/local/bin/clang   -DCHECK_FUNCTION_EXISTS=pthread_create    CMakeFiles/cmTC_59d34.dir/CheckFunctionExists.c.o  -o cmTC_59d34 -rdynamic -lpthreads 
+/usr/bin/ld: cannot find -lpthreads
+clang-5.0: error: linker command failed with exit code 1 (use -v to see invocation)
+CMakeFiles/cmTC_59d34.dir/build.make:97: recipe for target 'cmTC_59d34' failed
+make[1]: *** [cmTC_59d34] Error 1
+make[1]: Leaving directory '/home/n/code/opengl/simple/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_59d34/fast' failed
+make: *** [cmTC_59d34/fast] Error 2
+
+
+Determining if the pthread_create exist failed with the following output:
+Change Dir: /home/n/code/opengl/simple/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_23f7e/fast"
+make[1]: Entering directory '/home/n/code/opengl/simple/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTC_23f7e.dir/build.make CMakeFiles/cmTC_23f7e.dir/build
+make[2]: Entering directory '/home/n/code/opengl/simple/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_23f7e.dir/CheckSymbolExists.c.o
+/home/n/local/bin/clang     -o CMakeFiles/cmTC_23f7e.dir/CheckSymbolExists.c.o   -c /home/n/code/opengl/simple/CMakeFiles/CMakeTmp/CheckSymbolExists.c
+Linking C executable cmTC_23f7e
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_23f7e.dir/link.txt --verbose=1
+/home/n/local/bin/clang       CMakeFiles/cmTC_23f7e.dir/CheckSymbolExists.c.o  -o cmTC_23f7e -rdynamic 
+CMakeFiles/cmTC_23f7e.dir/CheckSymbolExists.c.o: In function `main':
+/home/n/code/opengl/simple/CMakeFiles/CMakeTmp/CheckSymbolExists.c:(.text+0x19): undefined reference to `pthread_create'
+clang-5.0: error: linker command failed with exit code 1 (use -v to see invocation)
+CMakeFiles/cmTC_23f7e.dir/build.make:97: recipe for target 'cmTC_23f7e' failed
+make[2]: *** [cmTC_23f7e] Error 1
+make[2]: Leaving directory '/home/n/code/opengl/simple/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_23f7e/fast' failed
+make[1]: *** [cmTC_23f7e/fast] Error 2
+make[1]: Leaving directory '/home/n/code/opengl/simple/CMakeFiles/CMakeTmp'
+
+File /home/n/code/opengl/simple/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
+/* */
+#include <pthread.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef pthread_create
+  return ((int*)(&pthread_create))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+
+Determining if the function pthread_create exists in the pthreads failed with the following output:
+Change Dir: /home/n/code/opengl/simple/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_95c30/fast"
+make[1]: Entering directory '/home/n/code/opengl/simple/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTC_95c30.dir/build.make CMakeFiles/cmTC_95c30.dir/build
+make[2]: Entering directory '/home/n/code/opengl/simple/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_95c30.dir/CheckFunctionExists.c.o
+/home/n/local/bin/clang    -DCHECK_FUNCTION_EXISTS=pthread_create   -o CMakeFiles/cmTC_95c30.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-3.5/Modules/CheckFunctionExists.c
+Linking C executable cmTC_95c30
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_95c30.dir/link.txt --verbose=1
+/home/n/local/bin/clang   -DCHECK_FUNCTION_EXISTS=pthread_create    CMakeFiles/cmTC_95c30.dir/CheckFunctionExists.c.o  -o cmTC_95c30 -rdynamic -lpthreads 
+/usr/bin/ld: cannot find -lpthreads
+clang-5.0: error: linker command failed with exit code 1 (use -v to see invocation)
+CMakeFiles/cmTC_95c30.dir/build.make:97: recipe for target 'cmTC_95c30' failed
+make[2]: *** [cmTC_95c30] Error 1
+make[2]: Leaving directory '/home/n/code/opengl/simple/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_95c30/fast' failed
+make[1]: *** [cmTC_95c30/fast] Error 2
+make[1]: Leaving directory '/home/n/code/opengl/simple/CMakeFiles/CMakeTmp'
+
+
+Determining if the pthread_create exist failed with the following output:
+Change Dir: /home/n/code/opengl/yryr/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_7a7e2/fast"
+/usr/bin/make -f CMakeFiles/cmTC_7a7e2.dir/build.make CMakeFiles/cmTC_7a7e2.dir/build
+make[1]: Entering directory '/home/n/code/opengl/yryr/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_7a7e2.dir/CheckSymbolExists.c.o
+/home/n/local/bin/clang     -o CMakeFiles/cmTC_7a7e2.dir/CheckSymbolExists.c.o   -c /home/n/code/opengl/yryr/CMakeFiles/CMakeTmp/CheckSymbolExists.c
+Linking C executable cmTC_7a7e2
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_7a7e2.dir/link.txt --verbose=1
+/home/n/local/bin/clang       CMakeFiles/cmTC_7a7e2.dir/CheckSymbolExists.c.o  -o cmTC_7a7e2 -rdynamic 
+CMakeFiles/cmTC_7a7e2.dir/CheckSymbolExists.c.o: In function `main':
+/home/n/code/opengl/yryr/CMakeFiles/CMakeTmp/CheckSymbolExists.c:(.text+0x19): undefined reference to `pthread_create'
+clang-5.0: error: linker command failed with exit code 1 (use -v to see invocation)
+CMakeFiles/cmTC_7a7e2.dir/build.make:97: recipe for target 'cmTC_7a7e2' failed
+make[1]: *** [cmTC_7a7e2] Error 1
+make[1]: Leaving directory '/home/n/code/opengl/yryr/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_7a7e2/fast' failed
+make: *** [cmTC_7a7e2/fast] Error 2
+
+File /home/n/code/opengl/yryr/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
+/* */
+#include <pthread.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef pthread_create
+  return ((int*)(&pthread_create))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+
+Determining if the function pthread_create exists in the pthreads failed with the following output:
+Change Dir: /home/n/code/opengl/yryr/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_09fa4/fast"
+/usr/bin/make -f CMakeFiles/cmTC_09fa4.dir/build.make CMakeFiles/cmTC_09fa4.dir/build
+make[1]: Entering directory '/home/n/code/opengl/yryr/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_09fa4.dir/CheckFunctionExists.c.o
+/home/n/local/bin/clang    -DCHECK_FUNCTION_EXISTS=pthread_create   -o CMakeFiles/cmTC_09fa4.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-3.5/Modules/CheckFunctionExists.c
+Linking C executable cmTC_09fa4
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_09fa4.dir/link.txt --verbose=1
+/home/n/local/bin/clang   -DCHECK_FUNCTION_EXISTS=pthread_create    CMakeFiles/cmTC_09fa4.dir/CheckFunctionExists.c.o  -o cmTC_09fa4 -rdynamic -lpthreads 
+/usr/bin/ld: cannot find -lpthreads
+clang-5.0: error: linker command failed with exit code 1 (use -v to see invocation)
+CMakeFiles/cmTC_09fa4.dir/build.make:97: recipe for target 'cmTC_09fa4' failed
+make[1]: *** [cmTC_09fa4] Error 1
+make[1]: Leaving directory '/home/n/code/opengl/yryr/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_09fa4/fast' failed
+make: *** [cmTC_09fa4/fast] Error 2
+
+
+Determining if the pthread_create exist failed with the following output:
+Change Dir: /home/n/code/opengl/yryr/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_46ce1/fast"
+/usr/bin/make -f CMakeFiles/cmTC_46ce1.dir/build.make CMakeFiles/cmTC_46ce1.dir/build
+make[1]: Entering directory '/home/n/code/opengl/yryr/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_46ce1.dir/CheckSymbolExists.c.o
+/home/n/local/bin/clang     -o CMakeFiles/cmTC_46ce1.dir/CheckSymbolExists.c.o   -c /home/n/code/opengl/yryr/CMakeFiles/CMakeTmp/CheckSymbolExists.c
+Linking C executable cmTC_46ce1
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_46ce1.dir/link.txt --verbose=1
+/home/n/local/bin/clang       CMakeFiles/cmTC_46ce1.dir/CheckSymbolExists.c.o  -o cmTC_46ce1 -rdynamic 
+CMakeFiles/cmTC_46ce1.dir/CheckSymbolExists.c.o: In function `main':
+/home/n/code/opengl/yryr/CMakeFiles/CMakeTmp/CheckSymbolExists.c:(.text+0x19): undefined reference to `pthread_create'
+clang-5.0: error: linker command failed with exit code 1 (use -v to see invocation)
+CMakeFiles/cmTC_46ce1.dir/build.make:97: recipe for target 'cmTC_46ce1' failed
+make[1]: *** [cmTC_46ce1] Error 1
+make[1]: Leaving directory '/home/n/code/opengl/yryr/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_46ce1/fast' failed
+make: *** [cmTC_46ce1/fast] Error 2
+
+File /home/n/code/opengl/yryr/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
+/* */
+#include <pthread.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef pthread_create
+  return ((int*)(&pthread_create))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+
+Determining if the function pthread_create exists in the pthreads failed with the following output:
+Change Dir: /home/n/code/opengl/yryr/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_c6b28/fast"
+/usr/bin/make -f CMakeFiles/cmTC_c6b28.dir/build.make CMakeFiles/cmTC_c6b28.dir/build
+make[1]: Entering directory '/home/n/code/opengl/yryr/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_c6b28.dir/CheckFunctionExists.c.o
+/home/n/local/bin/clang    -DCHECK_FUNCTION_EXISTS=pthread_create   -o CMakeFiles/cmTC_c6b28.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-3.5/Modules/CheckFunctionExists.c
+Linking C executable cmTC_c6b28
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_c6b28.dir/link.txt --verbose=1
+/home/n/local/bin/clang   -DCHECK_FUNCTION_EXISTS=pthread_create    CMakeFiles/cmTC_c6b28.dir/CheckFunctionExists.c.o  -o cmTC_c6b28 -rdynamic -lpthreads 
+/usr/bin/ld: cannot find -lpthreads
+clang-5.0: error: linker command failed with exit code 1 (use -v to see invocation)
+CMakeFiles/cmTC_c6b28.dir/build.make:97: recipe for target 'cmTC_c6b28' failed
+make[1]: *** [cmTC_c6b28] Error 1
+make[1]: Leaving directory '/home/n/code/opengl/yryr/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_c6b28/fast' failed
+make: *** [cmTC_c6b28/fast] Error 2
+
+

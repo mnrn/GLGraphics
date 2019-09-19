@@ -1,0 +1,13 @@
+[
+{
+  "directory": "/Users/n/codes/graphics/opengl/simple-gl/build",
+  "command": "/Applications/Xcode-beta.app/Contents/Developer/usr/bin/g++   -I../external -I../include -I../base -F/Applications/Xcode-beta.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.15.sdk/System/Library/Frameworks -I/usr/local/include   -DNOMINMAX -D_USE_MATH_DEFINES -Weverything -Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-unused-macros -Wno-reserved-id-macro -Wno-old-style-cast -Wno-missing-prototypes -Wno-global-constructors -Wno-exit-time-destructors -Wno-padded -Wno-weak-vtables -Wno-covered-switch-default -g -g -pg -isysroot /Applications/Xcode-beta.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.15.sdk -mmacosx-version-min=10.14   -std=c++17 -o CMakeFiles/hello.dir/projects/hello/main.cpp.o -c /Users/n/codes/graphics/opengl/simple-gl/projects/hello/main.cpp",
+  "file": "/Users/n/codes/graphics/opengl/simple-gl/projects/hello/main.cpp"
+},
+
+{
+  "directory": "/Users/n/codes/graphics/opengl/simple-gl/build",
+  "command": "/Applications/Xcode-beta.app/Contents/Developer/usr/bin/g++   -I../external -I../include -I../base -F/Applications/Xcode-beta.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.15.sdk/System/Library/Frameworks -I/usr/local/include   -DNOMINMAX -D_USE_MATH_DEFINES -Weverything -Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-unused-macros -Wno-reserved-id-macro -Wno-old-style-cast -Wno-missing-prototypes -Wno-global-constructors -Wno-exit-time-destructors -Wno-padded -Wno-weak-vtables -Wno-covered-switch-default -g -g -pg -isysroot /Applications/Xcode-beta.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.15.sdk -mmacosx-version-min=10.14   -std=c++17 -o CMakeFiles/hello.dir/projects/hello/SceneHelloTriangle.cpp.o -c /Users/n/codes/graphics/opengl/simple-gl/projects/hello/SceneHelloTriangle.cpp",
+  "file": "/Users/n/codes/graphics/opengl/simple-gl/projects/hello/SceneHelloTriangle.cpp"
+}
+]

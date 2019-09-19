@@ -1,0 +1,8 @@
+# For macosx
+*.DS_Store
+
+# Ignore the object files and dependency files.
+*.o
+*.d
+
+CMakeCache.txt
