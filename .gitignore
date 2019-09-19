@@ -6,3 +6,5 @@
 *.d
 
 CMakeCache.txt
+/CMakeFiles
+/CMakeScripts
