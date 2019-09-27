@@ -64,7 +64,7 @@ template <typename F> void loop(GLFWwindow *handle, F callback) {
   // using precision_t = double;
   // static constexpr double periodic = 1.0 / 60.0;
 
-  timer timer;
+  Timer timer;
   while (glfwWindowShouldClose(handle) == false &&
          glfwGetKey(handle, GLFW_KEY_ESCAPE) == false) {
 

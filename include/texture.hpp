@@ -1,90 +1,70 @@
 /**
- * @brief 
+ * @brief
  */
 
-
-#ifndef YR_TEXTURE_HPP
-#define YR_TEXTURE_HPP
-
+#ifndef TEXTURE_HPP
+#define TEXTURE_HPP
 
 // ********************************************************************************
 // Include files
 // ********************************************************************************
 
+#include "glinclude.hpp"
+
 #include <type_traits>
 
+// ********************************************************************************
+// Traits
+// ********************************************************************************
 
-namespace yr {
+template <typename T> struct texture_traits {
+  using typename T::path_type path_type;
+  static_assert(std::is_const<path_type>::value,
+                "path_type needs const-qualified type!");
 
-    // ********************************************************************************
-    // Traits
-    // ********************************************************************************
+  static T construct(path_type texturePath) { return T(texturePath); }
 
-    template<typename T>
-    struct texture_traits {
-        using typename T::path_type path_type;
-        static_assert(std::is_const<path_type>::value, "path_type needs const-qualified type!")
+  using typename T::handle_type handle_type;
+  static handle_type handle(const T &t) { return t.handle_; }
 
-        static T construct(path_type texturePath) {
-            return T(texturePath);
-        }
+  using typename T::target_type target_type;
+  static target_type target(const T &t) { return t.target_; }
+};
 
-        using typename T::handle_type handle_type;
-        static handle_type handle(const T& t) {
-            return t.handle_;
-        }
+template <typename T> struct is_texture_type : std::false_type {};
 
-        using typename T::target_type target_type;
-        static target_type target(const T& t) {
-            return t.target_;
-        }
-    };
+struct texture_1d_tag {};
+struct texture_2d_tag {};
+struct texture_3d_tag {};
+struct texture_cube_map_tag {};
 
+struct texture_1d_array_tag {};
+struct texture_2d_array_tag {};
+struct texture_3d_array_tag {};
+struct texture_cube_map_array_tag {};
 
-    template<typename T>
-    struct is_texture_type : std::false_type { };
+// ********************************************************************************
+// Details
+// ********************************************************************************
 
-    struct texture_1d_tag { };
-    struct texture_2d_tag { };
-    struct texture_3d_tag { };
-    struct texture_cube_map_tag { };
+namespace texture {
 
-    struct texture_1d_array_tag{ };
-    struct texture_2d_array_tag{ };
-    struct texture_3d_array_tag{ };
-    struct texture_cube_map_array_tag{ };
+template <typename Texture> void bind(const Texture &t, GLenum unit) {
+  static_assert(is_texture_type<Texture>::value, "Texture needs texture-type!");
 
+  glActiveTexture(unit);
+  glBindTexture(texture_traits<Texture>::target(t),
+                texture_traits<Texture>::handle(t));
+}
 
-    // ********************************************************************************
-    // Details
-    // ********************************************************************************
+template <typename Texture> void unbind(const Texture &t) {
+  static_assert(is_texture_type<Texture>::value, "Texture needs texture-type!");
 
-    namespace Texture {
-
-        template<typename Texture>
-        void Bind(const Texture& t, GLenum unit) {
-            static_assert(is_texture_type<Texture>::value, "Texture needs texture-type!");
-
-            glActiveTexture(unit);
-            glBindTexture(texture_traits<Texture>::target(t), texture_trais<Texture>::handle(t));
-        }
-
-        template<typename Texture>
-        void Unbind(const Texture& t) {
-            static_assert(is_texture_type<Texture>::value, "Texture needs texture-type!");
-
-            glBindTexture(texture_traits<Texture>::target(t), 0);
-        }
-
+  glBindTexture(texture_traits<Texture>::target(t), 0);
+}
 
 #include "texture.ipp"
 
+} // namespace texture
 
-    }  // end namespace Texture
-
-
-}  // end namespace yr
-
-
-
-#endif  // ifndef YR_TEXTURE_HPP
+#endif // ifndef TEXTURE_HPP

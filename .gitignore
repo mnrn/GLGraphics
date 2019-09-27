@@ -8,3 +8,8 @@
 CMakeCache.txt
 /CMakeFiles
 /CMakeScripts
+
+.ninja_deps
+.ninja_log
+build.ninja
+rules.ninja

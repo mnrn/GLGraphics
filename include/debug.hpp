@@ -25,9 +25,11 @@ namespace debug {
 // Functions
 // ********************************************************************************
 
-[[maybe_unused]] static void APIENTRY callback(GLenum src, GLenum type, GLuint id,
-                              GLenum severity, GLsizei length,
-                              const GLchar *msg, const void *param) {
+[[maybe_unused]] static void APIENTRY callback(GLenum src, GLenum type,
+                                               GLuint id, GLenum severity,
+                                               GLsizei length,
+                                               const GLchar *msg,
+                                               const void *param) {
 
   UNUSED_VARIABLE(length);
   UNUSED_VARIABLE(param);
@@ -107,11 +109,12 @@ namespace debug {
     break;
   }
 
-  fmt::printf("%s:%s[%s](%d): %s\n", srcstr.c_str(),
-                   typestr.c_str(), sevstr.c_str(), id, msg);
+  fmt::printf("%s:%s[%s](%d): %s\n", srcstr.c_str(), typestr.c_str(),
+              sevstr.c_str(), id, msg);
 }
 
-[[maybe_unused]] static int32_t check_error(const char *filepath, int32_t line) {
+[[maybe_unused]] static int32_t check_error(const char *filepath,
+                                            int32_t line) {
 
   GLenum glErr = glGetError();
   int32_t retcode = 0;
@@ -146,7 +149,7 @@ namespace debug {
   return retcode;
 }
 
-static void dump_info() {
+static void dumpInfo() {
 
   const GLubyte *renderer = glGetString(GL_RENDERER);
   const GLubyte *vendor = glGetString(GL_VENDOR);
@@ -163,16 +166,16 @@ static void dump_info() {
   fmt::printf("GL Renderer  : %s\n", renderer);
   fmt::printf("GL Vendor    : %s\n", vendor);
   fmt::printf("GL Version   : %s\n", version);
-  fmt::printf("GL Version   : %d.%d\n",  major, minor);
+  fmt::printf("GL Version   : %d.%d\n", major, minor);
   fmt::printf("GLSL Version : %s\n", glslver);
   std::cout
       << "------------------------------------------------------------------"
       << std::endl;
 }
 
-static void setup_info() {
+static void setupInfo() {
   // Dump GL Info
-  debug::dump_info();
+  debug::dumpInfo();
 
   // Setup Debug Info
 #ifndef __APPLE__
@@ -185,6 +188,5 @@ static void setup_info() {
 }
 
 } // end namespace debug
-
 
 #endif // DEBUG_HPP

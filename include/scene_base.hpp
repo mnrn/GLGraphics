@@ -7,27 +7,19 @@
 #define SCENE_BASE_HPP
 
 // ********************************************************************************
-// Namespace
-// ********************************************************************************
-
-namespace scene {
-
-// ********************************************************************************
 // Class
 // ********************************************************************************
 
 /**
  * @brief Scene Base Class
  */
-class base {
+class SceneBase {
 public:
-  virtual ~base() = default;
+  virtual ~SceneBase() = default;
   virtual void update(float d) = 0;
   virtual void render() const = 0;
 
 private:
 };
-
-} // namespace Scene
 
 #endif // end of SCENE_BASE_HPP

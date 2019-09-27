@@ -11,11 +11,11 @@
 
 #include <boost/noncopyable.hpp>
 
-#include "glinclude.hpp"
 #include "common.hpp"
+#include "glinclude.hpp"
 
-#include "window.hpp"
 #include "debug.hpp"
+#include "window.hpp"
 
 // ********************************************************************************
 // Namespace
@@ -34,8 +34,8 @@ public:
 
     window_ = window::create(1280, 720, app_name);
 
-    init_glew();
-    debug::setup_info();
+    initGlew();
+    debug::setupInfo();
   }
 
   ~yrgl() {
@@ -52,7 +52,7 @@ public:
 private:
   GLFWwindow *window_ = nullptr;
 
-  static void init_glew() {
+  static void initGlew() {
 
     // Initialize GLEW
     glewExperimental = GL_TRUE;

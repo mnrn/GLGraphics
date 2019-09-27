@@ -26,25 +26,19 @@
 #include <boost/noncopyable.hpp>
 
 // ********************************************************************************
-// Namespace
-// ********************************************************************************
-
-namespace shader {
-
-// ********************************************************************************
 // Class(es)
 // ********************************************************************************
 
 /**
  * @brief Shader type
  */
-enum class type {
-  vertex,
-  fragment,
-  geometry,
-  tess_control,
-  tess_evaluation,
-  compute,
+enum class ShaderType {
+  Vertex,
+  Fragment,
+  Geometry,
+  TessControl,
+  TessEvaluation,
+  Compute,
 };
 
 /**
@@ -52,9 +46,9 @@ enum class type {
  * @ref
  * https://github.com/daw42/glslcookbook/blob/master/ingredients/glslprogram.cpp
  */
-class program : private boost::noncopyable {
+class ShaderProgram : private boost::noncopyable {
 public:
-  ~program() {
+  ~ShaderProgram() {
     if (handle_ == 0) {
       return;
     }
@@ -79,9 +73,9 @@ public:
   // Compile & Link
   //*--------------------------------------------------------------------------------
 
-  bool compile(const char *filepath, type type) {
+  bool compile(const char *filepath, ShaderType type) {
 
-    if (!is_file_exists(filepath)) {
+    if (!isFileExists(filepath)) {
       log_ = std::string("File Not Found : ") + filepath;
       return false;
     }
@@ -110,7 +104,7 @@ public:
 
   bool link() {
 
-    if (is_linked_) {
+    if (isLinked_) {
       return true;
     }
     if (handle_ == 0) {
@@ -123,11 +117,11 @@ public:
     int status = GL_FALSE;
     glGetProgramiv(handle_, GL_LINK_STATUS, &status);
     if (GL_FALSE == status) {
-      store_log(handle_);
+      storeLog(handle_);
       return false;
     } else {
-      is_linked_ = true;
-      return is_linked_;
+      isLinked_ = true;
+      return isLinked_;
     }
   }
 
@@ -136,7 +130,7 @@ public:
   //*--------------------------------------------------------------------------------
 
   void use() const {
-    if (handle_ > 0 && is_linked_) {
+    if (handle_ > 0 && isLinked_) {
       glUseProgram(handle_);
     }
   }
@@ -145,11 +139,11 @@ public:
   // Bind Location
   //*--------------------------------------------------------------------------------
 
-  void bind_attrib_location(GLuint location, const char *name) const {
+  void bindAttribLocation(GLuint location, const char *name) const {
     glBindAttribLocation(handle_, location, name);
   }
 
-  void bind_frag_data_location(GLuint location, const char *name) const {
+  void bindFragDataLocation(GLuint location, const char *name) const {
     glBindFragDataLocation(handle_, location, name);
   }
 
@@ -157,39 +151,39 @@ public:
   // Accessor
   //*--------------------------------------------------------------------------------
 
-  const std::string &get_log() const { return log_; }
-  GLuint get_handle() const { return handle_; }
-  bool is_linked() const { return is_linked_; }
+  const std::string &log() const { return log_; }
+  GLuint handle() const { return handle_; }
+  bool isLinked() const { return isLinked_; }
 
   //*--------------------------------------------------------------------------------
   // Setting Uniform Variable(s)
   //*--------------------------------------------------------------------------------
 
-  void set_uniform(const char *name, float x, float y, float z) const {
-    set_uniform(name, glUniform3f, x, y, z);
+  void setUniform(const char *name, float x, float y, float z) const {
+    setUniform(name, glUniform3f, x, y, z);
   }
-  void set_uniform(const char *name, const glm::vec3 &v) const {
-    set_uniform(name, v.x, v.y, v.z);
+  void setUniform(const char *name, const glm::vec3 &v) const {
+    setUniform(name, v.x, v.y, v.z);
   }
-  void set_uniform(const char *name, const glm::vec4 &v) const {
-    set_uniform(name, glUniform4f, v.x, v.y, v.z, v.w);
+  void setUniform(const char *name, const glm::vec4 &v) const {
+    setUniform(name, glUniform4f, v.x, v.y, v.z, v.w);
   }
-  void set_uniform(const char *name, const glm::mat3 &m) const {
-    set_uniform(name, glUniformMatrix3fv, 1,
+  void setUniform(const char *name, const glm::mat3 &m) const {
+    setUniform(name, glUniformMatrix3fv, 1,
                static_cast<unsigned char>(GL_FALSE), std::addressof(m[0][0]));
   }
-  void set_uniform(const char *name, const glm::mat4 &m) const {
-    set_uniform(name, glUniformMatrix4fv, 1,
+  void setUniform(const char *name, const glm::mat4 &m) const {
+    setUniform(name, glUniformMatrix4fv, 1,
                static_cast<unsigned char>(GL_FALSE), std::addressof(m[0][0]));
   }
-  void set_uniform(const char *name, float f) const {
-    set_uniform(name, glUniform1f, f);
+  void setUniform(const char *name, float f) const {
+    setUniform(name, glUniform1f, f);
   }
-  void set_uniform(const char *name, int i) const {
-    set_uniform(name, glUniform1i, i);
+  void setUniform(const char *name, int i) const {
+    setUniform(name, glUniform1i, i);
   }
-  void set_uniform(const char *name, bool b) const {
-    set_uniform(name, static_cast<int>(b));
+  void setUniform(const char *name, bool b) const {
+    setUniform(name, static_cast<int>(b));
   }
 
 private:
@@ -198,42 +192,42 @@ private:
   //*--------------------------------------------------------------------------------
 
   template <typename F, typename... Args>
-  void set_uniform(const char *name, F f, Args &&... args) const {
-    auto location = get_uniform_location(name);
+  void setUniform(const char *name, F f, Args &&... args) const {
+    auto location = getUniformLocation(name);
     if (location >= 0) {
       f(location, std::forward<Args>(args)...);
     }
   }
 
-  int get_uniform_location(const char *name) const {
+  int getUniformLocation(const char *name) const {
     return glGetUniformLocation(handle_, name);
   }
 
-  bool is_file_exists(const char *filepath) const {
+  bool isFileExists(const char *filepath) const {
     boost::system::error_code error;
     const bool result = boost::filesystem::exists(filepath, error);
     return !error && result;
   }
 
-  bool compile(const std::string &src, type type) {
+  bool compile(const std::string &src, ShaderType type) {
     GLuint handle = 0;
     switch (type) {
-    case type::vertex:
+    case ShaderType::Vertex:
       handle = glCreateShader(GL_VERTEX_SHADER);
       break;
-    case type::fragment:
+    case ShaderType::Fragment:
       handle = glCreateShader(GL_FRAGMENT_SHADER);
       break;
-    case type::geometry:
+    case ShaderType::Geometry:
       handle = glCreateShader(GL_GEOMETRY_SHADER);
       break;
-    case type::tess_control:
+    case ShaderType::TessControl:
       handle = glCreateShader(GL_TESS_CONTROL_SHADER);
       break;
-    case type::tess_evaluation:
+    case ShaderType::TessEvaluation:
       handle = glCreateShader(GL_TESS_EVALUATION_SHADER);
       break;
-    case type::compute:
+    case ShaderType::Compute:
       handle = glCreateShader(GL_COMPUTE_SHADER);
       break;
     default:
@@ -248,7 +242,7 @@ private:
     int res = GL_FALSE;
     glGetShaderiv(handle, GL_COMPILE_STATUS, std::addressof(res));
     if (GL_FALSE == res) {
-      store_log(handle);
+      storeLog(handle);
       return false;
     } else {
       glAttachShader(handle_, handle);
@@ -256,7 +250,7 @@ private:
     }
   }
 
-  void store_log(GLuint handle) {
+  void storeLog(GLuint handle) {
     int length = 0;
     log_ = "";
 
@@ -277,11 +271,9 @@ private:
   //*--------------------------------------------------------------------------------
 
   GLuint handle_ = 0;
-  bool is_linked_ = false;
+  bool isLinked_ = false;
 
   std::string log_;
 };
-
-} // end namespace Shader
 
 #endif // end ifndef SHADER_PROGRAM_HPP

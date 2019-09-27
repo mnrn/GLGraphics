@@ -1,6 +1,5 @@
 /**
  * @brief  Library Test
- * @date   2016/03/19
  */
 
 // ********************************************************************************
@@ -9,7 +8,7 @@
 
 #include <memory>
 
-#include "scene_hello_triangle.hpp"
+#include "scene_bezier.hpp"
 #include "yryr.hpp"
 
 // ********************************************************************************
@@ -23,10 +22,10 @@ int main(
     int argc, char **argv
 #endif
 ) {
-  yr::yrgl yryr("Hello Triangle!!!");
+  yr::yrgl yryr("Hello Bezier!!!");
 
   // Create scene
-  std::unique_ptr<SceneBase> scene = std::make_unique<SceneHelloTriangle>();
+  std::unique_ptr<SceneBase> scene = std::make_unique<SceneBezier>();
 
   // Enter the main loop
   yryr.run([&scene]() {

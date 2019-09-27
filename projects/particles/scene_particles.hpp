@@ -11,38 +11,38 @@
 // Include files
 // ********************************************************************************
 
-#include "SceneBase.hpp"
-#include "ShaderProgram.hpp"
+#include "scene_base.hpp"
+#include "shader_program.hpp"
 
 
 // ********************************************************************************
 // Namespace
 // ********************************************************************************
 
-namespace Scene {
+namespace scene {
 
 
 // ********************************************************************************
 // Class
 // ********************************************************************************
 
-class Particles : public Base {
+class particles : public base {
 public:
-    Particles();
-    ~Particles() override = default;
+    particles();
+    ~particles() override = default;
 
-    void Update(float t) override;
-    void Render() const override;
+    void update(float t) override;
+    void render() const override;
 private:
-    void InitBuffer();
-    bool CompileAndLinkShader();
+    void init_buffer();
+    bool compile_and_link_shader();
     
     GLuint hParticlesVAO_ = 0;
     GLuint hBlackHoleVAO_ = 0;
     GLuint hBlackHoleBuffer_ = 0;
 
-    Shader::Program renderProgram_;
-    Shader::Program computeProgram_;
+    shader::program render_;
+    shader::program compute_;
 
     glm::vec4 blackHole1Pos_{ 5.0f,  0.0f, 0.0f, 1.0f };
     glm::vec4 blackHole2Pos_{ -5.0f, 0.0f, 0.0f, 1.0f };

@@ -10,27 +10,26 @@
 #include <iostream>
 #include <vector>
 #include <glm/gtc/matrix_transform.hpp>
-#include "SceneParticles.hpp"
+#include "scene_particles.hpp"
 
 
 // ********************************************************************************
 // Namespace
 // ********************************************************************************
 
-namespace Scene {
+namespace scene {
 
 
 // ********************************************************************************
 // Special member functions
 // ********************************************************************************
 
-Particles::Particles() {
-    if (CompileAndLinkShader() == false) {
+particles::particles() {
+    if (compile_and_link_shader() == false) {
         std::exit(EXIT_FAILURE);
     }
 
-    InitBuffer();
-
+    init_buffer();
 
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
     glEnable(GL_BLEND);
@@ -42,12 +41,12 @@ Particles::Particles() {
 // Overrided functions
 // ********************************************************************************
 
-void Particles::Update(float deltaSec) {
+void particles::update(float deltaSec) {
     static_cast<void>(deltaSec);
 }
 
 
-void Particles::Render() const {
+void particles::render() const {
 
     // Rotate the black holes
     const glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), glm::radians(angle_), glm::vec3(0.0f, 0.0f, 1.0f));
@@ -55,23 +54,23 @@ void Particles::Render() const {
     const glm::vec3 blackHole2Pos = glm::vec3(rotation * blackHole2Pos_);
 
     // Execute a compute shader
-    computeProgram_.Use();
-    computeProgram_.SetUniform("blackHole1Pos", blackHole1Pos);
-    computeProgram_.SetUniform("blackHole2Pos", blackHole2Pos);
+    compute_.use();
+    compute_.set_uniform("blackHole1Pos", blackHole1Pos);
+    compute_.set_uniform("blackHole2Pos", blackHole2Pos);
     glDispatchCompute(totalParticlesNum_ / localSizeX_, 1, 1);
     glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
     // Draw the scene
-    renderProgram_.Use();
+    render_.use();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     const glm::mat4 proj  = glm::perspective(glm::radians(50.0f), static_cast<float>(width_) / static_cast<float>(height_), 1.0f, 100.0f);
     const glm::mat4 view  = glm::lookAt(glm::vec3(2.0f, 0.0f, 20.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
     const glm::mat4 model = glm::mat4(1.0f);
-    renderProgram_.SetUniform("MVP", proj * view * model);
+    render_.set_uniform("MVP", proj * view * model);
 
     // Draw the particles
     glPointSize(1.0f);
-    renderProgram_.SetUniform("color", glm::vec4(0.0f, 0.0f, 0.0f, 0.2f));
+    render_.set_uniform("color", glm::vec4(0.0f, 0.0f, 0.0f, 0.2f));
     glBindVertexArray(hParticlesVAO_);
     glDrawArrays(GL_POINTS, 0, totalParticlesNum_);
     glBindVertexArray(0);
@@ -82,7 +81,7 @@ void Particles::Render() const {
                        blackHole2Pos.x, blackHole2Pos.y, blackHole2Pos.z, blackHole2Pos.z };
     glBindBuffer(GL_ARRAY_BUFFER, hBlackHoleVAO_);
     glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(GLfloat) * 8, data);
-    renderProgram_.SetUniform("color", glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
+    render_.set_uniform("color", glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
     glBindVertexArray(hBlackHoleVAO_);
     glDrawArrays(GL_POINTS, 0, 2);
     glBindVertexArray(0);
@@ -93,41 +92,41 @@ void Particles::Render() const {
 // Initialize
 // ********************************************************************************
 
-bool Particles::CompileAndLinkShader() {
+bool particles::compile_and_link_shader() {
 
     // For render program.
-    if (renderProgram_.Compile("./data/shaders/particles/particles.vert", Shader::Type::Vertex) == false) {
+    if (render_.compile("./data/shaders/particles/particles.vert", Shader::Type::Vertex) == false) {
         std::cerr << "vertex shader failed to compile." << std::endl;
-        std::cerr << renderProgram_.GetLog() << std::endl;
+        std::cerr << render_.get_log() << std::endl;
         return false;
     }
-    if (renderProgram_.Compile("./data/shaders/particles/particles.frag", Shader::Type::Fragment) == false) {
+    if (render_.compile("./data/shaders/particles/particles.frag", Shader::Type::Fragment) == false) {
         std::cerr << "fragment shader failed to compile." << std::endl;
-        std::cerr << renderProgram_.GetLog() << std::endl;
+        std::cerr << render_.get_log() << std::endl;
         return false;
     }
-    if (renderProgram_.Link() == false) {
+    if (render_.Link() == false) {
         std::cerr << "render program failed to link." << std::endl;
-        std::cerr << renderProgram_.GetLog() << std::endl;
+        std::cerr << render_.get_log() << std::endl;
         return false;
     }
 
     // For compute program.
-    if (computeProgram_.Compile("./data/shaders/particles/particles.comp", Shader::Type::Compute) == false) {
+    if (compute_.compile("./data/shaders/particles/particles.comp", Shader::Type::Compute) == false) {
         std::cerr << "compute shader failed to compile." << std::endl;
-        std::cerr << computeProgram_.GetLog() << std::endl;
+        std::cerr << compute_.get_log() << std::endl;
         return false;
     }
-    if (computeProgram_.Link() == false) {
+    if (compute_.Link() == false) {
         std::cerr << "compute program failed to link." << std::endl;
-        std::cerr << computeProgram_.GetLog() << std::endl;
+        std::cerr << compute_.get_log() << std::endl;
         return false;
     }
 
     return true;
 }
 
-void Particles::InitBuffer() {
+void particles::init_buffer() {
 
     // Initialize variables.
     std::vector<GLfloat> initPos;

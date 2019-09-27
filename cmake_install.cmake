@@ -1,4 +1,4 @@
-# Install script for directory: /Users/n/codes/graphics/opengl/simple-gl
+# Install script for directory: /Users/n/codes/graphics/opengl/easy-gl
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -40,5 +40,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/Users/n/codes/graphics/opengl/simple-gl/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/Users/n/codes/graphics/opengl/easy-gl/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

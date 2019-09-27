@@ -19,7 +19,7 @@
 // Class
 // ********************************************************************************
 
-class timer {
+class Timer {
 public:
   // start timer
   void start() { start_ = std::chrono::high_resolution_clock::now(); }
