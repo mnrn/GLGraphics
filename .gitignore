@@ -5,11 +5,10 @@
 *.o
 *.d
 
-CMakeCache.txt
-/CMakeFiles
-/CMakeScripts
-
-.ninja_deps
-.ninja_log
-build.ninja
-rules.ninja
+/bin
+/build
+/data
+/ssl
+/scripts
+/doc
+*.heap

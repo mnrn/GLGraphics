@@ -116,6 +116,6 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/")
 set(TARGETS
     hello
     bezier
-    #particles
+    particles
 )
 buildAll()

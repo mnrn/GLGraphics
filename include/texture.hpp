@@ -9,7 +9,7 @@
 // Include files
 // ********************************************************************************
 
-#include "glinclude.hpp"
+#include "gl_include.hpp"
 
 #include <type_traits>
 

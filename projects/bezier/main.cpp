@@ -8,8 +8,8 @@
 
 #include <memory>
 
+#include "app.hpp"
 #include "scene_bezier.hpp"
-#include "yryr.hpp"
 
 // ********************************************************************************
 // Entry point
@@ -22,13 +22,13 @@ int main(
     int argc, char **argv
 #endif
 ) {
-  yr::yrgl yryr("Hello Bezier!!!");
+  App app("Hello Bezier!!!");
 
   // Create scene
   std::unique_ptr<SceneBase> scene = std::make_unique<SceneBezier>();
 
   // Enter the main loop
-  yryr.run([&scene]() {
+  app.run([&scene]() {
     scene->update(0.0f);
     scene->render();
   });

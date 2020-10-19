@@ -9,8 +9,8 @@
 
 #include <memory>
 
+#include "app.hpp"
 #include "scene_hello_triangle.hpp"
-#include "yryr.hpp"
 
 // ********************************************************************************
 // Entry point
@@ -23,13 +23,13 @@ int main(
     int argc, char **argv
 #endif
 ) {
-  yr::yrgl yryr("Hello Triangle!!!");
+  App app("Hello Triangle!!!");
 
   // Create scene
   std::unique_ptr<SceneBase> scene = std::make_unique<SceneHelloTriangle>();
 
   // Enter the main loop
-  yryr.run([&scene]() {
+  app.run([&scene]() {
     scene->update(0.0f);
     scene->render();
   });

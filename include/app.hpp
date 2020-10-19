@@ -12,24 +12,18 @@
 #include <boost/noncopyable.hpp>
 
 #include "common.hpp"
-#include "glinclude.hpp"
+#include "gl_include.hpp"
 
 #include "debug.hpp"
 #include "window.hpp"
 
 // ********************************************************************************
-// Namespace
-// ********************************************************************************
-
-namespace yr {
-
-// ********************************************************************************
 // Class
 // ********************************************************************************
 
-class yrgl : private boost::noncopyable {
+class App : private boost::noncopyable {
 public:
-  yrgl(const char *app_name) {
+  app(const char *app_name) {
     glfwInit();
 
     window_ = window::create(1280, 720, app_name);
@@ -38,7 +32,7 @@ public:
     debug::setupInfo();
   }
 
-  ~yrgl() {
+  ~app() {
 
     window::destroy(window_);
 
@@ -68,7 +62,5 @@ private:
     }
   }
 };
-
-} // namespace yr
 
 #endif // end ifndef YRYR_HPP

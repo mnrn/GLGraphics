@@ -14,7 +14,7 @@
 // Including file
 // ********************************************************************************
 
-#include "glinclude.hpp"
+#include "gl_include.hpp"
 
 #include <fstream>
 #include <memory>
