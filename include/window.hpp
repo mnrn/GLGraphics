@@ -10,10 +10,11 @@
 // Include files
 // ********************************************************************************
 
+#include <boost/assert.hpp>
 #include <thread>
 
-#include "timer.hpp"
 #include "debug.hpp"
+#include "timer.hpp"
 
 // ********************************************************************************
 // Namespace

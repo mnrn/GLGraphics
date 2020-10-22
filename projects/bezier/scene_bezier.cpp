@@ -67,22 +67,22 @@ void SceneBezier::render() const {
 
 std::optional<std::string> SceneBezier::compileAndLinkShader() {
   // compile and links
-  if (!bezier_.compile("./data/shaders/bezier/bezier.vs.glsl",
+  if (!bezier_.compile("./res/shaders/bezier/bezier.vs.glsl",
                        ShaderType::Vertex) ||
-      !bezier_.compile("./data/shaders/bezier/bezier.tcs.glsl",
+      !bezier_.compile("./res/shaders/bezier/bezier.tcs.glsl",
                        ShaderType::TessControl) ||
-      !bezier_.compile("./data/shaders/bezier/bezier.tes.glsl",
+      !bezier_.compile("./res/shaders/bezier/bezier.tes.glsl",
                        ShaderType::TessEvaluation) ||
-      !bezier_.compile("./data/shaders/bezier/bezier.fs.glsl",
+      !bezier_.compile("./res/shaders/bezier/bezier.fs.glsl",
                        ShaderType::Fragment) ||
       !bezier_.link()) {
     return bezier_.log();
   }
   bezier_.use();
 
-  if (!solid_.compile("./data/shaders/bezier/solid.vs.glsl",
+  if (!solid_.compile("./res/shaders/bezier/solid.vs.glsl",
                       ShaderType::Vertex) ||
-      !solid_.compile("./data/shaders/bezier/solid.fs.glsl",
+      !solid_.compile("./res/shaders/bezier/solid.fs.glsl",
                       ShaderType::Fragment) ||
       !solid_.link()) {
     return solid_.log();

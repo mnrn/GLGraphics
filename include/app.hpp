@@ -2,8 +2,8 @@
  * @brief ゆるくやる
  */
 
-#ifndef YRYR_HPP
-#define YRYR_HPP
+#ifndef APP_HPP
+#define APP_HPP
 
 // ********************************************************************************
 // Include files
@@ -23,16 +23,16 @@
 
 class App : private boost::noncopyable {
 public:
-  app(const char *app_name) {
+  App(const char *appName) {
     glfwInit();
 
-    window_ = window::create(1280, 720, app_name);
+    window_ = window::create(1280, 720, appName);
 
     initGlew();
     debug::setupInfo();
   }
 
-  ~app() {
+  ~App() {
 
     window::destroy(window_);
 
@@ -63,4 +63,4 @@ private:
   }
 };
 
-#endif // end ifndef YRYR_HPP
+#endif // APP_HPP
