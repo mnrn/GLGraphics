@@ -18,8 +18,8 @@
 
 class SceneParticles : public SceneBase {
 public:
-  particles();
-  ~particles() override = default;
+  SceneParticles();
+  ~SceneParticles() override = default;
 
   void update(float t) override;
   void render() const override;
