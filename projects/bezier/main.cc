@@ -8,7 +8,7 @@
 
 #include <memory>
 
-#include "app.hpp"
+#include "app.h"
 #include "scene_bezier.h"
 
 // ********************************************************************************

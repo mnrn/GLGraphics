@@ -3,8 +3,8 @@
  * @date   2017/03/18
  */
 
-#ifndef DEBUG_HPP
-#define DEBUG_HPP
+#ifndef DEBUG_H
+#define DEBUG_H
 
 // ********************************************************************************
 // Include files
@@ -25,11 +25,9 @@ namespace debug {
 // Functions
 // ********************************************************************************
 
-[[maybe_unused]] static void APIENTRY callback(GLenum src, GLenum type,
-                                               GLuint id, GLenum severity,
-                                               GLsizei length,
-                                               const GLchar *msg,
-                                               const void *param) {
+[[maybe_unused]] static inline void APIENTRY
+callback(GLenum src, GLenum type, GLuint id, GLenum severity, GLsizei length,
+         const GLchar *msg, const void *param) {
 
   UNUSED_VARIABLE(length);
   UNUSED_VARIABLE(param);
@@ -113,8 +111,8 @@ namespace debug {
               sevstr.c_str(), id, msg);
 }
 
-[[maybe_unused]] static int32_t check_error(const char *filepath,
-                                            int32_t line) {
+[[maybe_unused]] static inline int32_t checkError(const char *filepath,
+                                                  int32_t line) {
 
   GLenum glErr = glGetError();
   int32_t retcode = 0;
@@ -149,7 +147,7 @@ namespace debug {
   return retcode;
 }
 
-static void dumpInfo() {
+static inline void dumpInfo() {
 
   const GLubyte *renderer = glGetString(GL_RENDERER);
   const GLubyte *vendor = glGetString(GL_VENDOR);
@@ -173,7 +171,7 @@ static void dumpInfo() {
       << std::endl;
 }
 
-static void setupInfo() {
+static inline void setupInfo() {
   // Dump GL Info
   debug::dumpInfo();
 
@@ -189,4 +187,4 @@ static void setupInfo() {
 
 } // end namespace debug
 
-#endif // DEBUG_HPP
+#endif // DEBUG_H

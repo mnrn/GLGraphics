@@ -13,7 +13,7 @@
 #include <optional>
 #include <string>
 
-#include "scene_base.hpp"
+#include "scene_base.h"
 #include "shader_program.hpp"
 
 // ********************************************************************************

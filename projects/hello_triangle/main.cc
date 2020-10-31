@@ -9,7 +9,7 @@
 
 #include <memory>
 
-#include "app.hpp"
+#include "app.h"
 #include "scene_hello_triangle.h"
 
 // ********************************************************************************

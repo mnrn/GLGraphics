@@ -2,8 +2,8 @@
  * @brief アプリに関するクラスを扱います。
  */
 
-#ifndef APP_HPP
-#define APP_HPP
+#ifndef APP_H
+#define APP_H
 
 // ********************************************************************************
 // Include files
@@ -11,11 +11,11 @@
 
 #include <boost/noncopyable.hpp>
 
-#include "common.hpp"
-#include "gl_include.hpp"
+#include "common.h"
+#include "gl_include.h"
 
-#include "debug.hpp"
-#include "window.hpp"
+#include "debug.h"
+#include "window.h"
 
 // ********************************************************************************
 // Class

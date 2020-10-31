@@ -3,8 +3,8 @@
  * @date   2017/03/19
  */
 
-#ifndef WINDOW_HPP
-#define WINDOW_HPP
+#ifndef WINDOW_H
+#define WINDOW_H
 
 // ********************************************************************************
 // Include files
@@ -13,7 +13,7 @@
 #include <boost/assert.hpp>
 #include <thread>
 
-#include "debug.hpp"
+#include "debug.h"
 #include "timer.hpp"
 
 // ********************************************************************************
@@ -22,9 +22,9 @@
 
 namespace window {
 
-GLFWwindow *create(int w, int h, const char *title,
-                   GLFWmonitor *monitor = nullptr,
-                   GLFWwindow *share = nullptr) {
+static inline GLFWwindow *create(int w, int h, const char *title,
+                                 GLFWmonitor *monitor = nullptr,
+                                 GLFWwindow *share = nullptr) {
 
   // Select OpenGL version
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -49,7 +49,7 @@ GLFWwindow *create(int w, int h, const char *title,
   return handle_;
 }
 
-GLFWwindow *destroy(GLFWwindow *handle) {
+static inline GLFWwindow *destroy(GLFWwindow *handle) {
   if (handle != nullptr) {
     glfwDestroyWindow(handle);
   }
@@ -87,4 +87,4 @@ template <typename F> void loop(GLFWwindow *handle, F callback) {
 
 } // end namespace window
 
-#endif // WINDOW_HPP
+#endif // WINDOW_H

@@ -2,8 +2,8 @@
  * @brief Common Definitions.
  */
 
-#ifndef COMMON_HPP
-#define COMMON_HPP
+#ifndef COMMON_H
+#define COMMON_H
 
 // ********************************************************************************
 // Include files
@@ -15,4 +15,4 @@
 
 #define UNUSED_VARIABLE(v) (static_cast<void>(v))
 
-#endif // end ifndef COMMON__HPP
+#endif // COMMON_H
