@@ -11,7 +11,7 @@ project(${PROJECT_NAME})
 
 set(PROJECTS_DIR_NAME projects)
 include_directories(SYSTEM third-party)
-include_directories(include)
+include_directories(core)
 
 # Compile mode
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g")
