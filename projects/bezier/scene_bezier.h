@@ -2,8 +2,8 @@
  * @brief Scene Bezier
  */
 
-#ifndef SCENE_BEZIER_HPP
-#define SCENE_BEZIER_HPP
+#ifndef SCENE_BEZIER_H
+#define SCENE_BEZIER_H
 
 // ********************************************************************************
 // Include files
@@ -49,4 +49,4 @@ private:
   const glm::mat4 proj_;
 };
 
-#endif // SCENE_BEZIER_HPP
+#endif // SCENE_BEZIER_H

@@ -2,8 +2,8 @@
  * @brief
  */
 
-#ifndef SCENE_PARTICLES_HPP
-#define SCENE_PARTICLES_HPP
+#ifndef SCENE_PARTICLES_H
+#define SCENE_PARTICLES_H
 
 // ********************************************************************************
 // Include files
@@ -51,4 +51,4 @@ private:
       1000; //!< per work group in the x dimension.
 };
 
-#endif // end of ifndef SCENE_PARTICLES_HPP
+#endif // end of ifndef SCENE_PARTICLES_H

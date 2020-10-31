@@ -3,8 +3,8 @@
  * @date 2017/
  */
 
-#ifndef SCENE_HELLO_TRIANGLE_HPP
-#define SCENE_HELLO_TRIANGLE_HPP
+#ifndef SCENE_HELLO_TRIANGLE_H
+#define SCENE_HELLO_TRIANGLE_H
 
 // ********************************************************************************
 // Include files
@@ -39,4 +39,4 @@ private:
   ShaderProgram prog_;
 };
 
-#endif // SCENE_HELLO_TRIANGLE_HPP
+#endif // SCENE_HELLO_TRIANGLE_H
