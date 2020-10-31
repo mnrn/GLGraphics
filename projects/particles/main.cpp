@@ -30,8 +30,8 @@ int main(
   std::unique_ptr<Scene::Base> pScene = std::make_unique<Scene::Particles>();
 
   // Enter the main loop
-  app.run([&pScene]() {
-    pScene->Update(0.0f);
+  app.run([&pScene](float dt) {
+    pScene->Update(dt);
     pScene->Render();
   });
 

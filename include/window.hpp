@@ -71,7 +71,7 @@ template <typename F> void loop(GLFWwindow *handle, F callback) {
 
     timer.start();
 
-    callback();
+    callback(0.0f);
     glfwSwapBuffers(handle);
     glfwPollEvents();
 

@@ -1,5 +1,5 @@
 /**
- * @brief ゆるくやる
+ * @brief アプリに関するクラスを扱います。
  */
 
 #ifndef APP_HPP

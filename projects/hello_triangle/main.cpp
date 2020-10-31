@@ -29,8 +29,8 @@ int main(
   std::unique_ptr<SceneBase> scene = std::make_unique<SceneHelloTriangle>();
 
   // Enter the main loop
-  app.run([&scene]() {
-    scene->update(0.0f);
+  app.run([&scene](float dt) {
+    scene->update(dt);
     scene->render();
   });
 

@@ -131,7 +131,7 @@ void SceneParticles::initBuffer() {
   const GLfloat dy = 2.0f / (particlesYNum_ - 1);
   const GLfloat dz = 2.0f / (particlesZNum_ - 1);
   const glm::mat4 transform = glm::translate(
-      glm::mat4(1.0f),
+      glm::mat4(1.0f), // Identity matrix
       glm::vec3(-1.0f, -1.0f,
                 -1.0f)); // want to center the particles at (0, 0, 0)
 
