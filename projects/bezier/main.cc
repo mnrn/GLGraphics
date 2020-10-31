@@ -9,7 +9,7 @@
 #include <memory>
 
 #include "app.hpp"
-#include "scene_bezier.hpp"
+#include "scene_bezier.h"
 
 // ********************************************************************************
 // Entry point

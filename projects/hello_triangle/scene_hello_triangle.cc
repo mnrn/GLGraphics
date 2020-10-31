@@ -9,7 +9,7 @@
 #include <boost/assert.hpp>
 #include <iostream>
 
-#include "scene_hello_triangle.hpp"
+#include "scene_hello_triangle.h"
 
 // ********************************************************************************
 // Special member functions

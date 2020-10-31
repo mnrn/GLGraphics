@@ -6,10 +6,12 @@
 // Include Files
 // ********************************************************************************
 
-#include "scene_particles.hpp"
 #include <glm/gtc/matrix_transform.hpp>
 #include <iostream>
 #include <vector>
+
+
+#include "scene_particles.h"
 
 // ********************************************************************************
 // Special member functions

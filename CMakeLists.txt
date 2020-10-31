@@ -67,19 +67,19 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 endif()
 
 add_definitions(-std=c++17)
-file(GLOB SOURCE *.cpp base/*.cpp)
+file(GLOB SOURCE *.cc base/*.cc)
 
 # Function for building
 function(build TARGET_NAME)
     # Main
-    file(GLOB SOURCE *.cpp base/*.cpp ${PROJECTS_DIR_NAME}/${TARGET_NAME}/*.cpp)
-    set(MAIN_CPP ${TARGET_NAME}/${TARGET_NAME}/main.cpp)
-    if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECTS_DIR_NAME}/${TARGET_NAME}/main.cpp)
-        set(MAIN_CPP ${PROJECTS_DIR_NAME}/${TARGET_NAME}/main.cpp)
+    file(GLOB SOURCE *.cc base/*.cc ${PROJECTS_DIR_NAME}/${TARGET_NAME}/*.cc)
+    set(MAIN_CC ${TARGET_NAME}/${TARGET_NAME}/main.cc)
+    if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECTS_DIR_NAME}/${TARGET_NAME}/main.cc)
+        set(MAIN_CC ${PROJECTS_DIR_NAME}/${TARGET_NAME}/main.cc)
     endif()
 
     add_executable(${TARGET_NAME}
-        ${MAIN_CPP}
+        ${MAIN_CC}
         ${SOURCE}
     )
     target_link_libraries(${TARGET_NAME} 

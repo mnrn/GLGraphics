@@ -5,12 +5,12 @@
 // ********************************************************************************
 // Include files
 // ********************************************************************************
-#include "scene_bezier.hpp"
 
 #include <boost/assert.hpp>
 #include <iostream>
-
 #include <glm/gtc/matrix_transform.hpp>
+
+#include "scene_bezier.h"
 
 // ********************************************************************************
 // Special member functions

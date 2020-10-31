@@ -1,6 +1,6 @@
 /**
- * @brief  Library Test
- * @date   2016/03/19
+ * @brief  Render Particles
+ * @date   2017/08/27
  */
 
 // ********************************************************************************
@@ -10,7 +10,7 @@
 #include <memory>
 
 #include "app.hpp"
-#include "scene_hello_triangle.hpp"
+#include "scene_particles.h"
 
 // ********************************************************************************
 // Entry point
@@ -23,15 +23,16 @@ int main(
     int argc, char **argv
 #endif
 ) {
-  App app("Hello Triangle!!!");
+
+  App app("Compute Particles");
 
   // Create scene
-  std::unique_ptr<SceneBase> scene = std::make_unique<SceneHelloTriangle>();
+  std::unique_ptr<Scene::Base> pScene = std::make_unique<Scene::Particles>();
 
   // Enter the main loop
-  app.run([&scene](float dt) {
-    scene->update(dt);
-    scene->render();
+  app.run([&pScene](float dt) {
+    pScene->Update(dt);
+    pScene->Render();
   });
 
   return 0;
