@@ -23,10 +23,10 @@
 
 class App : private boost::noncopyable {
 public:
-  App(const char *appName) {
+  App(const char *appName, int w = 1280, int h = 720) {
     glfwInit();
 
-    window_ = window::create(1280, 720, appName);
+    window_ = window::create(w, h, appName);
 
     initGlew();
     debug::setupInfo();

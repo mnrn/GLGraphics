@@ -27,12 +27,12 @@ int main(
   App app("Compute Particles");
 
   // Create scene
-  std::unique_ptr<Scene> pScene = std::make_unique<SceneParticles>();
+  std::unique_ptr<Scene> scene = std::make_unique<SceneParticles>();
 
   // Enter the main loop
-  app.run([&pScene](float dt) {
-    pScene->Update(dt);
-    pScene->Render();
+  app.run([&scene](float dt) {
+    scene->update(dt);
+    scene->render();
   });
 
   return 0;

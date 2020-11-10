@@ -14,7 +14,7 @@
 #include <string>
 
 #include "scene.h"
-#include "shader_program.hpp"
+#include "shader.hpp"
 
 // ********************************************************************************
 // Class

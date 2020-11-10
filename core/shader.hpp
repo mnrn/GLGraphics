@@ -7,8 +7,8 @@
 // Include guard
 // ********************************************************************************
 
-#ifndef SHADER_PROGRAM_HPP
-#define SHADER_PROGRAM_HPP
+#ifndef SHADER_HPP
+#define SHADER_HPP
 
 // ********************************************************************************
 // Including file
@@ -272,8 +272,7 @@ private:
 
   GLuint handle_ = 0;
   bool isLinked_ = false;
-
   std::string log_;
 };
 
-#endif // end ifndef SHADER_PROGRAM_HPP
+#endif
