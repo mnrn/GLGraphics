@@ -26,7 +26,7 @@ int main(
   App app("Hello Triangle!!!");
 
   // Create scene
-  std::unique_ptr<SceneBase> scene = std::make_unique<SceneHelloTriangle>();
+  std::unique_ptr<Scene> scene = std::make_unique<SceneHelloTriangle>();
 
   // Enter the main loop
   app.run([&scene](float dt) {

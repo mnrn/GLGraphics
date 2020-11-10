@@ -14,7 +14,7 @@
 
 #include <glm/glm.hpp>
 
-#include "scene_base.h"
+#include "scene.h"
 #include "shader_program.hpp"
 
 // ********************************************************************************
@@ -24,7 +24,7 @@
 /**
  * @brief Scene Hello Triangle Class
  */
-class SceneBezier : public SceneBase {
+class SceneBezier : public Scene {
 public:
   SceneBezier();
   ~SceneBezier() override = default;

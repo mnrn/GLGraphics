@@ -9,14 +9,14 @@
 // Include files
 // ********************************************************************************
 
-#include "scene_base.h"
+#include "scene.h"
 #include "shader_program.hpp"
 
 // ********************************************************************************
 // Class
 // ********************************************************************************
 
-class SceneParticles : public SceneBase {
+class SceneParticles : public Scene {
 public:
   SceneParticles();
   ~SceneParticles() override = default;

@@ -25,7 +25,7 @@ int main(
   App app("Hello Bezier!!!");
 
   // Create scene
-  std::unique_ptr<SceneBase> scene = std::make_unique<SceneBezier>();
+  std::unique_ptr<Scene> scene = std::make_unique<SceneBezier>();
 
   // Enter the main loop
   app.run([&scene](float dt) {

@@ -12,6 +12,7 @@ project(${PROJECT_NAME})
 set(PROJECTS_DIR_NAME projects)
 include_directories(SYSTEM third-party)
 include_directories(core)
+include_directories(common)
 
 # Compile mode
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g")
@@ -64,15 +65,16 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-signed-enum-bitfield -Wno-shorten-64-to-32")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-missing-prototypes -Wno-global-constructors -Wno-exit-time-destructors -Wno-padded")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-weak-vtables -Wno-covered-switch-default")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-poison-system-directories -Wno-ctad-maybe-unsupported")
 endif()
 
 add_definitions(-std=c++17)
-file(GLOB SOURCE *.cc base/*.cc)
+file(GLOB SOURCE *.cc core/*.cc common/*.cc)
 
 # Function for building
 function(build TARGET_NAME)
     # Main
-    file(GLOB SOURCE *.cc base/*.cc ${PROJECTS_DIR_NAME}/${TARGET_NAME}/*.cc)
+    file(GLOB SOURCE *.cc core/*.cc common/*.cc ${PROJECTS_DIR_NAME}/${TARGET_NAME}/*.cc)
     set(MAIN_CC ${TARGET_NAME}/${TARGET_NAME}/main.cc)
     if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECTS_DIR_NAME}/${TARGET_NAME}/main.cc)
         set(MAIN_CC ${PROJECTS_DIR_NAME}/${TARGET_NAME}/main.cc)

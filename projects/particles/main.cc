@@ -27,7 +27,7 @@ int main(
   App app("Compute Particles");
 
   // Create scene
-  std::unique_ptr<Scene::Base> pScene = std::make_unique<Scene::Particles>();
+  std::unique_ptr<Scene> pScene = std::make_unique<SceneParticles>();
 
   // Enter the main loop
   app.run([&pScene](float dt) {

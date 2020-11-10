@@ -13,7 +13,7 @@
 #include <optional>
 #include <string>
 
-#include "scene_base.h"
+#include "scene.h"
 #include "shader_program.hpp"
 
 // ********************************************************************************
@@ -23,7 +23,7 @@
 /**
  * @brief Scene Hello Triangle Class
  */
-class SceneHelloTriangle : public SceneBase {
+class SceneHelloTriangle : public Scene {
 public:
   SceneHelloTriangle();
   ~SceneHelloTriangle() override = default;
