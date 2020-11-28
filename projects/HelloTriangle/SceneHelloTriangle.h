@@ -13,8 +13,8 @@
 #include <optional>
 #include <string>
 
-#include "scene.h"
-#include "shader.hpp"
+#include "Scene.h"
+#include "Shader.hh"
 
 // ********************************************************************************
 // Class
@@ -28,12 +28,12 @@ public:
   SceneHelloTriangle();
   ~SceneHelloTriangle() override = default;
 
-  void update(float d) override;
-  void render() const override;
+  void OnUpdate(float d) override;
+  void OnRender() const override;
 
 private:
-  std::optional<std::string> compileAndLinkShader();
-  void createVBO();
+  std::optional<std::string> CompileAndLinkShader();
+  void CreateVBO();
 
   GLuint vbo_ = 0;
   ShaderProgram prog_;

@@ -2,8 +2,8 @@
  * @brief Timer
  */
 
-#ifndef TIMER_HPP
-#define TIMER_HPP
+#ifndef TIMER_HH
+#define TIMER_HH
 
 // ********************************************************************************
 // Include files
@@ -37,4 +37,4 @@ private:
   std::chrono::time_point<ClockType> end_;
 };
 
-#endif // end of TIMER_HPP
+#endif

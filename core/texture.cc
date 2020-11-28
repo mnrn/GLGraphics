@@ -2,22 +2,22 @@
  * @brief Texture helper
  */
 
-#include "texture.h"
+#include "Texture.h"
 
 #include <stb/stb_image.h>
 
-static unsigned char *loadPixels(const std::string &name, int &w, int &h,
+static unsigned char *LoadPixels(const std::string &name, int &w, int &h,
                                  bool flip = true) {
   int bytesPerPix;
   stbi_set_flip_vertically_on_load(flip);
   return stbi_load(name.c_str(), &w, &h, &bytesPerPix, 4);
 }
 
-static void freePixels(unsigned char *data) { stbi_image_free(data); }
+static void FreePixels(unsigned char *data) { stbi_image_free(data); }
 
-GLuint loadTexture(const std::string &name) {
+GLuint LoadTexture(const std::string &name) {
   int w, h;
-  unsigned char *data = loadPixels(name, w, h);
+  unsigned char *data = LoadPixels(name, w, h);
   if (data == nullptr) {
     return 0;
   }
@@ -30,5 +30,6 @@ GLuint loadTexture(const std::string &name) {
 
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-  freePixels(data);
+  FreePixels(data);
+  return tex;
 }

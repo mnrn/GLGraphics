@@ -14,8 +14,8 @@
 
 #include <glm/glm.hpp>
 
-#include "scene.h"
-#include "shader.hpp"
+#include "Scene.h"
+#include "Shader.hh"
 
 // ********************************************************************************
 // Class
@@ -29,14 +29,14 @@ public:
   SceneBezier();
   ~SceneBezier() override = default;
 
-  void update(float d) override;
-  void render() const override;
+  void OnUpdate(float d) override;
+  void OnRender() const override;
 
 private:
-  std::optional<std::string> compileAndLinkShader();
-  void createVAO();
-  void setUniforms();
-  void setMatrices(const glm::mat4 &, const glm::mat4 &,
+  std::optional<std::string> CompileAndLinkShader();
+  void CreateVAO();
+  void SetUniforms();
+  void SetMatrices(const glm::mat4 &, const glm::mat4 &,
                    const glm::mat4 &) const;
 
   static constexpr float c = 3.5f;

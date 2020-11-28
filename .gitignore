@@ -5,9 +5,9 @@
 *.o
 *.d
 
-/bin
-/build
-/data
+/[Bb]in
+/[Bb]uild
+/[Dd]ata
 /ssl
 /scripts
 /doc

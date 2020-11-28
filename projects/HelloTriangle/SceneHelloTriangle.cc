@@ -9,28 +9,28 @@
 #include <boost/assert.hpp>
 #include <iostream>
 
-#include "scene_hello_triangle.h"
+#include "SceneHelloTriangle.h"
 
 // ********************************************************************************
 // Special member functions
 // ********************************************************************************
 
 SceneHelloTriangle::SceneHelloTriangle() {
-  if (const auto msg = compileAndLinkShader()) {
+  if (const auto msg = CompileAndLinkShader()) {
     std::cerr << msg.value() << std::endl;
     BOOST_ASSERT_MSG(false, "failed to compile or link!");
   }
 
-  createVBO();
+  CreateVBO();
 }
 
 // ********************************************************************************
 // Override functions
 // ********************************************************************************
 
-void SceneHelloTriangle::update(float d) { static_cast<void>(d); }
+void SceneHelloTriangle::OnUpdate(float d) { static_cast<void>(d); }
 
-void SceneHelloTriangle::render() const {
+void SceneHelloTriangle::OnRender() const {
   glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT);
 
@@ -42,20 +42,20 @@ void SceneHelloTriangle::render() const {
 // Shader prepare
 // ********************************************************************************
 
-std::optional<std::string> SceneHelloTriangle::compileAndLinkShader() {
+std::optional<std::string> SceneHelloTriangle::CompileAndLinkShader() {
   // compile and links
-  if (!prog_.compile("./res/shaders/basic/basic.vs.glsl", ShaderType::Vertex) ||
-      !prog_.compile("./res/shaders/basic/basic.fs.glsl",
+  if (!prog_.Compile("./Res/Shaders/Basic/basic.vs.glsl", ShaderType::Vertex) ||
+      !prog_.Compile("./Res/Shaders/Basic/basic.fs.glsl",
                      ShaderType::Fragment) ||
-      !prog_.link()) {
-    return prog_.log();
+      !prog_.Link()) {
+    return prog_.Log();
   }
 
-  prog_.use();
+  prog_.Use();
   return std::nullopt;
 }
 
-void SceneHelloTriangle::createVBO() {
+void SceneHelloTriangle::CreateVBO() {
   float position[] = {
       -0.8f, -0.8f, 0.0f, 0.8f, -0.8f, 0.0f, 0.0f, 0.8f, 0.0f,
   };

@@ -13,16 +13,16 @@
 #include <boost/assert.hpp>
 #include <thread>
 
-#include "debug.h"
-#include "timer.hpp"
+#include "Debug.h"
+#include "Timer.hh"
 
 // ********************************************************************************
 // Namespace
 // ********************************************************************************
 
-namespace window {
+namespace Window {
 
-static inline GLFWwindow *create(int w, int h, const char *title,
+static inline GLFWwindow *Create(int w, int h, const char *title,
                                  GLFWmonitor *monitor = nullptr,
                                  GLFWwindow *share = nullptr) {
 
@@ -39,52 +39,23 @@ static inline GLFWwindow *create(int w, int h, const char *title,
   glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
 
   // create window handle
-  GLFWwindow *handle_ = glfwCreateWindow(w, h, title, monitor, share);
-  if (handle_ == nullptr) {
+  GLFWwindow *handle = glfwCreateWindow(w, h, title, monitor, share);
+  if (handle == nullptr) {
     glfwTerminate();
     BOOST_ASSERT_MSG(false, "failed to create window!");
   }
 
-  glfwMakeContextCurrent(handle_);
-  return handle_;
+  glfwMakeContextCurrent(handle);
+  return handle;
 }
 
-static inline GLFWwindow *destroy(GLFWwindow *handle) {
+static inline GLFWwindow *Destroy(GLFWwindow *handle) {
   if (handle != nullptr) {
     glfwDestroyWindow(handle);
   }
   return nullptr;
 }
 
-template <typename F> void loop(GLFWwindow *handle, F callback) {
-
-  if (handle == nullptr) {
-    return;
-  }
-
-  // using precision_t = double;
-  // static constexpr double periodic = 1.0 / 60.0;
-
-  Timer timer;
-  while (glfwWindowShouldClose(handle) == false &&
-         glfwGetKey(handle, GLFW_KEY_ESCAPE) == false) {
-
-    timer.start();
-
-    callback(0.0f);
-    glfwSwapBuffers(handle);
-    glfwPollEvents();
-
-    timer.end();
-
-    // precision_t elapsed = timer_.elapsed();
-    // if (elapsed < periodic_) {
-    //     precision_t sleeptime = periodic_ - elapsed;
-    //     std::this_thread::sleep_for(std::chrono::duration<precision_t>(sleeptime));
-    // }
-  }
-}
-
-} // end namespace window
+} // namespace Window
 
 #endif // WINDOW_H

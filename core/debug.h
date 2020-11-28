@@ -19,14 +19,14 @@
 // Namespace
 // ********************************************************************************
 
-namespace debug {
+namespace Debug {
 
 // ********************************************************************************
 // Functions
 // ********************************************************************************
 
 [[maybe_unused]] static inline void APIENTRY
-callback(GLenum src, GLenum type, GLuint id, GLenum severity, GLsizei length,
+Callback(GLenum src, GLenum type, GLuint id, GLenum severity, GLsizei length,
          const GLchar *msg, const void *param) {
 
   UNUSED_VARIABLE(length);
@@ -111,7 +111,7 @@ callback(GLenum src, GLenum type, GLuint id, GLenum severity, GLsizei length,
               sevstr.c_str(), id, msg);
 }
 
-[[maybe_unused]] static inline int32_t checkError(const char *filepath,
+[[maybe_unused]] static inline int32_t CheckError(const char *filepath,
                                                   int32_t line) {
 
   GLenum glErr = glGetError();
@@ -147,7 +147,7 @@ callback(GLenum src, GLenum type, GLuint id, GLenum severity, GLsizei length,
   return retcode;
 }
 
-static inline void dumpInfo() {
+static inline void DumpInfo() {
 
   const GLubyte *renderer = glGetString(GL_RENDERER);
   const GLubyte *vendor = glGetString(GL_VENDOR);
@@ -171,9 +171,9 @@ static inline void dumpInfo() {
       << std::endl;
 }
 
-static inline void setupInfo() {
+static inline void SetupInfo() {
   // Dump GL Info
-  debug::dumpInfo();
+  Debug::DumpInfo();
 
   // Setup Debug Info
 #ifndef __APPLE__
@@ -185,6 +185,6 @@ static inline void setupInfo() {
 #endif
 }
 
-} // end namespace debug
+} // namespace Debug
 
 #endif // DEBUG_H

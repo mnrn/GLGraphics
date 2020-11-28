@@ -10,19 +10,18 @@
 #include <iostream>
 #include <vector>
 
-
-#include "scene_particles.h"
+#include "SceneParticles.h"
 
 // ********************************************************************************
 // Special member functions
 // ********************************************************************************
 
 SceneParticles::SceneParticles() {
-  if (compileAndLinkShader() == false) {
+  if (CompileAndLinkShader() == false) {
     std::exit(EXIT_FAILURE);
   }
 
-  initBuffer();
+  InitBuffer();
 
   glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
   glEnable(GL_BLEND);
@@ -33,9 +32,9 @@ SceneParticles::SceneParticles() {
 // Overrided functions
 // ********************************************************************************
 
-void SceneParticles::update(float deltaSec) { static_cast<void>(deltaSec); }
+void SceneParticles::OnUpdate(float deltaSec) { static_cast<void>(deltaSec); }
 
-void SceneParticles::render() const {
+void SceneParticles::OnRender() const {
 
   // Rotate the black holes
   const glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), glm::radians(angle_),
@@ -86,7 +85,7 @@ void SceneParticles::render() const {
 // Initialize
 // ********************************************************************************
 
-bool SceneParticles::compileAndLinkShader() {
+bool SceneParticles::CompileAndLinkShader() {
 
   // For render program.
   if (render_.compile("./res/shaders/particles/particles.vert",
@@ -123,7 +122,7 @@ bool SceneParticles::compileAndLinkShader() {
   return true;
 }
 
-void SceneParticles::initBuffer() {
+void SceneParticles::InitBuffer() {
 
   // Initialize variables.
   std::vector<GLfloat> initPos;

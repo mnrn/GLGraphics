@@ -16,8 +16,8 @@
 class Scene {
 public:
   virtual ~Scene() = default;
-  virtual void update(float d) = 0;
-  virtual void render() const = 0;
+  virtual void OnUpdate(float d) = 0;
+  virtual void OnRender() const = 0;
 };
 
 #endif

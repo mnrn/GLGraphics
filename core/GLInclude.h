@@ -6,8 +6,8 @@
 // Include guard
 // ********************************************************************************
 
-#ifndef GL_INCLUDE_H
-#define GL_INCLUDE_H
+#ifndef GLINCLUDE_H
+#define GLINCLUDE_H
 
 // ********************************************************************************
 // Include files
@@ -21,4 +21,4 @@
 
 #include <glm/glm.hpp>
 
-#endif // GL_INCLUDE_H
+#endif // GLINCLUDE_H

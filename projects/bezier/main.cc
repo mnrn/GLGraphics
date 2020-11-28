@@ -8,8 +8,8 @@
 
 #include <memory>
 
-#include "app.h"
-#include "scene_bezier.h"
+#include "App.h"
+#include "SceneBezier.h"
 
 // ********************************************************************************
 // Entry point
@@ -28,10 +28,8 @@ int main(
   std::unique_ptr<Scene> scene = std::make_unique<SceneBezier>();
 
   // Enter the main loop
-  app.run([&scene](float dt) {
-    scene->update(dt);
-    scene->render();
+  return app.Run([&scene](float dt) {
+    scene->OnUpdate(dt);
+    scene->OnRender();
   });
-
-  return 0;
 }

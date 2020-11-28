@@ -7,14 +7,14 @@
 // Include guard
 // ********************************************************************************
 
-#ifndef SHADER_HPP
-#define SHADER_HPP
+#ifndef SHADER_HH
+#define SHADER_HH
 
 // ********************************************************************************
 // Including file
 // ********************************************************************************
 
-#include "gl_include.h"
+#include "GLInclude.h"
 
 #include <fstream>
 #include <memory>
@@ -73,9 +73,9 @@ public:
   // Compile & Link
   //*--------------------------------------------------------------------------------
 
-  bool compile(const char *filepath, ShaderType type) {
+  bool Compile(const char *filepath, ShaderType type) {
 
-    if (!isFileExists(filepath)) {
+    if (!IsFileExists(filepath)) {
       log_ = std::string("File Not Found : ") + filepath;
       return false;
     }
@@ -99,10 +99,10 @@ public:
     code << infile.rdbuf();
     infile.close();
 
-    return compile(code.str(), type);
+    return Compile(code.str(), type);
   }
 
-  bool link() {
+  bool Link() {
 
     if (isLinked_) {
       return true;
@@ -117,7 +117,7 @@ public:
     int status = GL_FALSE;
     glGetProgramiv(handle_, GL_LINK_STATUS, &status);
     if (GL_FALSE == status) {
-      storeLog(handle_);
+      StoreLog(handle_);
       return false;
     } else {
       isLinked_ = true;
@@ -129,7 +129,7 @@ public:
   // Use Shader Program
   //*--------------------------------------------------------------------------------
 
-  void use() const {
+  void Use() const {
     if (handle_ > 0 && isLinked_) {
       glUseProgram(handle_);
     }
@@ -139,11 +139,11 @@ public:
   // Bind Location
   //*--------------------------------------------------------------------------------
 
-  void bindAttribLocation(GLuint location, const char *name) const {
+  void BindAttribLocation(GLuint location, const char *name) const {
     glBindAttribLocation(handle_, location, name);
   }
 
-  void bindFragDataLocation(GLuint location, const char *name) const {
+  void BindFragDataLocation(GLuint location, const char *name) const {
     glBindFragDataLocation(handle_, location, name);
   }
 
@@ -151,39 +151,39 @@ public:
   // Accessor
   //*--------------------------------------------------------------------------------
 
-  const std::string &log() const { return log_; }
-  GLuint handle() const { return handle_; }
-  bool isLinked() const { return isLinked_; }
+  const std::string &Log() const { return log_; }
+  GLuint Handle() const { return handle_; }
+  bool IsLinked() const { return isLinked_; }
 
   //*--------------------------------------------------------------------------------
   // Setting Uniform Variable(s)
   //*--------------------------------------------------------------------------------
 
-  void setUniform(const char *name, float x, float y, float z) const {
-    setUniform(name, glUniform3f, x, y, z);
+  void SetUniform(const char *name, float x, float y, float z) const {
+    SetUniform(name, glUniform3f, x, y, z);
   }
-  void setUniform(const char *name, const glm::vec3 &v) const {
-    setUniform(name, v.x, v.y, v.z);
+  void SetUniform(const char *name, const glm::vec3 &v) const {
+    SetUniform(name, v.x, v.y, v.z);
   }
-  void setUniform(const char *name, const glm::vec4 &v) const {
-    setUniform(name, glUniform4f, v.x, v.y, v.z, v.w);
+  void SetUniform(const char *name, const glm::vec4 &v) const {
+    SetUniform(name, glUniform4f, v.x, v.y, v.z, v.w);
   }
-  void setUniform(const char *name, const glm::mat3 &m) const {
-    setUniform(name, glUniformMatrix3fv, 1,
+  void SetUniform(const char *name, const glm::mat3 &m) const {
+    SetUniform(name, glUniformMatrix3fv, 1,
                static_cast<unsigned char>(GL_FALSE), std::addressof(m[0][0]));
   }
-  void setUniform(const char *name, const glm::mat4 &m) const {
-    setUniform(name, glUniformMatrix4fv, 1,
+  void SetUniform(const char *name, const glm::mat4 &m) const {
+    SetUniform(name, glUniformMatrix4fv, 1,
                static_cast<unsigned char>(GL_FALSE), std::addressof(m[0][0]));
   }
-  void setUniform(const char *name, float f) const {
-    setUniform(name, glUniform1f, f);
+  void SetUniform(const char *name, float f) const {
+    SetUniform(name, glUniform1f, f);
   }
-  void setUniform(const char *name, int i) const {
-    setUniform(name, glUniform1i, i);
+  void SetUniform(const char *name, int i) const {
+    SetUniform(name, glUniform1i, i);
   }
-  void setUniform(const char *name, bool b) const {
-    setUniform(name, static_cast<int>(b));
+  void SetUniform(const char *name, bool b) const {
+    SetUniform(name, static_cast<int>(b));
   }
 
 private:
@@ -192,24 +192,24 @@ private:
   //*--------------------------------------------------------------------------------
 
   template <typename F, typename... Args>
-  void setUniform(const char *name, F f, Args &&... args) const {
-    auto location = getUniformLocation(name);
+  void SetUniform(const char *name, F f, Args &&... args) const {
+    auto location = GetUniformLocation(name);
     if (location >= 0) {
       f(location, std::forward<Args>(args)...);
     }
   }
 
-  int getUniformLocation(const char *name) const {
+  int GetUniformLocation(const char *name) const {
     return glGetUniformLocation(handle_, name);
   }
 
-  bool isFileExists(const char *filepath) const {
+  bool IsFileExists(const char *filepath) const {
     boost::system::error_code error;
     const bool result = boost::filesystem::exists(filepath, error);
     return !error && result;
   }
 
-  bool compile(const std::string &src, ShaderType type) {
+  bool Compile(const std::string &src, ShaderType type) {
     GLuint handle = 0;
     switch (type) {
     case ShaderType::Vertex:
@@ -242,7 +242,7 @@ private:
     int res = GL_FALSE;
     glGetShaderiv(handle, GL_COMPILE_STATUS, std::addressof(res));
     if (GL_FALSE == res) {
-      storeLog(handle);
+      StoreLog(handle);
       return false;
     } else {
       glAttachShader(handle_, handle);
@@ -250,7 +250,7 @@ private:
     }
   }
 
-  void storeLog(GLuint handle) {
+  void StoreLog(GLuint handle) {
     int length = 0;
     log_ = "";
 

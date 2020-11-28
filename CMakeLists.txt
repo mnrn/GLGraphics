@@ -11,8 +11,8 @@ project(${PROJECT_NAME})
 
 set(PROJECTS_DIR_NAME projects)
 include_directories(SYSTEM third-party)
-include_directories(core)
-include_directories(common)
+include_directories(Core)
+include_directories(Common)
 
 # Compile mode
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g")
@@ -69,15 +69,15 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 endif()
 
 add_definitions(-std=c++17)
-file(GLOB SOURCE *.cc core/*.cc common/*.cc)
+file(GLOB SOURCE *.cc Core/*.cc Common/*.cc)
 
 # Function for building
 function(build TARGET_NAME)
     # Main
-    file(GLOB SOURCE *.cc core/*.cc common/*.cc ${PROJECTS_DIR_NAME}/${TARGET_NAME}/*.cc)
-    set(MAIN_CC ${TARGET_NAME}/${TARGET_NAME}/main.cc)
-    if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECTS_DIR_NAME}/${TARGET_NAME}/main.cc)
-        set(MAIN_CC ${PROJECTS_DIR_NAME}/${TARGET_NAME}/main.cc)
+    file(GLOB SOURCE *.cc Core/*.cc Common/*.cc ${PROJECTS_DIR_NAME}/${TARGET_NAME}/*.cc)
+    set(MAIN_CC ${TARGET_NAME}/${TARGET_NAME}/Main.cc)
+    if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECTS_DIR_NAME}/${TARGET_NAME}/Main.cc)
+        set(MAIN_CC ${PROJECTS_DIR_NAME}/${TARGET_NAME}/Main.cc)
     endif()
 
     add_executable(${TARGET_NAME}
@@ -103,8 +103,8 @@ endfunction(buildAll)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/")
 set(TARGETS
-    hello_triangle
-    bezier
-    #particles
+    HelloTriangle
+    Bezier
+    #Particles
 )
 buildAll()

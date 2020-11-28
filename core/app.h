@@ -11,11 +11,11 @@
 
 #include <boost/noncopyable.hpp>
 
-#include "common.h"
-#include "gl_include.h"
+#include "Common.h"
+#include "GLInclude.h"
 
-#include "debug.h"
-#include "window.h"
+#include "Debug.h"
+#include "Window.h"
 
 // ********************************************************************************
 // Class
@@ -26,27 +26,52 @@ public:
   App(const char *appName, int w = 1280, int h = 720) {
     glfwInit();
 
-    window_ = window::create(w, h, appName);
+    window_ = Window::Create(w, h, appName);
 
-    initGlew();
-    debug::setupInfo();
+    InitGlew();
+    Debug::SetupInfo();
   }
 
   ~App() {
 
-    window::destroy(window_);
+    Window::Destroy(window_);
 
     glfwTerminate();
   }
 
-  template <typename F> void run(F callback) {
-    window::loop(window_, callback);
+  template <typename Callback> int Run(Callback callback) {
+    if (window_ == nullptr) {
+      return EXIT_FAILURE;
+    }
+
+    // using precision_t = double;
+    // static constexpr double periodic = 1.0 / 60.0;
+
+    Timer timer;
+    while (glfwWindowShouldClose(window_) == false &&
+           glfwGetKey(window_, GLFW_KEY_ESCAPE) == false) {
+
+      timer.start();
+
+      callback(0.0f);
+      glfwSwapBuffers(window_);
+      glfwPollEvents();
+
+      timer.end();
+
+      // precision_t elapsed = timer_.elapsed();
+      // if (elapsed < periodic_) {
+      //     precision_t sleeptime = periodic_ - elapsed;
+      //     std::this_thread::sleep_for(std::chrono::duration<precision_t>(sleeptime));
+      // }
+    }
+    return EXIT_SUCCESS;
   }
 
 private:
   GLFWwindow *window_ = nullptr;
 
-  static void initGlew() {
+  static void InitGlew() {
 
     // Initialize GLEW
     glewExperimental = GL_TRUE;

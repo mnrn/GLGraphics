@@ -9,8 +9,8 @@
 
 #include <memory>
 
-#include "app.h"
-#include "scene_hello_triangle.h"
+#include "App.h"
+#include "SceneHelloTriangle.h"
 
 // ********************************************************************************
 // Entry point
@@ -29,10 +29,8 @@ int main(
   std::unique_ptr<Scene> scene = std::make_unique<SceneHelloTriangle>();
 
   // Enter the main loop
-  app.run([&scene](float dt) {
-    scene->update(dt);
-    scene->render();
+  return app.Run([&scene](float dt) {
+    scene->OnUpdate(dt);
+    scene->OnRender();
   });
-
-  return 0;
 }

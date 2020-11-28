@@ -9,8 +9,8 @@
 // Include files
 // ********************************************************************************
 
-#include "scene.h"
-#include "shader.hpp"
+#include "Scene.h"
+#include "Shader.hh"
 
 // ********************************************************************************
 // Class
@@ -21,12 +21,12 @@ public:
   SceneParticles();
   ~SceneParticles() override = default;
 
-  void update(float t) override;
-  void render() const override;
+  void OnUpdate(float t) override;
+  void OnRender() const override;
 
 private:
-  void initBuffer();
-  bool compileAndLinkShader();
+  void InitBuffer();
+  bool CompileAndLinkShader();
 
   GLuint hParticlesVAO_ = 0;
   GLuint hBlackHoleVAO_ = 0;
