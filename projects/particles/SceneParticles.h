@@ -21,8 +21,9 @@ public:
   SceneParticles();
   ~SceneParticles() override = default;
 
-  void OnUpdate(float t) override;
-  void OnRender() const override;
+  void OnUpdate(float) override;
+  void OnRender() override;
+  void OnResize(int, int) override;
 
 private:
   void InitBuffer();

@@ -9,8 +9,8 @@
 
 #include <memory>
 
-#include "app.h"
-#include "scene_particles.h"
+#include "App.h"
+#include "SceneParticles.h"
 
 // ********************************************************************************
 // Entry point
@@ -30,8 +30,7 @@ int main(
   std::unique_ptr<Scene> scene = std::make_unique<SceneParticles>();
 
   // Enter the main loop
-  return app.Run([&scene](float dt) {
-    scene->OnUpdate(dt);
-    scene->OnRender();
-  });
+  return app.Run([&scene](int w, int h) { scene->OnResize(w, h); },
+                 [&scene](float dt) { scene->OnUpdate(dt); },
+                 [&scene]() { scene->OnRender(); });
 }

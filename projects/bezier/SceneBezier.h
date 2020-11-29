@@ -29,8 +29,9 @@ public:
   SceneBezier();
   ~SceneBezier() override = default;
 
-  void OnUpdate(float d) override;
-  void OnRender() const override;
+  void OnUpdate(float) override;
+  void OnRender() override;
+  void OnResize(int, int) override;
 
 private:
   std::optional<std::string> CompileAndLinkShader();
@@ -41,12 +42,9 @@ private:
 
   static constexpr float c = 3.5f;
 
-  GLuint vao_ = 0;
-
   ShaderProgram bezier_;
   ShaderProgram solid_;
-
-  const glm::mat4 proj_;
+  GLuint vao_ = 0;
 };
 
 #endif // SCENE_BEZIER_H

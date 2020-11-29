@@ -28,8 +28,9 @@ public:
   SceneHelloTriangle();
   ~SceneHelloTriangle() override = default;
 
-  void OnUpdate(float d) override;
-  void OnRender() const override;
+  void OnUpdate(float) override;
+  void OnRender() override;
+  void OnResize(int, int) override;
 
 private:
   std::optional<std::string> CompileAndLinkShader();

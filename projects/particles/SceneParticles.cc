@@ -34,7 +34,7 @@ SceneParticles::SceneParticles() {
 
 void SceneParticles::OnUpdate(float deltaSec) { static_cast<void>(deltaSec); }
 
-void SceneParticles::OnRender() const {
+void SceneParticles::OnRender() {
 
   // Rotate the black holes
   const glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), glm::radians(angle_),
@@ -43,14 +43,14 @@ void SceneParticles::OnRender() const {
   const glm::vec3 blackHole2Pos = glm::vec3(rotation * blackHole2Pos_);
 
   // Execute a compute shader
-  compute_.use();
-  compute_.setUniform("blackHole1Pos", blackHole1Pos);
-  compute_.setUniform("blackHole2Pos", blackHole2Pos);
+  compute_.Use();
+  compute_.SetUniform("blackHole1Pos", blackHole1Pos);
+  compute_.SetUniform("blackHole2Pos", blackHole2Pos);
   glDispatchCompute(totalParticlesNum_ / localSizeX_, 1, 1);
   glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
   // Draw the scene
-  render_.use();
+  render_.Use();
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   const glm::mat4 proj = glm::perspective(
       glm::radians(50.0f),
@@ -59,11 +59,11 @@ void SceneParticles::OnRender() const {
       glm::lookAt(glm::vec3(2.0f, 0.0f, 20.0f), glm::vec3(0.0f, 0.0f, 0.0f),
                   glm::vec3(0.0f, 1.0f, 0.0f));
   const glm::mat4 model = glm::mat4(1.0f);
-  render_.setUniform("MVP", proj * view * model);
+  render_.SetUniform("MVP", proj * view * model);
 
   // Draw the particles
   glPointSize(1.0f);
-  render_.setUniform("color", glm::vec4(0.0f, 0.0f, 0.0f, 0.2f));
+  render_.SetUniform("color", glm::vec4(0.0f, 0.0f, 0.0f, 0.2f));
   glBindVertexArray(hParticlesVAO_);
   glDrawArrays(GL_POINTS, 0, totalParticlesNum_);
   glBindVertexArray(0);
@@ -75,10 +75,15 @@ void SceneParticles::OnRender() const {
                     blackHole2Pos.z, blackHole2Pos.z};
   glBindBuffer(GL_ARRAY_BUFFER, hBlackHoleVAO_);
   glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(GLfloat) * 8, data);
-  render_.setUniform("color", glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
+  render_.SetUniform("color", glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
   glBindVertexArray(hBlackHoleVAO_);
   glDrawArrays(GL_POINTS, 0, 2);
   glBindVertexArray(0);
+}
+
+void SceneParticles::OnResize(int w, int h) {
+  SetDimensions(w, h);
+  glViewport(0, 0, w, h);
 }
 
 // ********************************************************************************
@@ -88,34 +93,34 @@ void SceneParticles::OnRender() const {
 bool SceneParticles::CompileAndLinkShader() {
 
   // For render program.
-  if (render_.compile("./res/shaders/particles/particles.vert",
+  if (render_.Compile("./res/shaders/particles/particles.vert",
                       ShaderType::Vertex) == false) {
-    std::cerr << "vertex shader failed to compile." << std::endl;
-    std::cerr << render_.log() << std::endl;
+    std::cerr << "vertex shader failed to Compile." << std::endl;
+    std::cerr << render_.Log() << std::endl;
     return false;
   }
-  if (render_.compile("./res/shaders/particles/particles.frag",
+  if (render_.Compile("./res/shaders/particles/particles.frag",
                       ShaderType::Fragment) == false) {
-    std::cerr << "fragment shader failed to compile." << std::endl;
-    std::cerr << render_.log() << std::endl;
+    std::cerr << "fragment shader failed to Compile." << std::endl;
+    std::cerr << render_.Log() << std::endl;
     return false;
   }
-  if (render_.link() == false) {
-    std::cerr << "render program failed to link." << std::endl;
-    std::cerr << render_.log() << std::endl;
+  if (render_.Link() == false) {
+    std::cerr << "render program failed to Link." << std::endl;
+    std::cerr << render_.Log() << std::endl;
     return false;
   }
 
   // For compute program.
-  if (compute_.compile("./res/shaders/particles/particles.comp",
+  if (compute_.Compile("./res/shaders/particles/particles.comp",
                        ShaderType::Compute) == false) {
-    std::cerr << "compute shader failed to compile." << std::endl;
-    std::cerr << compute_.log() << std::endl;
+    std::cerr << "compute shader failed to Compile." << std::endl;
+    std::cerr << compute_.Log() << std::endl;
     return false;
   }
-  if (compute_.link() == false) {
-    std::cerr << "compute program failed to link." << std::endl;
-    std::cerr << compute_.log() << std::endl;
+  if (compute_.Link() == false) {
+    std::cerr << "compute program failed to Link." << std::endl;
+    std::cerr << compute_.Log() << std::endl;
     return false;
   }
 

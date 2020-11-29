@@ -8,7 +8,7 @@
 #include "GLInclude.h"
 #include <string>
 
-static GLuint LoadTexture(const std::string &name);
-// static GLuint loadCubeMap(const std::string &name);
+GLuint LoadTexture(const std::string &name);
+// GLuint loadCubeMap(const std::string &name);
 
 #endif

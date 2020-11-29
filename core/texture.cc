@@ -4,16 +4,17 @@
 
 #include "Texture.h"
 
+#define STB_IMAGE_IMPLEMENTATION
 #include <stb/stb_image.h>
 
-static unsigned char *LoadPixels(const std::string &name, int &w, int &h,
-                                 bool flip = true) {
+unsigned char *LoadPixels(const std::string &name, int &w, int &h,
+                          bool flip = true) {
   int bytesPerPix;
   stbi_set_flip_vertically_on_load(flip);
   return stbi_load(name.c_str(), &w, &h, &bytesPerPix, 4);
 }
 
-static void FreePixels(unsigned char *data) { stbi_image_free(data); }
+void FreePixels(unsigned char *data) { stbi_image_free(data); }
 
 GLuint LoadTexture(const std::string &name) {
   int w, h;

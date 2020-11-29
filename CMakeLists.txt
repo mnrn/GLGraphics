@@ -69,12 +69,12 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 endif()
 
 add_definitions(-std=c++17)
-file(GLOB SOURCE *.cc Core/*.cc Common/*.cc)
+file(GLOB SOURCE *.cc Core/*.cc Common/*.cc Common/Primitive/*.cc)
 
 # Function for building
 function(build TARGET_NAME)
     # Main
-    file(GLOB SOURCE *.cc Core/*.cc Common/*.cc ${PROJECTS_DIR_NAME}/${TARGET_NAME}/*.cc)
+    file(GLOB SOURCE *.cc Core/*.cc Common/*.cc Common/Primitive/*.cc ${PROJECTS_DIR_NAME}/${TARGET_NAME}/*.cc)
     set(MAIN_CC ${TARGET_NAME}/${TARGET_NAME}/Main.cc)
     if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECTS_DIR_NAME}/${TARGET_NAME}/Main.cc)
         set(MAIN_CC ${PROJECTS_DIR_NAME}/${TARGET_NAME}/Main.cc)
@@ -104,6 +104,7 @@ endfunction(buildAll)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/")
 set(TARGETS
     HelloTriangle
+    Texture
     Bezier
     #Particles
 )

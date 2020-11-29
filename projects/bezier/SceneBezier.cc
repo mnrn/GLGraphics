@@ -16,9 +16,8 @@
 // Special member functions
 // ********************************************************************************
 
-SceneBezier::SceneBezier()
-    : proj_(
-          glm::ortho(-0.4f * c, 0.4f * c, -0.3f * c, 0.3f * c, 0.1f, 100.0f)) {
+SceneBezier::SceneBezier() {
+  proj_ = glm::ortho(-0.4f * c, 0.4f * c, -0.3f * c, 0.3f * c, 0.1f, 100.0f);
   if (const auto msg = CompileAndLinkShader()) {
     std::cerr << msg.value() << std::endl;
     BOOST_ASSERT_MSG(false, "failed to compile or link!");
@@ -39,7 +38,7 @@ SceneBezier::SceneBezier()
 
 void SceneBezier::OnUpdate(float d) { static_cast<void>(d); }
 
-void SceneBezier::OnRender() const {
+void SceneBezier::OnRender() {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   const glm::vec3 eyePt(0.0f, 0.0f, 1.5f);
@@ -61,28 +60,33 @@ void SceneBezier::OnRender() const {
   glFinish();
 }
 
+void SceneBezier::OnResize(int w, int h) {
+  SetDimensions(w, h);
+  glViewport(0, 0, w, h);
+}
+
 // ********************************************************************************
 // functions
 // ********************************************************************************
 
 std::optional<std::string> SceneBezier::CompileAndLinkShader() {
   // compile and links
-  if (!bezier_.Compile("./Res/Shaders/Bezier/bezier.vs.glsl",
+  if (!bezier_.Compile("./Assets/Shaders/Bezier/bezier.vs.glsl",
                        ShaderType::Vertex) ||
-      !bezier_.Compile("./Res/Shaders/Bezier/bezier.tcs.glsl",
+      !bezier_.Compile("./Assets/Shaders/Bezier/bezier.tcs.glsl",
                        ShaderType::TessControl) ||
-      !bezier_.Compile("./Res/Shaders/Bezier/bezier.tes.glsl",
+      !bezier_.Compile("./Assets/Shaders/Bezier/bezier.tes.glsl",
                        ShaderType::TessEvaluation) ||
-      !bezier_.Compile("./Res/Shaders/Bezier/bezier.fs.glsl",
+      !bezier_.Compile("./Assets/Shaders/Bezier/bezier.fs.glsl",
                        ShaderType::Fragment) ||
       !bezier_.Link()) {
     return bezier_.Log();
   }
   bezier_.Use();
 
-  if (!solid_.Compile("./Res/Shaders/Bezier/solid.vs.glsl",
+  if (!solid_.Compile("./Assets/Shaders/Bezier/solid.vs.glsl",
                       ShaderType::Vertex) ||
-      !solid_.Compile("./Res/Shaders/Bezier/solid.fs.glsl",
+      !solid_.Compile("./Assets/Shaders/Bezier/solid.fs.glsl",
                       ShaderType::Fragment) ||
       !solid_.Link()) {
     return solid_.Log();

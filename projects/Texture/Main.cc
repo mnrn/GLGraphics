@@ -1,5 +1,6 @@
 /**
- * @brief  Library Test
+ * @brief  Texture Test
+ * @date   2016/03/19
  */
 
 // ********************************************************************************
@@ -9,7 +10,7 @@
 #include <memory>
 
 #include "App.h"
-#include "SceneBezier.h"
+#include "SceneTexture.h"
 
 // ********************************************************************************
 // Entry point
@@ -22,10 +23,10 @@ int main(
     int argc, char **argv
 #endif
 ) {
-  App app("Hello Bezier!!!");
+  App app("Texture Mapping");
 
   // Create scene
-  std::unique_ptr<Scene> scene = std::make_unique<SceneBezier>();
+  std::unique_ptr<Scene> scene = std::make_unique<SceneTexture>();
 
   // Enter the main loop
   return app.Run([&scene](int w, int h) { scene->OnResize(w, h); },

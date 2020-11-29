@@ -27,22 +27,25 @@ public:
     glfwInit();
 
     window_ = Window::Create(w, h, appName);
+    width_ = w;
+    height_ = h;
 
     InitGlew();
     Debug::SetupInfo();
   }
 
   ~App() {
-
     Window::Destroy(window_);
-
     glfwTerminate();
   }
 
-  template <typename Callback> int Run(Callback callback) {
+  template <typename Init, typename Update, typename Render>
+  int Run(Init onInit, Update onUpdate, Render onRender) {
     if (window_ == nullptr) {
       return EXIT_FAILURE;
     }
+
+    onInit(width_, height_);
 
     // using precision_t = double;
     // static constexpr double periodic = 1.0 / 60.0;
@@ -53,7 +56,9 @@ public:
 
       timer.start();
 
-      callback(0.0f);
+      onUpdate(0.0f);
+      onRender();
+
       glfwSwapBuffers(window_);
       glfwPollEvents();
 
@@ -70,6 +75,8 @@ public:
 
 private:
   GLFWwindow *window_ = nullptr;
+  int width_;
+  int height_;
 
   static void InitGlew() {
 

@@ -29,8 +29,7 @@ int main(
   std::unique_ptr<Scene> scene = std::make_unique<SceneHelloTriangle>();
 
   // Enter the main loop
-  return app.Run([&scene](float dt) {
-    scene->OnUpdate(dt);
-    scene->OnRender();
-  });
+  return app.Run([&scene](int w, int h) { scene->OnResize(w, h); },
+                 [&scene](float dt) { scene->OnUpdate(dt); },
+                 [&scene]() { scene->OnRender(); });
 }

@@ -30,12 +30,17 @@ SceneHelloTriangle::SceneHelloTriangle() {
 
 void SceneHelloTriangle::OnUpdate(float d) { static_cast<void>(d); }
 
-void SceneHelloTriangle::OnRender() const {
+void SceneHelloTriangle::OnRender() {
   glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT);
 
   glBindVertexArray(vbo_);
   glDrawArrays(GL_TRIANGLES, 0, 3);
+}
+
+void SceneHelloTriangle::OnResize(int w, int h) {
+  SetDimensions(w, h);
+  glViewport(0, 0, w, h);
 }
 
 // ********************************************************************************
@@ -44,8 +49,9 @@ void SceneHelloTriangle::OnRender() const {
 
 std::optional<std::string> SceneHelloTriangle::CompileAndLinkShader() {
   // compile and links
-  if (!prog_.Compile("./Res/Shaders/Basic/basic.vs.glsl", ShaderType::Vertex) ||
-      !prog_.Compile("./Res/Shaders/Basic/basic.fs.glsl",
+  if (!prog_.Compile("./Assets/Shaders/Basic/basic.vs.glsl",
+                     ShaderType::Vertex) ||
+      !prog_.Compile("./Assets/Shaders/Basic/basic.fs.glsl",
                      ShaderType::Fragment) ||
       !prog_.Link()) {
     return prog_.Log();
