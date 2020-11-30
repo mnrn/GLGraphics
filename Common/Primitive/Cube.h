@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Primitive/TriangleMesh.h"
+#include "TriangleMesh.h"
 
 class Cube : public TriangleMesh {
 public:

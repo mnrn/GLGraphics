@@ -4,7 +4,7 @@
 #include <optional>
 #include <vector>
 
-#include "Primitive/Drawable.h"
+#include "Drawable.h"
 
 class TriangleMesh : public Drawable {
 public:
@@ -18,14 +18,14 @@ public:
   GLuint GetNumVers() const { return nVerts_; }
 
 protected:
-  virtual void InitBuffers(const std::vector<GLuint> &indices,
-                           const std::vector<GLfloat> &points,
-                           const std::vector<GLfloat> &normals,
-                           const std::optional<std::vector<GLfloat>> &texCoords,
-                           const std::optional<std::vector<GLfloat>> &tangents);
+  virtual void InitBuffers(
+      const std::vector<GLuint> &indices, const std::vector<GLfloat> &points,
+      const std::vector<GLfloat> &normals,
+      const std::optional<std::vector<GLfloat>> &texCoords = std::nullopt,
+      const std::optional<std::vector<GLfloat>> &tangents = std::nullopt);
   virtual void DestroyBuffers();
 
-  GLuint vao_;                  // The vertex array object;
+  GLuint vao_;                  // 頂点配列オブジェクト
   GLuint nVerts_;               // 頂点数
-  std::vector<GLuint> buffers_; // Vertex buffers;
+  std::vector<GLuint> buffers_; // 頂点バッファ
 };
