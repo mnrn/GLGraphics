@@ -111,8 +111,8 @@ Callback(GLenum src, GLenum type, GLuint id, GLenum severity, GLsizei length,
               sevstr.c_str(), id, msg);
 }
 
-[[maybe_unused]] static inline int32_t CheckError(const char *filepath,
-                                                  int32_t line) {
+[[maybe_unused]] static inline int32_t CheckForOpenGLError(const char *filepath,
+                                                           int32_t line) {
 
   GLenum glErr = glGetError();
   int32_t retcode = 0;
@@ -177,7 +177,7 @@ static inline void SetupInfo() {
 
   // Setup Debug Info
 #ifndef __APPLE__
-  glDebugMessageCallback(debug::callback, nullptr);
+  glDebugMessageCallback(Debug::Callback, nullptr);
   glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr,
                         GL_TRUE);
   glDebugMessageInsert(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_MARKER, 0,

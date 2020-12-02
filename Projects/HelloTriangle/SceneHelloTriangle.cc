@@ -12,10 +12,6 @@
 #include "SceneHelloTriangle.h"
 
 // ********************************************************************************
-// Special member functions
-// ********************************************************************************
-
-// ********************************************************************************
 // Override functions
 // ********************************************************************************
 
@@ -28,13 +24,18 @@ void SceneHelloTriangle::OnInit() {
   CreateVBO();
 }
 
+void SceneHelloTriangle::OnDestroy() {
+  glDeleteVertexArrays(1, &vao_);
+  glDeleteBuffers(vbo_.size(), vbo_.data());
+}
+
 void SceneHelloTriangle::OnUpdate(float d) { static_cast<void>(d); }
 
 void SceneHelloTriangle::OnRender() {
   glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT);
 
-  glBindVertexArray(vbo_);
+  glBindVertexArray(vao_);
   glDrawArrays(GL_TRIANGLES, 0, 3);
 }
 
@@ -70,28 +71,24 @@ void SceneHelloTriangle::CreateVBO() {
       1.0f, 0.0f, 0.0, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
   };
 
-  GLuint hVBO[2]{};
-  glGenBuffers(2, hVBO);
+  glGenBuffers(vbo_.size(), vbo_.data());
 
-  GLuint vboPosition = hVBO[0];
-  GLuint vboColor = hVBO[1];
-
-  glBindBuffer(GL_ARRAY_BUFFER, vboPosition);
+  glBindBuffer(GL_ARRAY_BUFFER, vbo_[Position]);
   glBufferData(GL_ARRAY_BUFFER, sizeof(position), position, GL_STATIC_DRAW);
 
-  glBindBuffer(GL_ARRAY_BUFFER, vboColor);
+  glBindBuffer(GL_ARRAY_BUFFER, vbo_[Color]);
   glBufferData(GL_ARRAY_BUFFER, sizeof(color), color, GL_STATIC_DRAW);
 
-  glGenVertexArrays(1, &vbo_);
-  glBindVertexArray(vbo_);
+  glGenVertexArrays(1, &vao_);
+  glBindVertexArray(vao_);
 
   glEnableVertexAttribArray(0); // Vertex position
   glEnableVertexAttribArray(1); // Vertex color
 
-  glBindBuffer(GL_ARRAY_BUFFER, vboPosition);
+  glBindBuffer(GL_ARRAY_BUFFER, vbo_[Position]);
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 
-  glBindBuffer(GL_ARRAY_BUFFER, vboColor);
+  glBindBuffer(GL_ARRAY_BUFFER, vbo_[Color]);
   glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 
   glBindVertexArray(0);

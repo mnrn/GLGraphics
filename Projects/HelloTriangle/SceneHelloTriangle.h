@@ -10,6 +10,7 @@
 // Include files
 // ********************************************************************************
 
+#include <array>
 #include <optional>
 #include <string>
 
@@ -25,10 +26,8 @@
  */
 class SceneHelloTriangle : public Scene {
 public:
-  SceneHelloTriangle() = default;
-  ~SceneHelloTriangle() override = default;
-
   void OnInit() override;
+  void OnDestroy() override;
   void OnUpdate(float) override;
   void OnRender() override;
   void OnResize(int, int) override;
@@ -37,7 +36,13 @@ private:
   std::optional<std::string> CompileAndLinkShader();
   void CreateVBO();
 
-  GLuint vbo_ = 0;
+  enum VertexBuffer {
+    Position,
+    Color,
+    BufferNum,
+  };
+  std::array<GLuint, BufferNum> vbo_;
+  GLuint vao_ = 0;
   ShaderProgram prog_;
 };
 

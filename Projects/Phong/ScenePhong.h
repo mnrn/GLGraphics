@@ -25,9 +25,6 @@
  */
 class ScenePhong : public Scene {
 public:
-  ScenePhong() = default;
-  ~ScenePhong() override = default;
-
   void OnInit() override;
   void OnUpdate(float) override;
   void OnRender() override;

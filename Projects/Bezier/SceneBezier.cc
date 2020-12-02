@@ -32,6 +32,11 @@ void SceneBezier::OnInit() {
   SetUniforms();
 }
 
+void SceneBezier::OnDestroy() {
+  glDeleteVertexArrays(1, &vao_);
+  glDeleteBuffers(1, &vbo_);
+}
+
 void SceneBezier::OnUpdate(float d) { static_cast<void>(d); }
 
 void SceneBezier::OnRender() {
@@ -67,24 +72,24 @@ void SceneBezier::OnResize(int w, int h) {
 
 std::optional<std::string> SceneBezier::CompileAndLinkShader() {
   // compile and links
-  if (!bezier_.Compile("./Assets/Shaders/Bezier/bezier.vs.glsl",
-                       ShaderType::Vertex) ||
-      !bezier_.Compile("./Assets/Shaders/Bezier/bezier.tcs.glsl",
-                       ShaderType::TessControl) ||
-      !bezier_.Compile("./Assets/Shaders/Bezier/bezier.tes.glsl",
-                       ShaderType::TessEvaluation) ||
-      !bezier_.Compile("./Assets/Shaders/Bezier/bezier.fs.glsl",
-                       ShaderType::Fragment) ||
-      !bezier_.Link()) {
+  if (!(bezier_.Compile("./Assets/Shaders/Bezier/bezier.vs.glsl",
+                        ShaderType::Vertex) &&
+        bezier_.Compile("./Assets/Shaders/Bezier/bezier.tcs.glsl",
+                        ShaderType::TessControl) &&
+        bezier_.Compile("./Assets/Shaders/Bezier/bezier.tes.glsl",
+                        ShaderType::TessEvaluation) &&
+        bezier_.Compile("./Assets/Shaders/Bezier/bezier.fs.glsl",
+                        ShaderType::Fragment) &&
+        bezier_.Link())) {
     return bezier_.GetLog();
   }
   bezier_.Use();
 
-  if (!solid_.Compile("./Assets/Shaders/Bezier/solid.vs.glsl",
-                      ShaderType::Vertex) ||
-      !solid_.Compile("./Assets/Shaders/Bezier/solid.fs.glsl",
-                      ShaderType::Fragment) ||
-      !solid_.Link()) {
+  if (!(solid_.Compile("./Assets/Shaders/Bezier/solid.vs.glsl",
+                       ShaderType::Vertex) &&
+        solid_.Compile("./Assets/Shaders/Bezier/solid.fs.glsl",
+                       ShaderType::Fragment) &&
+        solid_.Link())) {
     return solid_.GetLog();
   }
   return std::nullopt;
@@ -94,17 +99,16 @@ void SceneBezier::CreateVAO() {
   // Set up patch VBO
   float v[] = {-1.0f, -1.0f, -0.5f, 1.0f, 0.5f, -1.0f, 1.0f, 1.0f};
 
-  GLuint vbo;
-  glGenBuffers(1, &vbo);
+  glGenBuffers(1, &vbo_);
 
-  glBindBuffer(GL_ARRAY_BUFFER, vbo);
+  glBindBuffer(GL_ARRAY_BUFFER, vbo_);
   glBufferData(GL_ARRAY_BUFFER, sizeof(v), v, GL_STATIC_DRAW);
 
   // Set up patch VAO
   glGenVertexArrays(1, &vao_);
   glBindVertexArray(vao_);
 
-  glBindBuffer(GL_ARRAY_BUFFER, vbo);
+  glBindBuffer(GL_ARRAY_BUFFER, vbo_);
   glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
   glEnableVertexAttribArray(0);
 

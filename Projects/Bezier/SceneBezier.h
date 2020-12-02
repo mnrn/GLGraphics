@@ -26,10 +26,8 @@
  */
 class SceneBezier : public Scene {
 public:
-  SceneBezier() = default;
-  ~SceneBezier() override = default;
-
   void OnInit() override;
+  void OnDestroy() override;
   void OnUpdate(float) override;
   void OnRender() override;
   void OnResize(int, int) override;
@@ -45,6 +43,8 @@ private:
 
   ShaderProgram bezier_;
   ShaderProgram solid_;
+
+  GLuint vbo_ = 0;
   GLuint vao_ = 0;
 };
 

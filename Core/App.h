@@ -39,36 +39,24 @@ public:
     glfwTerminate();
   }
 
-  template <typename Init, typename Update, typename Render>
-  int Run(Init onInit, Update onUpdate, Render onRender) {
+  template <typename Initialize, typename Update, typename Render>
+  int Run(Initialize onInit, Update onUpdate, Render onRender) {
     if (window_ == nullptr) {
       return EXIT_FAILURE;
     }
 
     onInit(width_, height_);
 
-    // using precision_t = double;
-    // static constexpr double periodic = 1.0 / 60.0;
+    while (!glfwWindowShouldClose(window_) &&
+           !glfwGetKey(window_, GLFW_KEY_ESCAPE)) {
 
-    Timer timer;
-    while (glfwWindowShouldClose(window_) == false &&
-           glfwGetKey(window_, GLFW_KEY_ESCAPE) == false) {
-
-      timer.Start();
+      Debug::CheckForOpenGLError(__FILE__, __LINE__);
 
       onUpdate(static_cast<float>(glfwGetTime()));
       onRender();
 
       glfwSwapBuffers(window_);
       glfwPollEvents();
-
-      timer.End();
-
-      // precision_t elapsed = timer_.elapsed();
-      // if (elapsed < periodic_) {
-      //     precision_t sleeptime = periodic_ - elapsed;
-      //     std::this_thread::sleep_for(std::chrono::duration<precision_t>(sleeptime));
-      // }
     }
     return EXIT_SUCCESS;
   }

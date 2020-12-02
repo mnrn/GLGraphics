@@ -25,9 +25,6 @@
  */
 class SceneSubroutine : public Scene {
 public:
-  SceneSubroutine() = default;
-  ~SceneSubroutine() override = default;
-
   void OnInit() override;
   void OnUpdate(float) override;
   void OnRender() override;

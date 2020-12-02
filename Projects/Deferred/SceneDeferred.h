@@ -20,6 +20,7 @@
 class SceneDeferred : public Scene {
 public:
   void OnInit() override;
+  void OnDestroy() override;
   void OnUpdate(float) override;
   void OnRender() override;
   void OnResize(int, int) override;
@@ -40,8 +41,10 @@ private:
   float tPrev_ = 0.0f;
 
   ShaderProgram prog_;
-  GLuint quad_;
   GBuffer gbuffer_;
+
+  GLuint quad_ = 0;
+  std::array<GLuint, 2> vbo_;
 };
 
 #endif

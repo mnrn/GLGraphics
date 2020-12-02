@@ -30,14 +30,16 @@ void SceneTexture::OnInit() {
   prog_.SetUniform("Light.La", glm::vec3(0.15f));
 
   // テクスチャのロード
-  const GLuint texID = LoadTexture("./Assets/Textures/DryCropResult.jpg");
+  tex_ = LoadTexture("./Assets/Textures/DryCropResult.jpg");
   glActiveTexture(GL_TEXTURE0);
-  glBindTexture(GL_TEXTURE_2D, texID);
+  glBindTexture(GL_TEXTURE_2D, tex_);
 
 #ifdef __APPLE__
   prog_.SetUniform("Tex1", 0);
 #endif
 }
+
+void SceneTexture::OnDestroy() { glDeleteTextures(1, &tex_); }
 
 void SceneTexture::OnUpdate(float) {}
 
@@ -65,14 +67,14 @@ void SceneTexture::OnResize(int w, int h) {
 }
 
 std::optional<std::string> SceneTexture::CompileAndLinkShader() {
-  if (!prog_.Compile("./Assets/Shaders/Texture/Texture.vs.glsl",
-                     ShaderType::Vertex) ||
-      !prog_.Compile("./Assets/Shaders/Texture/Texture.fs.glsl",
-                     ShaderType::Fragment) ||
-      !prog_.Link()) {
+  if (prog_.Compile("./Assets/Shaders/Texture/Texture.vs.glsl",
+                    ShaderType::Vertex) &&
+      prog_.Compile("./Assets/Shaders/Texture/Texture.fs.glsl",
+                    ShaderType::Fragment) &&
+      prog_.Link()) {
+    prog_.Use();
+    return std::nullopt;
+  } else {
     return prog_.GetLog();
   }
-
-  prog_.Use();
-  return std::nullopt;
 }

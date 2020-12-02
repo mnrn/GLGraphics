@@ -28,24 +28,23 @@ void SceneDeferred::OnInit() {
   GLfloat tc[] = {0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f,
                   0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f};
 
-  unsigned int handle[2];
-  glGenBuffers(2, handle);
+  glGenBuffers(vbo_.size(), vbo_.data());
 
-  glBindBuffer(GL_ARRAY_BUFFER, handle[0]);
+  glBindBuffer(GL_ARRAY_BUFFER, vbo_[0]);
   glBufferData(GL_ARRAY_BUFFER, 6 * 3 * sizeof(float), verts, GL_STATIC_DRAW);
 
-  glBindBuffer(GL_ARRAY_BUFFER, handle[1]);
+  glBindBuffer(GL_ARRAY_BUFFER, vbo_[1]);
   glBufferData(GL_ARRAY_BUFFER, 6 * 2 * sizeof(float), tc, GL_STATIC_DRAW);
 
   // 頂点配列オブジェクトの設定
   glGenVertexArrays(1, &quad_);
   glBindVertexArray(quad_);
 
-  glBindBuffer(GL_ARRAY_BUFFER, handle[0]);
+  glBindBuffer(GL_ARRAY_BUFFER, vbo_[0]);
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
   glEnableVertexAttribArray(0); // VertexPosition
 
-  glBindBuffer(GL_ARRAY_BUFFER, handle[1]);
+  glBindBuffer(GL_ARRAY_BUFFER, vbo_[1]);
   glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, 0);
   glEnableVertexAttribArray(2); // TexCoord
 
@@ -59,6 +58,11 @@ void SceneDeferred::OnInit() {
   prog_.SetUniform("NormalTex", 1);
   prog_.SetUniform("ColorTex", 2);
 #endif
+}
+
+void SceneDeferred::OnDestroy() {
+  glDeleteVertexArrays(1, &quad_);
+  glDeleteBuffers(vbo_.size(), vbo_.data());
 }
 
 void SceneDeferred::OnUpdate(float t) {

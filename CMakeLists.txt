@@ -101,7 +101,7 @@ function(buildAll)
     endforeach(TARGET)
 endfunction(buildAll)
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/")
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/Bin/")
 set(TARGETS
     HelloTriangle
     Diffuse

@@ -21,10 +21,11 @@
  */
 class Scene {
 public:
-  virtual ~Scene() = default;
+  virtual ~Scene() { OnDestroy(); }
 
   virtual void OnInit() = 0;
-  virtual void OnUpdate(float d) = 0;
+  virtual void OnDestroy() {}
+  virtual void OnUpdate(float t) = 0;
   virtual void OnRender() = 0;
   virtual void OnResize(int w, int h) = 0;
 

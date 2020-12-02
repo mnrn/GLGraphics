@@ -25,9 +25,6 @@
  */
 class SceneDiffuse : public Scene {
 public:
-  SceneDiffuse() = default;
-  ~SceneDiffuse() override = default;
-
   void OnInit() override;
   void OnUpdate(float) override;
   void OnRender() override;
