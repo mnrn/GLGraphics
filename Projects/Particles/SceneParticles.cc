@@ -13,10 +13,10 @@
 #include "SceneParticles.h"
 
 // ********************************************************************************
-// Special member functions
+// Overrided functions
 // ********************************************************************************
 
-SceneParticles::SceneParticles() {
+void SceneParticles::OnInit() {
   if (CompileAndLinkShader() == false) {
     std::exit(EXIT_FAILURE);
   }
@@ -27,10 +27,6 @@ SceneParticles::SceneParticles() {
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
-
-// ********************************************************************************
-// Overrided functions
-// ********************************************************************************
 
 void SceneParticles::OnUpdate(float deltaSec) { static_cast<void>(deltaSec); }
 
@@ -96,18 +92,18 @@ bool SceneParticles::CompileAndLinkShader() {
   if (render_.Compile("./res/shaders/particles/particles.vert",
                       ShaderType::Vertex) == false) {
     std::cerr << "vertex shader failed to Compile." << std::endl;
-    std::cerr << render_.Log() << std::endl;
+    std::cerr << render_.GetLog() << std::endl;
     return false;
   }
   if (render_.Compile("./res/shaders/particles/particles.frag",
                       ShaderType::Fragment) == false) {
     std::cerr << "fragment shader failed to Compile." << std::endl;
-    std::cerr << render_.Log() << std::endl;
+    std::cerr << render_.GetLog() << std::endl;
     return false;
   }
   if (render_.Link() == false) {
     std::cerr << "render program failed to Link." << std::endl;
-    std::cerr << render_.Log() << std::endl;
+    std::cerr << render_.GetLog() << std::endl;
     return false;
   }
 
@@ -115,12 +111,12 @@ bool SceneParticles::CompileAndLinkShader() {
   if (compute_.Compile("./res/shaders/particles/particles.comp",
                        ShaderType::Compute) == false) {
     std::cerr << "compute shader failed to Compile." << std::endl;
-    std::cerr << compute_.Log() << std::endl;
+    std::cerr << compute_.GetLog() << std::endl;
     return false;
   }
   if (compute_.Link() == false) {
     std::cerr << "compute program failed to Link." << std::endl;
-    std::cerr << compute_.Log() << std::endl;
+    std::cerr << compute_.GetLog() << std::endl;
     return false;
   }
 

@@ -54,15 +54,15 @@ public:
     while (glfwWindowShouldClose(window_) == false &&
            glfwGetKey(window_, GLFW_KEY_ESCAPE) == false) {
 
-      timer.start();
+      timer.Start();
 
-      onUpdate(0.0f);
+      onUpdate(static_cast<float>(glfwGetTime()));
       onRender();
 
       glfwSwapBuffers(window_);
       glfwPollEvents();
 
-      timer.end();
+      timer.End();
 
       // precision_t elapsed = timer_.elapsed();
       // if (elapsed < periodic_) {

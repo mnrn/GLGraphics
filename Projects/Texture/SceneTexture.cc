@@ -13,7 +13,7 @@
 #include "SceneTexture.h"
 #include "Texture.h"
 
-SceneTexture::SceneTexture() {
+void SceneTexture::OnInit() {
   if (const auto msg = CompileAndLinkShader()) {
     std::cerr << msg.value() << std::endl;
     BOOST_ASSERT_MSG(false, "failed to compile or link!");
@@ -65,13 +65,12 @@ void SceneTexture::OnResize(int w, int h) {
 }
 
 std::optional<std::string> SceneTexture::CompileAndLinkShader() {
-  // コンパイルとリンク
-  if (!prog_.Compile("./Assets/Shaders/Texture/texture.vs.glsl",
+  if (!prog_.Compile("./Assets/Shaders/Texture/Texture.vs.glsl",
                      ShaderType::Vertex) ||
-      !prog_.Compile("./Assets/Shaders/Texture/texture.fs.glsl",
+      !prog_.Compile("./Assets/Shaders/Texture/Texture.fs.glsl",
                      ShaderType::Fragment) ||
       !prog_.Link()) {
-    return prog_.Log();
+    return prog_.GetLog();
   }
 
   prog_.Use();

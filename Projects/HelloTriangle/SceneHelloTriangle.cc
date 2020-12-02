@@ -15,7 +15,11 @@
 // Special member functions
 // ********************************************************************************
 
-SceneHelloTriangle::SceneHelloTriangle() {
+// ********************************************************************************
+// Override functions
+// ********************************************************************************
+
+void SceneHelloTriangle::OnInit() {
   if (const auto msg = CompileAndLinkShader()) {
     std::cerr << msg.value() << std::endl;
     BOOST_ASSERT_MSG(false, "failed to compile or link!");
@@ -23,10 +27,6 @@ SceneHelloTriangle::SceneHelloTriangle() {
 
   CreateVBO();
 }
-
-// ********************************************************************************
-// Override functions
-// ********************************************************************************
 
 void SceneHelloTriangle::OnUpdate(float d) { static_cast<void>(d); }
 
@@ -49,12 +49,12 @@ void SceneHelloTriangle::OnResize(int w, int h) {
 
 std::optional<std::string> SceneHelloTriangle::CompileAndLinkShader() {
   // compile and links
-  if (!prog_.Compile("./Assets/Shaders/Basic/basic.vs.glsl",
+  if (!prog_.Compile("./Assets/Shaders/Basic/Basic.vs.glsl",
                      ShaderType::Vertex) ||
-      !prog_.Compile("./Assets/Shaders/Basic/basic.fs.glsl",
+      !prog_.Compile("./Assets/Shaders/Basic/Basic.fs.glsl",
                      ShaderType::Fragment) ||
       !prog_.Link()) {
-    return prog_.Log();
+    return prog_.GetLog();
   }
 
   prog_.Use();
@@ -85,8 +85,8 @@ void SceneHelloTriangle::CreateVBO() {
   glGenVertexArrays(1, &vbo_);
   glBindVertexArray(vbo_);
 
-  glEnableVertexAttribArray(0); // vertex position
-  glEnableVertexAttribArray(1); // vertex color
+  glEnableVertexAttribArray(0); // Vertex position
+  glEnableVertexAttribArray(1); // Vertex color
 
   glBindBuffer(GL_ARRAY_BUFFER, vboPosition);
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);

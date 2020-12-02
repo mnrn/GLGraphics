@@ -104,7 +104,11 @@ endfunction(buildAll)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/")
 set(TARGETS
     HelloTriangle
+    Diffuse
+    Phong
+    Subroutine
     Texture
+    Deferred
     Bezier
     #Particles
 )

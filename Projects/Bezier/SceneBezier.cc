@@ -13,10 +13,10 @@
 #include "SceneBezier.h"
 
 // ********************************************************************************
-// Special member functions
+// Override functions
 // ********************************************************************************
 
-SceneBezier::SceneBezier() {
+void SceneBezier::OnInit() {
   proj_ = glm::ortho(-0.4f * c, 0.4f * c, -0.3f * c, 0.3f * c, 0.1f, 100.0f);
   if (const auto msg = CompileAndLinkShader()) {
     std::cerr << msg.value() << std::endl;
@@ -31,10 +31,6 @@ SceneBezier::SceneBezier() {
   glPatchParameteri(GL_PATCH_VERTICES, 4);
   SetUniforms();
 }
-
-// ********************************************************************************
-// Override functions
-// ********************************************************************************
 
 void SceneBezier::OnUpdate(float d) { static_cast<void>(d); }
 
@@ -80,7 +76,7 @@ std::optional<std::string> SceneBezier::CompileAndLinkShader() {
       !bezier_.Compile("./Assets/Shaders/Bezier/bezier.fs.glsl",
                        ShaderType::Fragment) ||
       !bezier_.Link()) {
-    return bezier_.Log();
+    return bezier_.GetLog();
   }
   bezier_.Use();
 
@@ -89,7 +85,7 @@ std::optional<std::string> SceneBezier::CompileAndLinkShader() {
       !solid_.Compile("./Assets/Shaders/Bezier/solid.fs.glsl",
                       ShaderType::Fragment) ||
       !solid_.Link()) {
-    return solid_.Log();
+    return solid_.GetLog();
   }
   return std::nullopt;
 }

@@ -1,16 +1,16 @@
 /**
- * @brief  Render Particles
- * @date   2017/08/27
+ * @brief  Subroutine Test
  */
 
 // ********************************************************************************
 // Include files
 // ********************************************************************************
 
+#include "SceneSubroutine.h"
+
 #include <memory>
 
 #include "App.h"
-#include "SceneParticles.h"
 
 // ********************************************************************************
 // Entry point
@@ -23,11 +23,10 @@ int main(
     int argc, char **argv
 #endif
 ) {
-
-  App app("Compute Particles");
+  App app("Subroutine");
 
   // Create scene
-  std::unique_ptr<Scene> scene = std::make_unique<SceneParticles>();
+  std::unique_ptr<Scene> scene = std::make_unique<SceneSubroutine>();
 
   // Enter the main loop
   return app.Run(

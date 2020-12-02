@@ -1,10 +1,9 @@
 /**
- * @brief Scene Triangle
- * @date 2017/
+ * @brief Diffuse Reflection Model Test
  */
 
-#ifndef SCENE_HELLO_TRIANGLE_H
-#define SCENE_HELLO_TRIANGLE_H
+#ifndef SCENE_PHONG_H
+#define SCENE_PHONG_H
 
 // ********************************************************************************
 // Include files
@@ -13,6 +12,7 @@
 #include <optional>
 #include <string>
 
+#include "Primitive/Torus.h"
 #include "Scene.h"
 #include "Shader.hh"
 
@@ -21,12 +21,12 @@
 // ********************************************************************************
 
 /**
- * @brief Scene Hello Triangle Class
+ * @brief Scene Phong Class
  */
-class SceneHelloTriangle : public Scene {
+class ScenePhong : public Scene {
 public:
-  SceneHelloTriangle() = default;
-  ~SceneHelloTriangle() override = default;
+  ScenePhong() = default;
+  ~ScenePhong() override = default;
 
   void OnInit() override;
   void OnUpdate(float) override;
@@ -35,9 +35,9 @@ public:
 
 private:
   std::optional<std::string> CompileAndLinkShader();
-  void CreateVBO();
 
-  GLuint vbo_ = 0;
+  Torus torus_{0.7f, 0.3f, 50, 50};
+  float angle_ = 0.0f;
   ShaderProgram prog_;
 };
 

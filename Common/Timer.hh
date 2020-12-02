@@ -22,15 +22,15 @@
 template <typename ClockType = std::chrono::high_resolution_clock> class Timer {
 public:
   // start timer
-  void start() { start_ = ClockType::now(); }
+  void Start() { start_ = ClockType::now(); }
   // end tismer
-  void end() { end_ = ClockType::now(); }
+  void End() { end_ = ClockType::now(); }
   // get timer duration
-  std::chrono::duration<double, std::milli> duration() const {
+  std::chrono::duration<double, std::milli> Duration() const {
     return end_ - start_;
   }
   // get elapsed time
-  double elapsed() const { return duration().count(); }
+  double Elapsed() const { return Duration().count(); }
 
 private:
   std::chrono::time_point<ClockType> start_;

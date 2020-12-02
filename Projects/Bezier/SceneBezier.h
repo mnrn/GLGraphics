@@ -26,9 +26,10 @@
  */
 class SceneBezier : public Scene {
 public:
-  SceneBezier();
+  SceneBezier() = default;
   ~SceneBezier() override = default;
 
+  void OnInit() override;
   void OnUpdate(float) override;
   void OnRender() override;
   void OnResize(int, int) override;

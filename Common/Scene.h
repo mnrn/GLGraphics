@@ -22,6 +22,8 @@
 class Scene {
 public:
   virtual ~Scene() = default;
+
+  virtual void OnInit() = 0;
   virtual void OnUpdate(float d) = 0;
   virtual void OnRender() = 0;
   virtual void OnResize(int w, int h) = 0;
@@ -34,9 +36,10 @@ public:
 protected:
   int width_;
   int height_;
-  glm::mat4 model_;
-  glm::mat4 view_;
-  glm::mat4 proj_;
+
+  glm::mat4 model_; // モデル行列
+  glm::mat4 view_;  // ビュー行列
+  glm::mat4 proj_;  // 射影行列
 };
 
 #endif

@@ -1,6 +1,5 @@
 /**
- * @brief  Render Particles
- * @date   2017/08/27
+ * @brief  Diffuse Model Test
  */
 
 // ********************************************************************************
@@ -10,7 +9,7 @@
 #include <memory>
 
 #include "App.h"
-#include "SceneParticles.h"
+#include "ScenePhong.h"
 
 // ********************************************************************************
 // Entry point
@@ -23,11 +22,10 @@ int main(
     int argc, char **argv
 #endif
 ) {
-
-  App app("Compute Particles");
+  App app("Phong Shading Model");
 
   // Create scene
-  std::unique_ptr<Scene> scene = std::make_unique<SceneParticles>();
+  std::unique_ptr<Scene> scene = std::make_unique<ScenePhong>();
 
   // Enter the main loop
   return app.Run(

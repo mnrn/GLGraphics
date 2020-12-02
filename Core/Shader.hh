@@ -17,6 +17,7 @@
 #include "GLInclude.h"
 
 #include <fstream>
+#include <iostream>
 #include <memory>
 #include <sstream>
 #include <string>
@@ -151,8 +152,8 @@ public:
   // Accessor
   //*--------------------------------------------------------------------------------
 
-  const std::string &Log() const { return log_; }
-  GLuint Handle() const { return handle_; }
+  const std::string &GetLog() const { return log_; }
+  GLuint GetHandle() const { return handle_; }
   bool IsLinked() const { return isLinked_; }
 
   //*--------------------------------------------------------------------------------
@@ -240,7 +241,7 @@ private:
 
     // Check for errors
     int res = GL_FALSE;
-    glGetShaderiv(handle, GL_COMPILE_STATUS, std::addressof(res));
+    glGetShaderiv(handle, GL_COMPILE_STATUS, &res);
     if (GL_FALSE == res) {
       StoreLog(handle);
       return false;
@@ -259,11 +260,10 @@ private:
       return;
     }
 
-    char *log = new char[static_cast<std::size_t>(length)];
+    std::string log(length, ' ');
     int written = 0;
-    glGetProgramInfoLog(handle, length, &written, log);
+    glGetProgramInfoLog(handle, length, &written, &log[0]);
     log_ = log;
-    delete[] log;
   }
 
   //*--------------------------------------------------------------------------------

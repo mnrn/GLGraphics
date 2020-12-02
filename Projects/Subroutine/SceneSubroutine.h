@@ -1,10 +1,9 @@
 /**
- * @brief Scene Triangle
- * @date 2017/
+ * @brief Subroutine Test
  */
 
-#ifndef SCENE_HELLO_TRIANGLE_H
-#define SCENE_HELLO_TRIANGLE_H
+#ifndef SCENE_SUBROUTINE_H
+#define SCENE_SUBROUTINE_H
 
 // ********************************************************************************
 // Include files
@@ -13,6 +12,7 @@
 #include <optional>
 #include <string>
 
+#include "Primitive/Teapot.h"
 #include "Scene.h"
 #include "Shader.hh"
 
@@ -21,12 +21,12 @@
 // ********************************************************************************
 
 /**
- * @brief Scene Hello Triangle Class
+ * @brief Scene Subroutine Class
  */
-class SceneHelloTriangle : public Scene {
+class SceneSubroutine : public Scene {
 public:
-  SceneHelloTriangle() = default;
-  ~SceneHelloTriangle() override = default;
+  SceneSubroutine() = default;
+  ~SceneSubroutine() override = default;
 
   void OnInit() override;
   void OnUpdate(float) override;
@@ -35,10 +35,10 @@ public:
 
 private:
   std::optional<std::string> CompileAndLinkShader();
-  void CreateVBO();
+  void SetMatrices();
 
-  GLuint vbo_ = 0;
+  Teapot teapot_{13, glm::mat4(1.0f)};
   ShaderProgram prog_;
 };
 
-#endif // SCENE_HELLO_TRIANGLE_H
+#endif // SCENE_SUBROUTINE_H

@@ -18,9 +18,10 @@
 
 class SceneParticles : public Scene {
 public:
-  SceneParticles();
+  SceneParticles() = default;
   ~SceneParticles() override = default;
 
+  void OnInit() override;
   void OnUpdate(float) override;
   void OnRender() override;
   void OnResize(int, int) override;

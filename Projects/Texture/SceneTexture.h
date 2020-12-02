@@ -7,9 +7,10 @@
 
 class SceneTexture : public Scene {
 public:
-  SceneTexture();
+  SceneTexture() = default;
   ~SceneTexture() override = default;
 
+  void OnInit() override;
   void OnUpdate(float) override;
   void OnRender() override;
   void OnResize(int, int) override;
