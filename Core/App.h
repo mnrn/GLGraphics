@@ -9,6 +9,7 @@
 // Include files
 // ********************************************************************************
 
+#include <boost/assert.hpp>
 #include <boost/noncopyable.hpp>
 
 #include "Common.h"
@@ -27,10 +28,9 @@ public:
     glfwInit();
 
     window_ = Window::Create(w, h, appName);
-    width_ = w;
-    height_ = h;
+    glfwGetFramebufferSize(window_, &width_, &height_);
 
-    InitGlew();
+    InitGlad();
     Debug::SetupInfo();
   }
 
@@ -66,19 +66,10 @@ private:
   int width_;
   int height_;
 
-  static void InitGlew() {
-
-    // Initialize GLEW
-    glewExperimental = GL_TRUE;
-    const GLenum err = glewInit();
-    if (err == GLEW_OK) {
-      std::cout << "GLEW_OK: Glew Ver." << glewGetString(GLEW_VERSION)
-                << std::endl;
-    } else {
-      std::cerr << "GLEW Error:" << glewGetErrorString(err) << std::endl;
-    }
-    if (!GLEW_ARB_vertex_array_object) {
-      std::cerr << "ARB_vertex_array_object not avaliable" << std::endl;
+  static void InitGlad() {
+    // Initialize GLAD
+    if (!gladLoadGL()) {
+      BOOST_ASSERT_MSG(false, "Something went wrong!");
     }
   }
 };

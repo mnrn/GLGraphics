@@ -25,6 +25,7 @@ namespace Debug {
 // Functions
 // ********************************************************************************
 
+#ifndef __APPLE__
 [[maybe_unused]] static inline void APIENTRY
 Callback(GLenum src, GLenum type, GLuint id, GLenum severity, GLsizei length,
          const GLchar *msg, const void *param) {
@@ -110,6 +111,7 @@ Callback(GLenum src, GLenum type, GLuint id, GLenum severity, GLsizei length,
   fmt::printf("%s:%s[%s](%d): %s\n", srcstr.c_str(), typestr.c_str(),
               sevstr.c_str(), id, msg);
 }
+#endif
 
 [[maybe_unused]] static inline int32_t CheckForOpenGLError(const char *filepath,
                                                            int32_t line) {

@@ -20,7 +20,7 @@ set(CMAKE_CXX_FLAGS_RELWITHDEBINFO, "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -g -pg -O
 set(CMAKE_CXX_FLAGS_RELEASE, "${CMAKE_CXX_FLAGS_RELEASE} -DNDEBUG -O4 -flto")
 set(CMAKE_CXX_FLAGS_MINSIZEREL, "${CMAKE_CXX_FLAGS_MINSIZEREL} -DNDEBUG -Oz")
 
-
+# OpenGL
 find_package(OpenGL REQUIRED)
 if (NOT OPENGL_FOUND)
     message(FATAL_ERROR "Could not find opengl!")
@@ -28,14 +28,7 @@ else()
     message("@@ OPENGL_LIBRARIES: ${OPENGL_LIBRARIES}")
 endif()
 
-set(CMAKE_LIBRARY_PATH "${CMAKE_SOURCE_DIR}/lib/glew")
-find_library(GLEW_LIBRARIES NAMES GLEW glew32 glew glew32s PATH_SUFFIXES lib64)
-if (NOT GLEW_LIBRARIES)
-    message(FATAL_ERROR "Could not find glew!")
-else()
-    message("@@ GLEW_LIBRARIES: ${GLEW_LIBRARIES}")
-endif()
-
+# glfw
 find_package(GLFW REQUIRED)
 if (NOT GLFW_FOUND)
     message(FATAL_ERROR "Could not find glfw!")
@@ -43,6 +36,7 @@ else()
     message("@@ GLFW_LIBRARIES: ${GLFW_LIBRARIES}")
 endif()
 
+# Boost
 set(Boost_USE_STATIC_LIBS ON)
 find_package(Boost COMPONENTS filesystem REQUIRED)
 if (NOT Boost_FOUND)
@@ -50,6 +44,10 @@ if (NOT Boost_FOUND)
 else()
     message("@@ Boost_LIBRARY_DIRS: ${Boost_LIBRARY_DIRS}")
 endif()
+
+## glad
+add_subdirectory(Lib/glad)
+set(GLAD_LIBRARIES glad)
 
 # Set preprocessor defines
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNOMINMAX -D_USE_MATH_DEFINES")
@@ -87,8 +85,8 @@ function(build TARGET_NAME)
     target_link_libraries(${TARGET_NAME} 
         ${OPENGL_LIBRARIES}
         ${CMAKE_THREAD_LIBS_INIT}
-        ${GLEW_LIBRARIES}
         ${GLFW_LIBRARIES}
+        ${GLAD_LIBRARIES}
         ${Boost_LIBRARIES}
     )
 endfunction(build)

@@ -39,7 +39,9 @@ enum class ShaderType {
   Geometry,
   TessControl,
   TessEvaluation,
+#ifndef __APPLE__
   Compute,
+#endif
 };
 
 /**
@@ -228,9 +230,11 @@ private:
     case ShaderType::TessEvaluation:
       handle = glCreateShader(GL_TESS_EVALUATION_SHADER);
       break;
+#ifndef __APPLE__
     case ShaderType::Compute:
       handle = glCreateShader(GL_COMPUTE_SHADER);
       break;
+#endif
     default:
       return false;
     }

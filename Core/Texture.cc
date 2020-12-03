@@ -25,6 +25,7 @@ GLuint LoadTexture(const std::string &name) {
   GLuint tex = 0;
   glGenTextures(1, &tex);
   glBindTexture(GL_TEXTURE_2D, tex);
+
   glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, w, h);
   glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, w, h, GL_RGBA, GL_UNSIGNED_BYTE,
                   data);
