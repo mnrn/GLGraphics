@@ -50,16 +50,16 @@ void SceneHelloTriangle::OnResize(int w, int h) {
 
 std::optional<std::string> SceneHelloTriangle::CompileAndLinkShader() {
   // compile and links
-  if (!prog_.Compile("./Assets/Shaders/Basic/Basic.vs.glsl",
-                     ShaderType::Vertex) ||
-      !prog_.Compile("./Assets/Shaders/Basic/Basic.fs.glsl",
-                     ShaderType::Fragment) ||
-      !prog_.Link()) {
+  if (prog_.Compile("./Assets/Shaders/Basic/Basic.vs.glsl",
+                     ShaderType::Vertex) &&
+      prog_.Compile("./Assets/Shaders/Basic/Basic.fs.glsl",
+                     ShaderType::Fragment) &&
+      prog_.Link()) {
+    prog_.Use();
+    return std::nullopt;
+  } else {
     return prog_.GetLog();
   }
-
-  prog_.Use();
-  return std::nullopt;
 }
 
 void SceneHelloTriangle::CreateVBO() {

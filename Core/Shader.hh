@@ -23,7 +23,11 @@
 #include <string>
 #include <utility>
 
+#ifdef __APPLE__
 #include <boost/filesystem.hpp>
+#else
+#include <filesystem>
+#endif
 #include <boost/noncopyable.hpp>
 
 // ********************************************************************************
@@ -46,8 +50,6 @@ enum class ShaderType {
 
 /**
  * @brief GLSL Shader Program Class
- * @ref
- * https://github.com/daw42/glslcookbook/blob/master/ingredients/glslprogram.cpp
  */
 class ShaderProgram : private boost::noncopyable {
 public:
@@ -207,9 +209,15 @@ private:
   }
 
   bool IsFileExists(const char *filepath) const {
+#ifdef __APPLE__
     boost::system::error_code error;
     const bool result = boost::filesystem::exists(filepath, error);
     return !error && result;
+#else
+    std::error_code ec;
+    const bool result = std::filesystem::exists(filepath, ec);
+    return !ec && result;
+#endif
   }
 
   bool Compile(const std::string &src, ShaderType type) {

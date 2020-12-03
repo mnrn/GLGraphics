@@ -53,11 +53,11 @@ void SceneDeferred::OnInit() {
   gbuffer_.OnInit(width_, height_);
 
   prog_.SetUniform("Light.Ld", glm::vec3(1.0f));
-#ifdef __APPLE__
+
   prog_.SetUniform("PositionTex", 0);
   prog_.SetUniform("NormalTex", 1);
   prog_.SetUniform("ColorTex", 2);
-#endif
+
 }
 
 void SceneDeferred::OnDestroy() {

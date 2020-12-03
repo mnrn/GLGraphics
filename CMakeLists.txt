@@ -1,6 +1,9 @@
-cmake_minimum_required(VERSION 3.2 FATAL_ERROR)
-cmake_policy(VERSION 3.2)
+cmake_minimum_required(VERSION 3.12)
+cmake_policy(VERSION 3.12)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMake")
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED)
 
 project(dummy NONE)
   if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
@@ -29,20 +32,33 @@ else()
 endif()
 
 # glfw
-find_package(GLFW REQUIRED)
-if (NOT GLFW_FOUND)
-    message(FATAL_ERROR "Could not find glfw!")
+if (UNIX)
+    find_package(GLFW)
+    if (NOT GLFW_FOUND)
+        message(FATAL_ERROR "Could not find glfw!")
+    else()
+        message("@@ GLFW_LIBRARIES: ${GLFW_LIBRARIES}")
+    endif()
 else()
+    find_library(GLFW_LIBRARIES
+      NAMES
+        glfw
+        glfw3
+      HINTS
+        ${CMAKE_SOURCE_DIR}/Lib/glfw
+    )
     message("@@ GLFW_LIBRARIES: ${GLFW_LIBRARIES}")
 endif()
 
 # Boost
-set(Boost_USE_STATIC_LIBS ON)
-find_package(Boost COMPONENTS filesystem REQUIRED)
-if (NOT Boost_FOUND)
-    message(FATAL_ERROR "Could not find Boost!")
-else()
-    message("@@ Boost_LIBRARY_DIRS: ${Boost_LIBRARY_DIRS}")
+if (APPLE)
+    set(Boost_USE_STATIC_LIBS ON)
+    find_package(Boost COMPONENTS filesystem REQUIRED)
+    if (NOT Boost_FOUND)
+        message(FATAL_ERROR "Could not find Boost!")
+    else()
+        message("@@ Boost_LIBRARY_DIRS: ${Boost_LIBRARY_DIRS}")
+    endif()
 endif()
 
 ## glad
@@ -66,7 +82,6 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-poison-system-directories -Wno-ctad-maybe-unsupported")
 endif()
 
-add_definitions(-std=c++17)
 file(GLOB SOURCE *.cc Core/*.cc Common/*.cc Common/Primitive/*.cc)
 
 # Function for building

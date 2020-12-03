@@ -11,6 +11,7 @@
 
 #include <boost/assert.hpp>
 #include <boost/noncopyable.hpp>
+#include <iostream>
 
 #include "Common.h"
 #include "GLInclude.h"
@@ -25,13 +26,17 @@
 class App : private boost::noncopyable {
 public:
   App(const char *appName, int w = 1280, int h = 720) {
-    glfwInit();
+    if (glfwInit() == GL_FALSE) {
+      BOOST_ASSERT_MSG(false, "glfw Initialization failed!");
+    }
 
     window_ = Window::Create(w, h, appName);
     glfwGetFramebufferSize(window_, &width_, &height_);
 
     InitGlad();
+#if (_DEBUG)
     Debug::SetupInfo();
+#endif
   }
 
   ~App() {
@@ -50,14 +55,16 @@ public:
     while (!glfwWindowShouldClose(window_) &&
            !glfwGetKey(window_, GLFW_KEY_ESCAPE)) {
 
+#if (_DEBUG)
       Debug::CheckForOpenGLError(__FILE__, __LINE__);
-
+#endif
       onUpdate(static_cast<float>(glfwGetTime()));
       onRender();
 
       glfwSwapBuffers(window_);
       glfwPollEvents();
     }
+
     return EXIT_SUCCESS;
   }
 
