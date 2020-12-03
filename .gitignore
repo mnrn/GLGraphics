@@ -1,5 +1,7 @@
-# For macosx
 *.DS_Store
+
+/.vs
+/out
 
 # Ignore the object files and dependency files.
 *.o
