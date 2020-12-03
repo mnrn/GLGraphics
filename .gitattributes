@@ -1,0 +1,3 @@
+*.h linguist-language=C++
+
+Lib/glad/* linguist-vendored

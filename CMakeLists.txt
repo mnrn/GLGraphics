@@ -123,6 +123,6 @@ set(TARGETS
     Texture
     Deferred
     Bezier
-    #Particles
+    Particles
 )
 buildAll()

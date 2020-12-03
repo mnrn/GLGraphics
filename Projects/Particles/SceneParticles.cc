@@ -59,7 +59,7 @@ void SceneParticles::OnRender() {
 
   // Draw the particles
   glPointSize(1.0f);
-  render_.SetUniform("color", glm::vec4(0.0f, 0.0f, 0.0f, 0.2f));
+  render_.SetUniform("Color", glm::vec4(0.0f, 0.0f, 0.0f, 0.2f));
   glBindVertexArray(hParticlesVAO_);
   glDrawArrays(GL_POINTS, 0, totalParticlesNum_);
   glBindVertexArray(0);
@@ -71,7 +71,7 @@ void SceneParticles::OnRender() {
                     blackHole2Pos.z, blackHole2Pos.z};
   glBindBuffer(GL_ARRAY_BUFFER, hBlackHoleVAO_);
   glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(GLfloat) * 8, data);
-  render_.SetUniform("color", glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
+  render_.SetUniform("Color", glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
   glBindVertexArray(hBlackHoleVAO_);
   glDrawArrays(GL_POINTS, 0, 2);
   glBindVertexArray(0);
@@ -89,13 +89,13 @@ void SceneParticles::OnResize(int w, int h) {
 bool SceneParticles::CompileAndLinkShader() {
 
   // For render program.
-  if (render_.Compile("./res/shaders/particles/particles.vert",
+  if (render_.Compile("./Assets/Shaders/Particles/particles.vs.glsl",
                       ShaderType::Vertex) == false) {
     std::cerr << "vertex shader failed to Compile." << std::endl;
     std::cerr << render_.GetLog() << std::endl;
     return false;
   }
-  if (render_.Compile("./res/shaders/particles/particles.frag",
+  if (render_.Compile("./Assets/Shaders/Particles/particles.fs.glsl",
                       ShaderType::Fragment) == false) {
     std::cerr << "fragment shader failed to Compile." << std::endl;
     std::cerr << render_.GetLog() << std::endl;
@@ -108,7 +108,7 @@ bool SceneParticles::CompileAndLinkShader() {
   }
 
   // For compute program.
-  if (compute_.Compile("./res/shaders/particles/particles.comp",
+  if (compute_.Compile("./Assets/Shaders/Particles/particles.cs.glsl",
                        ShaderType::Compute) == false) {
     std::cerr << "compute shader failed to Compile." << std::endl;
     std::cerr << compute_.GetLog() << std::endl;
