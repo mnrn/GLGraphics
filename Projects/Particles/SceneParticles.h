@@ -10,6 +10,9 @@
 // ********************************************************************************
 
 #include "Scene.h"
+
+#include <array>
+
 #include "Shader.hh"
 
 // ********************************************************************************
@@ -19,6 +22,7 @@
 class SceneParticles : public Scene {
 public:
   void OnInit() override;
+  void OnDestroy() override;
   void OnUpdate(float) override;
   void OnRender() override;
   void OnResize(int, int) override;
@@ -28,8 +32,8 @@ private:
   bool CompileAndLinkShader();
 
   GLuint hParticlesVAO_ = 0;
-  GLuint hBlackHoleVAO_ = 0;
   GLuint hBlackHoleBuffer_ = 0;
+  GLuint hBlackHoleVAO_ = 0;
 
   ShaderProgram render_;
   ShaderProgram compute_;

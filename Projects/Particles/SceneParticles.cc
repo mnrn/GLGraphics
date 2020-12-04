@@ -1,5 +1,5 @@
 /**
- * @brief
+ * @brief コンピュートシェーダー入門
  */
 
 // ********************************************************************************
@@ -28,24 +28,29 @@ void SceneParticles::OnInit() {
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
+void SceneParticles::OnDestroy() {
+  glDeleteVertexArrays(1, &hBlackHoleVAO_);
+  glDeleteBuffers(1, &hBlackHoleBuffer_);
+  glDeleteVertexArrays(1, &hParticlesVAO_);
+}
+
 void SceneParticles::OnUpdate(float deltaSec) { static_cast<void>(deltaSec); }
 
 void SceneParticles::OnRender() {
-
-  // Rotate the black holes
+  // 重力場の回転
   const glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), glm::radians(angle_),
                                          glm::vec3(0.0f, 0.0f, 1.0f));
   const glm::vec3 blackHole1Pos = glm::vec3(rotation * blackHole1Pos_);
   const glm::vec3 blackHole2Pos = glm::vec3(rotation * blackHole2Pos_);
 
-  // Execute a compute shader
+  // コンピュートシェーダーの実行
   compute_.Use();
-  compute_.SetUniform("blackHole1Pos", blackHole1Pos);
-  compute_.SetUniform("blackHole2Pos", blackHole2Pos);
+  compute_.SetUniform("BlackHole1Pos", blackHole1Pos);
+  compute_.SetUniform("BlackHole2Pos", blackHole2Pos);
   glDispatchCompute(totalParticlesNum_ / localSizeX_, 1, 1);
   glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
-  // Draw the scene
+  // シーン描画準備
   render_.Use();
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   const glm::mat4 proj = glm::perspective(
@@ -57,15 +62,15 @@ void SceneParticles::OnRender() {
   const glm::mat4 model = glm::mat4(1.0f);
   render_.SetUniform("MVP", proj * view * model);
 
-  // Draw the particles
+  // パーティクルの描画
   glPointSize(1.0f);
   render_.SetUniform("Color", glm::vec4(0.0f, 0.0f, 0.0f, 0.2f));
   glBindVertexArray(hParticlesVAO_);
   glDrawArrays(GL_POINTS, 0, totalParticlesNum_);
   glBindVertexArray(0);
 
-  // Draw the black holes
-  glPointSize(5.0f);
+  // ブラックホールの描画
+  glPointSize(2.5f);
   GLfloat data[] = {blackHole1Pos.x, blackHole1Pos.y, blackHole1Pos.z,
                     blackHole1Pos.z, blackHole2Pos.x, blackHole2Pos.y,
                     blackHole2Pos.z, blackHole2Pos.z};
@@ -88,7 +93,7 @@ void SceneParticles::OnResize(int w, int h) {
 
 bool SceneParticles::CompileAndLinkShader() {
 
-  // For render program.
+  // シーン描画用プログラム
   if (render_.Compile("./Assets/Shaders/Particles/particles.vs.glsl",
                       ShaderType::Vertex) == false) {
     std::cerr << "vertex shader failed to Compile." << std::endl;
@@ -107,7 +112,7 @@ bool SceneParticles::CompileAndLinkShader() {
     return false;
   }
 
-  // For compute program.
+  // コンピュートシェーダー用プログラム
   if (compute_.Compile("./Assets/Shaders/Particles/particles.cs.glsl",
                        ShaderType::Compute) == false) {
     std::cerr << "compute shader failed to Compile." << std::endl;
@@ -125,7 +130,7 @@ bool SceneParticles::CompileAndLinkShader() {
 
 void SceneParticles::InitBuffer() {
 
-  // Initialize variables.
+  // 変数の初期化を行います。
   std::vector<GLfloat> initPos;
   std::vector<GLfloat> initVel(totalParticlesNum_ * 4, 0.0f);
   glm::vec4 p(0.0f, 0.0f, 0.0f, 1.0f);
@@ -135,9 +140,9 @@ void SceneParticles::InitBuffer() {
   const glm::mat4 transform = glm::translate(
       glm::mat4(1.0f), // Identity matrix
       glm::vec3(-1.0f, -1.0f,
-                -1.0f)); // want to center the particles at (0, 0, 0)
+                -1.0f)); // 中央のパーティクルが(0, 0, 0)にくるようにします。
 
-  // Setup particles position.
+  // パーティクルの初期位置を設定します。
   for (int32_t xi = 0; xi < particlesXNum_; xi++) {
     for (int32_t yi = 0; yi < particlesYNum_; yi++) {
       for (int32_t zi = 0; zi < particlesZNum_; zi++) {
@@ -155,7 +160,7 @@ void SceneParticles::InitBuffer() {
     }
   }
 
-  // Generate buffer object for position and velocity.
+  // コンピュートシェーダー用のバッファを生成します。
   GLuint bufObjs[2];
   glGenBuffers(2, bufObjs);
   GLuint bufPos = bufObjs[0];
@@ -163,14 +168,12 @@ void SceneParticles::InitBuffer() {
 
   const GLuint bufSize = totalParticlesNum_ * sizeof(GLfloat) * 4;
 
-  // Bind a named buffer object and, creates and initializes buffers objects's
-  // data store.
   glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, bufPos);
   glBufferData(GL_SHADER_STORAGE_BUFFER, bufSize, &initPos[0], GL_DYNAMIC_DRAW);
   glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, bufVel);
   glBufferData(GL_SHADER_STORAGE_BUFFER, bufSize, &initVel[0], GL_DYNAMIC_COPY);
 
-  // Setup the paritcles vbo.
+  // パーティクル用のVAOを生成します。
   glGenVertexArrays(1, &hParticlesVAO_);
   glBindVertexArray(hParticlesVAO_);
   glBindBuffer(GL_ARRAY_BUFFER, bufPos);
@@ -178,7 +181,7 @@ void SceneParticles::InitBuffer() {
   glEnableVertexAttribArray(0);
   glBindVertexArray(0);
 
-  // Setup a hole buffer and vbo for drawing the black holes.
+  // ブラックホール用のVBOとVAOを生成します。
   glGenBuffers(1, &hBlackHoleBuffer_);
   glBindBuffer(GL_ARRAY_BUFFER, hBlackHoleBuffer_);
   GLfloat data[] = {blackHole1Pos_.x, blackHole1Pos_.y, blackHole1Pos_.z,
