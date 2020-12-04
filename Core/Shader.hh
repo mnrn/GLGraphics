@@ -53,6 +53,7 @@ enum class ShaderType {
  */
 class ShaderProgram : private boost::noncopyable {
 public:
+  ShaderProgram() = default;
   ~ShaderProgram() {
     if (handle_ == 0) {
       return;

@@ -32,6 +32,7 @@ void SceneParticles::OnDestroy() {
   glDeleteVertexArrays(1, &hBlackHoleVAO_);
   glDeleteBuffers(1, &hBlackHoleBuffer_);
   glDeleteVertexArrays(1, &hParticlesVAO_);
+  glDeleteBuffers(computeBuffer_.size(), computeBuffer_.data());
 }
 
 void SceneParticles::OnUpdate(float deltaSec) { static_cast<void>(deltaSec); }
@@ -150,21 +151,21 @@ void SceneParticles::InitBuffer() {
         p.x = dx * xi;
         p.y = dy * yi;
         p.z = dz * zi;
+        p.w = 1.0f;
         p = transform * p;
 
-        initPos.push_back(p.x);
-        initPos.push_back(p.y);
-        initPos.push_back(p.z);
-        initPos.push_back(p.w);
+        initPos.emplace_back(p.x);
+        initPos.emplace_back(p.y);
+        initPos.emplace_back(p.z);
+        initPos.emplace_back(p.w);
       }
     }
   }
 
   // コンピュートシェーダー用のバッファを生成します。
-  GLuint bufObjs[2];
-  glGenBuffers(2, bufObjs);
-  GLuint bufPos = bufObjs[0];
-  GLuint bufVel = bufObjs[1];
+  glGenBuffers(computeBuffer_.size(), computeBuffer_.data());
+  GLuint bufPos = computeBuffer_[0];
+  GLuint bufVel = computeBuffer_[1];
 
   const GLuint bufSize = totalParticlesNum_ * sizeof(GLfloat) * 4;
 
@@ -181,7 +182,7 @@ void SceneParticles::InitBuffer() {
   glEnableVertexAttribArray(0);
   glBindVertexArray(0);
 
-  // ブラックホール用のVBOとVAOを生成します。
+  // ブラックホール用のVBOとVAOを設定します。
   glGenBuffers(1, &hBlackHoleBuffer_);
   glBindBuffer(GL_ARRAY_BUFFER, hBlackHoleBuffer_);
   GLfloat data[] = {blackHole1Pos_.x, blackHole1Pos_.y, blackHole1Pos_.z,
