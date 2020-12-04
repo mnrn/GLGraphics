@@ -2,8 +2,8 @@
 
 layout ( vertices=4 ) out;
 
-uniform int segments;
-uniform int strips;
+uniform int Segments;
+uniform int Strips;
 
 void main() {
   // Pass along the version position unmodified
@@ -14,6 +14,6 @@ void main() {
   // the number of segments per strip.  Unfortunately, not all drivers do this.
   // If this example doesn't work for you, try switching the right
   // hand side of the two assignments below.
-  gl_TessLevelOuter[0] = float(strips);
-  gl_TessLevelOuter[1] = float(segments);
+  gl_TessLevelOuter[0] = float(Strips);
+  gl_TessLevelOuter[1] = float(Segments);
 }

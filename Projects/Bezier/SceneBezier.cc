@@ -27,7 +27,7 @@ void SceneBezier::OnInit() {
   glPointSize(10.0f);
 
   CreateVAO();
-  // Set the number of vertices per patch.  IMPORTANT!!
+  // パッチごとの頂点数(制御点)を設定しておきます。  IMPORTANT!!
   glPatchParameteri(GL_PATCH_VERTICES, 4);
   SetUniforms();
 }
@@ -50,11 +50,11 @@ void SceneBezier::OnRender() {
   glBindVertexArray(vao_);
   SetMatrices(model, view, proj_);
 
-  // Draw curve
+  // ベジェ曲線の描画
   bezier_.Use();
   glDrawArrays(GL_PATCHES, 0, 4);
 
-  // Draw the control points
+  // 制御点の描画
   solid_.Use();
   glDrawArrays(GL_POINTS, 0, 4);
 
@@ -96,7 +96,7 @@ std::optional<std::string> SceneBezier::CompileAndLinkShader() {
 }
 
 void SceneBezier::CreateVAO() {
-  // Set up patch VBO
+  // 制御点用のVBOを設定します。
   float v[] = {-1.0f, -1.0f, -0.5f, 1.0f, 0.5f, -1.0f, 1.0f, 1.0f};
 
   glGenBuffers(1, &vbo_);
@@ -104,7 +104,7 @@ void SceneBezier::CreateVAO() {
   glBindBuffer(GL_ARRAY_BUFFER, vbo_);
   glBufferData(GL_ARRAY_BUFFER, sizeof(v), v, GL_STATIC_DRAW);
 
-  // Set up patch VAO
+  // 制御点用のVAOを設定します。
   glGenVertexArrays(1, &vao_);
   glBindVertexArray(vao_);
 
@@ -116,14 +116,14 @@ void SceneBezier::CreateVAO() {
 }
 
 void SceneBezier::SetUniforms() {
-  // Segments and strips may be inverted on NVIDIA
+  // NVIDIA環境ではセグメントとストリップが反転する場合もあるようです。
   bezier_.Use();
-  bezier_.SetUniform("segments", 50);
-  bezier_.SetUniform("strips", 1);
-  bezier_.SetUniform("color", glm::vec4(1.0f, 1.0f, 0.5f, 1.0f));
+  bezier_.SetUniform("Segments", 50);
+  bezier_.SetUniform("Strips", 1);
+  bezier_.SetUniform("Color", glm::vec4(1.0f, 1.0f, 0.5f, 1.0f));
 
   solid_.Use();
-  solid_.SetUniform("color", glm::vec4(0.5f, 1.0f, 1.0f, 1.0f));
+  solid_.SetUniform("Color", glm::vec4(0.5f, 1.0f, 1.0f, 1.0f));
 }
 
 void SceneBezier::SetMatrices(const glm::mat4 &model, const glm::mat4 &view,
