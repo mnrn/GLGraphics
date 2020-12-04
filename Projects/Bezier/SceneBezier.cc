@@ -27,7 +27,7 @@ void SceneBezier::OnInit() {
   glPointSize(10.0f);
 
   CreateVAO();
-  // ƒpƒbƒ`‚²‚Æ‚Ì’¸“_”(§Œä“_)‚ğİ’è‚µ‚Ä‚¨‚«‚Ü‚·B  IMPORTANT!!
+  // ãƒ‘ãƒƒãƒã”ã¨ã®é ‚ç‚¹æ•°(åˆ¶å¾¡ç‚¹)ã‚’è¨­å®šã—ã¾ã™ã€‚  IMPORTANT!!
   glPatchParameteri(GL_PATCH_VERTICES, 4);
   SetUniforms();
 }
@@ -50,11 +50,11 @@ void SceneBezier::OnRender() {
   glBindVertexArray(vao_);
   SetMatrices(model, view, proj_);
 
-  // ƒxƒWƒF‹Èü‚Ì•`‰æ
+  // ãƒ™ã‚¸ã‚§æ›²ç·šã®æç”»
   bezier_.Use();
   glDrawArrays(GL_PATCHES, 0, 4);
 
-  // §Œä“_‚Ì•`‰æ
+  // åˆ¶å¾¡ç‚¹ã®æç”»
   solid_.Use();
   glDrawArrays(GL_POINTS, 0, 4);
 
@@ -72,22 +72,22 @@ void SceneBezier::OnResize(int w, int h) {
 
 std::optional<std::string> SceneBezier::CompileAndLinkShader() {
   // compile and links
-  if (!(bezier_.Compile("./Assets/Shaders/Bezier/bezier.vs.glsl",
+  if (!(bezier_.Compile("./Assets/Shaders/Bezier/Bezier.vs.glsl",
                         ShaderType::Vertex) &&
-        bezier_.Compile("./Assets/Shaders/Bezier/bezier.tcs.glsl",
+        bezier_.Compile("./Assets/Shaders/Bezier/Bezier.tcs.glsl",
                         ShaderType::TessControl) &&
-        bezier_.Compile("./Assets/Shaders/Bezier/bezier.tes.glsl",
+        bezier_.Compile("./Assets/Shaders/Bezier/Bezier.tes.glsl",
                         ShaderType::TessEvaluation) &&
-        bezier_.Compile("./Assets/Shaders/Bezier/bezier.fs.glsl",
+        bezier_.Compile("./Assets/Shaders/Bezier/Bezier.fs.glsl",
                         ShaderType::Fragment) &&
         bezier_.Link())) {
     return bezier_.GetLog();
   }
   bezier_.Use();
 
-  if (!(solid_.Compile("./Assets/Shaders/Bezier/solid.vs.glsl",
+  if (!(solid_.Compile("./Assets/Shaders/Bezier/Solid.vs.glsl",
                        ShaderType::Vertex) &&
-        solid_.Compile("./Assets/Shaders/Bezier/solid.fs.glsl",
+        solid_.Compile("./Assets/Shaders/Bezier/Solid.fs.glsl",
                        ShaderType::Fragment) &&
         solid_.Link())) {
     return solid_.GetLog();
@@ -96,7 +96,7 @@ std::optional<std::string> SceneBezier::CompileAndLinkShader() {
 }
 
 void SceneBezier::CreateVAO() {
-  // §Œä“_—p‚ÌVBO‚ğİ’è‚µ‚Ü‚·B
+  // ãƒ‘ãƒƒãƒã®VBOã‚’ç”Ÿæˆã—ã¾ã™ã€‚
   float v[] = {-1.0f, -1.0f, -0.5f, 1.0f, 0.5f, -1.0f, 1.0f, 1.0f};
 
   glGenBuffers(1, &vbo_);
@@ -104,7 +104,7 @@ void SceneBezier::CreateVAO() {
   glBindBuffer(GL_ARRAY_BUFFER, vbo_);
   glBufferData(GL_ARRAY_BUFFER, sizeof(v), v, GL_STATIC_DRAW);
 
-  // §Œä“_—p‚ÌVAO‚ğİ’è‚µ‚Ü‚·B
+  // ãƒ‘ãƒƒãƒã®VAOã‚’ç”Ÿæˆã—ã¾ã™ã€‚
   glGenVertexArrays(1, &vao_);
   glBindVertexArray(vao_);
 
@@ -116,7 +116,7 @@ void SceneBezier::CreateVAO() {
 }
 
 void SceneBezier::SetUniforms() {
-  // NVIDIAŠÂ‹«‚Å‚ÍƒZƒOƒƒ“ƒg‚ÆƒXƒgƒŠƒbƒv‚ª”½“]‚·‚éê‡‚à‚ ‚é‚æ‚¤‚Å‚·B
+  // NVIDIAç’°å¢ƒã§ã¯Segmentsã¨StripsãŒå…¥ã‚Œæ›¿ã‚ã£ã¦ã„ã‚‹ã‹ã‚‚ã—ã‚Œã¾ã›ã‚“ã€‚
   bezier_.Use();
   bezier_.SetUniform("Segments", 50);
   bezier_.SetUniform("Strips", 1);

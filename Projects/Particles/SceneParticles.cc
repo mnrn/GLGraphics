@@ -1,5 +1,5 @@
 /**
- * @brief ƒRƒ“ƒsƒ…[ƒgƒVƒF[ƒ_[“ü–å
+ * @brief ã‚³ãƒ³ãƒ”ãƒ¥ãƒ¼ãƒˆã‚·ã‚§ãƒ¼ãƒ€ãƒ¼å…¥é–€
  */
 
 // ********************************************************************************
@@ -38,20 +38,20 @@ void SceneParticles::OnDestroy() {
 void SceneParticles::OnUpdate(float deltaSec) { static_cast<void>(deltaSec); }
 
 void SceneParticles::OnRender() {
-  // d—Íê‚Ì‰ñ“]
+  // é‡åŠ›å ´ã®å›è»¢
   const glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), glm::radians(angle_),
                                          glm::vec3(0.0f, 0.0f, 1.0f));
   const glm::vec3 blackHole1Pos = glm::vec3(rotation * blackHole1Pos_);
   const glm::vec3 blackHole2Pos = glm::vec3(rotation * blackHole2Pos_);
 
-  // ƒRƒ“ƒsƒ…[ƒgƒVƒF[ƒ_[‚ÌÀs
+  // ã‚³ãƒ³ãƒ”ãƒ¥ãƒ¼ãƒˆã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ã®å®Ÿè¡Œ
   compute_.Use();
   compute_.SetUniform("BlackHole1Pos", blackHole1Pos);
   compute_.SetUniform("BlackHole2Pos", blackHole2Pos);
   glDispatchCompute(totalParticlesNum_ / localSizeX_, 1, 1);
   glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
-  // ƒV[ƒ“•`‰æ€”õ
+  // ã‚·ãƒ¼ãƒ³ã®æç”»æº–å‚™
   render_.Use();
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   const glm::mat4 proj = glm::perspective(
@@ -63,21 +63,21 @@ void SceneParticles::OnRender() {
   const glm::mat4 model = glm::mat4(1.0f);
   render_.SetUniform("MVP", proj * view * model);
 
-  // ƒp[ƒeƒBƒNƒ‹‚Ì•`‰æ
+  // ãƒ‘ãƒ¼ãƒ†ã‚£ã‚¯ãƒ«ã®æç”»
   glPointSize(1.0f);
-  render_.SetUniform("Color", glm::vec4(0.0f, 0.0f, 0.0f, 0.2f));
+  render_.SetUniform("Color", glm::vec4(0.015f, 0.05f, 0.3f, 0.1f));
   glBindVertexArray(hParticlesVAO_);
   glDrawArrays(GL_POINTS, 0, totalParticlesNum_);
   glBindVertexArray(0);
 
-  // ƒuƒ‰ƒbƒNƒz[ƒ‹‚Ì•`‰æ
+  // ãƒ–ãƒ©ãƒƒã‚¯ãƒ›ãƒ¼ãƒ«ã®æç”»
   glPointSize(2.5f);
   GLfloat data[] = {blackHole1Pos.x, blackHole1Pos.y, blackHole1Pos.z,
                     blackHole1Pos.z, blackHole2Pos.x, blackHole2Pos.y,
                     blackHole2Pos.z, blackHole2Pos.z};
   glBindBuffer(GL_ARRAY_BUFFER, hBlackHoleVAO_);
   glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(GLfloat) * 8, data);
-  render_.SetUniform("Color", glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
+  render_.SetUniform("Color", glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
   glBindVertexArray(hBlackHoleVAO_);
   glDrawArrays(GL_POINTS, 0, 2);
   glBindVertexArray(0);
@@ -94,14 +94,14 @@ void SceneParticles::OnResize(int w, int h) {
 
 bool SceneParticles::CompileAndLinkShader() {
 
-  // ƒV[ƒ“•`‰æ—pƒvƒƒOƒ‰ƒ€
-  if (render_.Compile("./Assets/Shaders/Particles/particles.vs.glsl",
+  // ã‚·ãƒ¼ãƒ³æç”»ç”¨ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ãƒ—ãƒ­ã‚°ãƒ©ãƒ 
+  if (render_.Compile("./Assets/Shaders/Particles/Particles.vs.glsl",
                       ShaderType::Vertex) == false) {
     std::cerr << "vertex shader failed to Compile." << std::endl;
     std::cerr << render_.GetLog() << std::endl;
     return false;
   }
-  if (render_.Compile("./Assets/Shaders/Particles/particles.fs.glsl",
+  if (render_.Compile("./Assets/Shaders/Particles/Particles.fs.glsl",
                       ShaderType::Fragment) == false) {
     std::cerr << "fragment shader failed to Compile." << std::endl;
     std::cerr << render_.GetLog() << std::endl;
@@ -113,8 +113,8 @@ bool SceneParticles::CompileAndLinkShader() {
     return false;
   }
 
-  // ƒRƒ“ƒsƒ…[ƒgƒVƒF[ƒ_[—pƒvƒƒOƒ‰ƒ€
-  if (compute_.Compile("./Assets/Shaders/Particles/particles.cs.glsl",
+  // ã‚³ãƒ³ãƒ”ãƒ¥ãƒ¼ãƒˆãƒ¼ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ãƒ—ãƒ­ã‚°ãƒ©ãƒ 
+  if (compute_.Compile("./Assets/Shaders/Particles/Particles.cs.glsl",
                        ShaderType::Compute) == false) {
     std::cerr << "compute shader failed to Compile." << std::endl;
     std::cerr << compute_.GetLog() << std::endl;
@@ -131,7 +131,7 @@ bool SceneParticles::CompileAndLinkShader() {
 
 void SceneParticles::InitBuffer() {
 
-  // •Ï”‚Ì‰Šú‰»‚ğs‚¢‚Ü‚·B
+  // å¤‰æ•°ã®åˆæœŸåŒ–
   std::vector<GLfloat> initPos;
   std::vector<GLfloat> initVel(totalParticlesNum_ * 4, 0.0f);
   glm::vec4 p(0.0f, 0.0f, 0.0f, 1.0f);
@@ -141,9 +141,9 @@ void SceneParticles::InitBuffer() {
   const glm::mat4 transform = glm::translate(
       glm::mat4(1.0f), // Identity matrix
       glm::vec3(-1.0f, -1.0f,
-                -1.0f)); // ’†‰›‚Ìƒp[ƒeƒBƒNƒ‹‚ª(0, 0, 0)‚É‚­‚é‚æ‚¤‚É‚µ‚Ü‚·B
+                -1.0f)); // ä¸­å¤®ã®ãƒ‘ãƒ¼ãƒ†ã‚£ã‚¯ãƒ«ãŒ(0, 0, 0)ã«ãªã‚‹ã‚ˆã†ã«è¨­å®šã—ã¾ã™ã€‚
 
-  // ƒp[ƒeƒBƒNƒ‹‚Ì‰ŠúˆÊ’u‚ğİ’è‚µ‚Ü‚·B
+  // ãƒ‘ãƒ¼ãƒ†ã‚£ã‚¯ãƒ«ã®åˆæœŸä½ç½®ã‚’è¨­å®šã—ã¾ã™ã€‚
   for (int32_t xi = 0; xi < particlesXNum_; xi++) {
     for (int32_t yi = 0; yi < particlesYNum_; yi++) {
       for (int32_t zi = 0; zi < particlesZNum_; zi++) {
@@ -162,7 +162,7 @@ void SceneParticles::InitBuffer() {
     }
   }
 
-  // ƒRƒ“ƒsƒ…[ƒgƒVƒF[ƒ_[—p‚Ìƒoƒbƒtƒ@‚ğ¶¬‚µ‚Ü‚·B
+  // ã‚³ãƒ³ãƒ”ãƒ¥ãƒ¼ãƒˆã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ç”¨ã®ãƒãƒƒãƒ•ã‚¡ã‚’ç”Ÿæˆã—è¨­å®šã—ã¾ã™ã€‚
   glGenBuffers(computeBuffer_.size(), computeBuffer_.data());
   GLuint bufPos = computeBuffer_[0];
   GLuint bufVel = computeBuffer_[1];
@@ -174,7 +174,7 @@ void SceneParticles::InitBuffer() {
   glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, bufVel);
   glBufferData(GL_SHADER_STORAGE_BUFFER, bufSize, &initVel[0], GL_DYNAMIC_COPY);
 
-  // ƒp[ƒeƒBƒNƒ‹—p‚ÌVAO‚ğ¶¬‚µ‚Ü‚·B
+  // ãƒ‘ãƒ¼ãƒ†ã‚£ã‚¯ãƒ«ã®VAOã‚’ç”Ÿæˆã—è¨­å®šã—ã¾ã™ã€‚
   glGenVertexArrays(1, &hParticlesVAO_);
   glBindVertexArray(hParticlesVAO_);
   glBindBuffer(GL_ARRAY_BUFFER, bufPos);
@@ -182,7 +182,7 @@ void SceneParticles::InitBuffer() {
   glEnableVertexAttribArray(0);
   glBindVertexArray(0);
 
-  // ƒuƒ‰ƒbƒNƒz[ƒ‹—p‚ÌVBO‚ÆVAO‚ğİ’è‚µ‚Ü‚·B
+  // ãƒ–ãƒ©ãƒƒã‚¯ãƒ›ãƒ¼ãƒ«ç”¨ã®VBOã¨VAOã‚’ç”Ÿæˆã—è¨­å®šã—ã¾ã™ã€‚
   glGenBuffers(1, &hBlackHoleBuffer_);
   glBindBuffer(GL_ARRAY_BUFFER, hBlackHoleBuffer_);
   GLfloat data[] = {blackHole1Pos_.x, blackHole1Pos_.y, blackHole1Pos_.z,
