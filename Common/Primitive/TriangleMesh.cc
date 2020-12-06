@@ -6,7 +6,7 @@ TriangleMesh::~TriangleMesh() { DestroyBuffers(); }
 
 void TriangleMesh::InitBuffers(
     const std::vector<GLuint> &indices, const std::vector<GLfloat> &points,
-    const std::vector<GLfloat> &normals,
+    const std::optional<std::vector<GLfloat>> &normals,
     const std::optional<std::vector<GLfloat>> &texCoords,
     const std::optional<std::vector<GLfloat>> &tangents) {
   if (!buffers_.empty()) {
@@ -28,11 +28,14 @@ void TriangleMesh::InitBuffers(
   glBufferData(GL_ARRAY_BUFFER, points.size() * sizeof(GLfloat), points.data(),
                GL_STATIC_DRAW);
 
-  glGenBuffers(1, &normBuf);
-  buffers_.emplace_back(normBuf);
-  glBindBuffer(GL_ARRAY_BUFFER, normBuf);
-  glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(GLfloat),
-               normals.data(), GL_STATIC_DRAW);
+  if (normals) {
+    glGenBuffers(1, &normBuf);
+    buffers_.emplace_back(normBuf);
+    glBindBuffer(GL_ARRAY_BUFFER, normBuf);
+    glBufferData(GL_ARRAY_BUFFER, normals.value().size() * sizeof(GLfloat),
+                 normals.value().data(), GL_STATIC_DRAW);
+  }
+
 
   if (texCoords) {
     glGenBuffers(1, &tcBuf);
@@ -60,9 +63,11 @@ void TriangleMesh::InitBuffers(
   glEnableVertexAttribArray(0); // Vertex position
 
   // Normal
-  glBindBuffer(GL_ARRAY_BUFFER, normBuf);
-  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
-  glEnableVertexAttribArray(1); // Normal
+  if (normals) {
+    glBindBuffer(GL_ARRAY_BUFFER, normBuf);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glEnableVertexAttribArray(1); // Normal
+  }
 
   // Tex Coord
   if (texCoords) {

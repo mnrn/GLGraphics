@@ -4,6 +4,13 @@
 #define TINYOBJLOADER_IMPLEMENTATION
 #include <tiny_obj_loader/tiny_obj_loader.h>
 
+// 法線情報の生成(TODO)
+static void ComputeNormal(const tinyobj::attrib_t& attrib,
+  const std::vector<tinyobj::shape_t>& shapes,
+  std::vector<GLfloat>& normal) {
+
+}
+
 ObjMesh::ObjMesh(const std::string &path) {
   tinyobj::attrib_t attrib;
   std::vector<tinyobj::shape_t> shapes;
@@ -29,17 +36,19 @@ ObjMesh::ObjMesh(const std::string &path) {
   std::vector<GLfloat> texCoords;
 
   // Shapeの数だけループする。
-  for (size_t s = 0; s < shapes.size(); s++) {
+  const size_t ssize = shapes.size();
+  for (size_t s = 0; s < ssize; s++) {
 
     // 面f(ポリゴン)の数だけループする。
+    const size_t fsize = shapes[s].mesh.num_face_vertices.size();
     size_t indexOffset = 0;
-    for (size_t f = 0; f < shapes[s].mesh.num_face_vertices.size(); f++) {
+    for (size_t f = 0; f < fsize; f++) {
 
       // 面fを構成する頂点の数だけループする。
       const size_t fv = shapes[s].mesh.num_face_vertices[f];
       for (size_t v = 0; v < fv; v++) {
         const tinyobj::index_t idx = shapes[s].mesh.indices[indexOffset + v];
-        indices.emplace_back(idx.vertex_index);
+        indices.emplace_back(indexOffset + v);
 
         const tinyobj::real_t vx = attrib.vertices[3 * idx.vertex_index + 0];
         const tinyobj::real_t vy = attrib.vertices[3 * idx.vertex_index + 1];
@@ -70,6 +79,11 @@ ObjMesh::ObjMesh(const std::string &path) {
     }
   }
 
+  // 法線情報が取得できなかった場合は生成します。
+  if (attrib.normals.empty()) {
+    ComputeNormal(attrib, shapes, normals);
+  }
+  
   const auto optTexCoords =
       texCoords.empty() ? std::nullopt : std::make_optional(texCoords);
   InitBuffers(indices, positions, normals, optTexCoords);

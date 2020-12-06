@@ -20,7 +20,7 @@ public:
 protected:
   virtual void InitBuffers(
       const std::vector<GLuint> &indices, const std::vector<GLfloat> &points,
-      const std::vector<GLfloat> &normals,
+      const std::optional<std::vector<GLfloat>> &normals = std::nullopt,
       const std::optional<std::vector<GLfloat>> &texCoords = std::nullopt,
       const std::optional<std::vector<GLfloat>> &tangents = std::nullopt);
   virtual void DestroyBuffers();

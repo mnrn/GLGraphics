@@ -39,7 +39,7 @@ private:
   ShaderProgram prog_;
 
   std::unique_ptr<ObjMesh> spotCowMesh_ =
-      std::make_unique<ObjMesh>("./Assets/Models/Tests/Cube/cube.obj");
+      std::make_unique<ObjMesh>("./Assets/Models/Bunny/bunny.obj");
 
   Teapot teapot_{50, glm::mat4(1.0f)};
   Plane plane_{20, 20, 1, 1};

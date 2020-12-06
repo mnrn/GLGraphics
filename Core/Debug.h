@@ -187,6 +187,13 @@ static inline void SetupInfo() {
 #endif
 }
 
+static inline void CleanupInfo() {
+#ifndef __APPLE__
+  glDebugMessageInsert(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_MARKER, 0,
+                       GL_DEBUG_SEVERITY_NOTIFICATION, -1, "Eng debugging..");
+#endif
+}
+
 } // namespace Debug
 
 #endif // DEBUG_H

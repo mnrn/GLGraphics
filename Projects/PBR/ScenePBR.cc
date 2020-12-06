@@ -76,12 +76,13 @@ std::optional<std::string> ScenePBR::CompileAndLinkShader() {
 
 void ScenePBR::DrawScene() {
   DrawFloor();
+
   for (int i = 0; i < kNumCows; i++) {
     const float cowX = i * (10.0f / (kNumCows - 1)) - 5.0f;
     const float rough = (i + 1) * (1.0f / kNumCows);
     DrawSpot(glm::vec3(cowX, 0.0f, 0.0f), rough, 0, kBaseCowColor);
   }
-
+  
   const std::vector<glm::vec3> kMetalColors = {
       glm::vec3(1.0f, 0.71f, 0.29f),    // Gold
       glm::vec3(0.95f, 0.64f, 0.54f),   // Copper
@@ -117,6 +118,7 @@ void ScenePBR::DrawSpot(const glm::vec3 &pos, float rough, int metal,
   model_ = glm::translate(model_, pos);
   model_ =
       glm::rotate(model_, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+  model_ = glm::scale(model_, glm::vec3(0.5f, 0.5f, 0.5f));
   SetMatrices();
 
   spotCowMesh_->Render();
