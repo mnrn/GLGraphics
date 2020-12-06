@@ -36,10 +36,10 @@ Vulkanでの実装がもう少し楽になりそうならそちらに移行す�
 
 ## 参考
 
-[OpenGL 4 Shading Language Cookbook - Third Edition](https://www.packtpub.com/product/opengl-4-shading-language-cookbook-third-edition/9781789342253)
-[HLSL Development Cookbook](https://www.packtpub.com/product/hlsl-development-cookbook/9781849694209)
-[Unity 2018 Shaders and Effects Cookbook - Third Edition](https://www.packtpub.com/product/unity-2018-shaders-and-effects-cookbook-third-edition/9781788396233)
-[Physically Based Rendering in Filament](https://google.github.io/filament/Filament.md.html)
+[OpenGL 4 Shading Language Cookbook - Third Edition](https://www.packtpub.com/product/opengl-4-shading-language-cookbook-third-edition/9781789342253)  
+[HLSL Development Cookbook](https://www.packtpub.com/product/hlsl-development-cookbook/9781849694209)  
+[Unity 2018 Shaders and Effects Cookbook - Third Edition](https://www.packtpub.com/product/unity-2018-shaders-and-effects-cookbook-third-edition/9781788396233)  
+[Physically Based Rendering in Filament](https://google.github.io/filament/Filament.md.html)  
 
 [boost]:<https://www.boost.org/>
 [GLFW]:<https://www.glfw.org/>
