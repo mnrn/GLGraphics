@@ -37,7 +37,7 @@ private:
   static constexpr inline int32_t totalParticlesNum_ =
       particlesXNum_ * particlesYNum_ * particlesZNum_;
   static constexpr inline int32_t localSizeX_ =
-      1000; //!< コンピュートシェーダーのスレッド数と一致させてください。
+      1000; //!< 繧ｳ繝ｳ繝斐Η繝ｼ繝医す繧ｧ繝ｼ繝繝ｼ縺ｮ蛟､縺ｨ蜷後§縺ｫ縺吶ｋ蠢�隕√′縺ゅｊ縺ｾ縺吶�
 
   std::array<GLuint, 2> computeBuffer_;
   GLuint hParticlesVAO_ = 0;
