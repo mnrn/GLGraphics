@@ -91,7 +91,6 @@ function(build TARGET_NAME)
         ${CMAKE_THREAD_LIBS_INIT}
         ${GLFW_LIBRARIES}
         ${GLAD_LIBRARIES}
-        ${Boost_LIBRARIES}
     )
 endfunction(build)
 
