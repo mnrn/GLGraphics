@@ -126,9 +126,8 @@ void ScenePBR::DrawMesh(const glm::vec3 &pos, float rough, int metal,
   prog_.SetUniform("Material.Color", color);
   model_ = glm::translate(model_, pos);
   model_ =
-      glm::rotate(model_, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-  // model_ = glm::scale(model_, glm::vec3(0.5f, 0.5f, 0.5f));
+      glm::rotate(model_, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
   SetMatrices();
 
-  spotCowMesh_->Render();
+  mesh_->Render();
 }

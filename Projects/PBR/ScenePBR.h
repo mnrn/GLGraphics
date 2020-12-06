@@ -39,8 +39,8 @@ private:
 
   ShaderProgram prog_;
 
-  std::unique_ptr<ObjMesh> spotCowMesh_ =
-      std::make_unique<ObjMesh>("./Assets/Models/Dragon/dragon.obj");
+  std::unique_ptr<ObjMesh> mesh_ =
+      std::make_unique<ObjMesh>("./Assets/Models/Spot/spot_triangulated.obj");
 
   Teapot teapot_{50, glm::mat4(1.0f)};
   Plane plane_{20, 20, 1, 1};
