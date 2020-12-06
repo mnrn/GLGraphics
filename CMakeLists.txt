@@ -50,17 +50,6 @@ else()
     message("@@ GLFW_LIBRARIES: ${GLFW_LIBRARIES}")
 endif()
 
-# Boost
-if (APPLE)
-    set(Boost_USE_STATIC_LIBS ON)
-    find_package(Boost COMPONENTS filesystem REQUIRED)
-    if (NOT Boost_FOUND)
-        message(FATAL_ERROR "Could not find Boost!")
-    else()
-        message("@@ Boost_LIBRARY_DIRS: ${Boost_LIBRARY_DIRS}")
-    endif()
-endif()
-
 ## glad
 add_subdirectory(Lib/glad)
 set(GLAD_LIBRARIES glad)
@@ -82,12 +71,12 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-poison-system-directories -Wno-ctad-maybe-unsupported")
 endif()
 
-file(GLOB SOURCE *.cc Core/*.cc Common/*.cc Common/Primitive/*.cc)
+file(GLOB SOURCE *.cc Core/*.cc Common/*.cc Common/Primitive/*.cc Common/Mesh/*cc)
 
 # Function for building
 function(build TARGET_NAME)
     # Main
-    file(GLOB SOURCE *.cc Core/*.cc Common/*.cc Common/Primitive/*.cc ${PROJECTS_DIR_NAME}/${TARGET_NAME}/*.cc)
+    file(GLOB SOURCE *.cc Core/*.cc Common/*.cc Common/Primitive/*.cc Common/Mesh/*cc ${PROJECTS_DIR_NAME}/${TARGET_NAME}/*.cc)
     set(MAIN_CC ${TARGET_NAME}/${TARGET_NAME}/Main.cc)
     if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECTS_DIR_NAME}/${TARGET_NAME}/Main.cc)
         set(MAIN_CC ${PROJECTS_DIR_NAME}/${TARGET_NAME}/Main.cc)
@@ -120,6 +109,7 @@ set(TARGETS
     Diffuse
     Phong
     Subroutine
+    PBR
     Texture
     Deferred
     Bezier

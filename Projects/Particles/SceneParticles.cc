@@ -112,7 +112,7 @@ bool SceneParticles::CompileAndLinkShader() {
     std::cerr << render_.GetLog() << std::endl;
     return false;
   }
-
+#ifndef __APPLE__
   // コンピュートーシェーダープログラム
   if (compute_.Compile("./Assets/Shaders/Particles/Particles.cs.glsl",
                        ShaderType::Compute) == false) {
@@ -125,7 +125,7 @@ bool SceneParticles::CompileAndLinkShader() {
     std::cerr << compute_.GetLog() << std::endl;
     return false;
   }
-
+#endif
   return true;
 }
 
@@ -140,8 +140,9 @@ void SceneParticles::InitBuffer() {
   const GLfloat dz = 2.0f / (particlesZNum_ - 1);
   const glm::mat4 transform = glm::translate(
       glm::mat4(1.0f), // Identity matrix
-      glm::vec3(-1.0f, -1.0f,
-                -1.0f)); // 中央のパーティクルが(0, 0, 0)になるように設定します。
+      glm::vec3(
+          -1.0f, -1.0f,
+          -1.0f)); // 中央のパーティクルが(0, 0, 0)になるように設定します。
 
   // パーティクルの初期位置を設定します。
   for (int32_t xi = 0; xi < particlesXNum_; xi++) {

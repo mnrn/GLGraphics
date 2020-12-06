@@ -7,8 +7,6 @@ Vulkanでの実装がもう少し楽になりそうならそちらに移行す�
 ## 制作環境
 
 もともとLinuxで動かしていたプログラムをMacでも保守できるようにして、その後Windowsへ移植しました。  
-Linuxを動かしていたPCが故障してしまったので今はWindowsのみの動作確認になります。  
-ただし、MacOSでもOpenGL4.2以降が必要なプログラムが動かないだけで他は動きます。
 
 ## ビルド
 
@@ -30,8 +28,18 @@ Linuxを動かしていたPCが故障してしまったので今はWindowsのみ
   - C++20のstd::formatの代用になります。今回はヘッダオンリーにしています。
 - [stb]
   - 今回使用しているのは画像のローダーになります。
+- [tinyobjloader]
+  - objファイルの読み込みに使用しました。
+  - objファイルの簡潔さを考えると自作でも良かったかもしれませんが、今後の拡張性と保守性などを考えてこちらにしました。
 
 リポジトリのルートディレクトリにCMakeLists.txtがあるので詳しくはそちらを参照ください。  
+
+## 参考
+
+[OpenGL 4 Shading Language Cookbook - Third Edition](https://www.packtpub.com/product/opengl-4-shading-language-cookbook-third-edition/9781789342253)
+[HLSL Development Cookbook](https://www.packtpub.com/product/hlsl-development-cookbook/9781849694209)
+[Unity 2018 Shaders and Effects Cookbook - Third Edition](https://www.packtpub.com/product/unity-2018-shaders-and-effects-cookbook-third-edition/9781788396233)
+[Physically Based Rendering in Filament](https://google.github.io/filament/Filament.md.html)
 
 [boost]:<https://www.boost.org/>
 [GLFW]:<https://www.glfw.org/>
@@ -39,3 +47,4 @@ Linuxを動かしていたPCが故障してしまったので今はWindowsのみ
 [GLM]:<https://github.com/g-truc/glm>
 [fmt]:<https://github.com/fmtlib/fmt>
 [stb]:<https://github.com/nothings/stb>
+[tinyobjloader]:<https://github.com/tinyobjloader/tinyobjloader>

@@ -34,7 +34,7 @@ public:
     glfwGetFramebufferSize(window_, &width_, &height_);
 
     InitGlad();
-#if (_DEBUG)
+#if (!NDEBUG)
     Debug::SetupInfo();
 #endif
   }
@@ -55,7 +55,7 @@ public:
     while (!glfwWindowShouldClose(window_) &&
            !glfwGetKey(window_, GLFW_KEY_ESCAPE)) {
 
-#if (_DEBUG)
+#if (!NDEBUG)
       Debug::CheckForOpenGLError(__FILE__, __LINE__);
 #endif
       onUpdate(static_cast<float>(glfwGetTime()));
@@ -64,10 +64,11 @@ public:
       glfwSwapBuffers(window_);
       glfwPollEvents();
     }
-#if (_DEBUG)
+#ifndef __APPLE__
+#if (!NDEBUG)
     glDebugMessageInsert(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_MARKER, 0,
-                         GL_DEBUG_SEVERITY_NOTIFICATION, -1,
-                         "Eng debugging..");
+                         GL_DEBUG_SEVERITY_NOTIFICATION, -1, "Eng debugging..");
+#endif
 #endif
     return EXIT_SUCCESS;
   }

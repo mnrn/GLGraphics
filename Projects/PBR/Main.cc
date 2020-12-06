@@ -1,6 +1,5 @@
 /**
- * @brief  Render Particles
- * @date   2017/08/27
+ * @brief 物理ベースレンダリングテスト
  */
 
 // ********************************************************************************
@@ -11,11 +10,7 @@
 
 #include "App.h"
 #include "SceneLoop.h"
-#include "SceneParticles.h"
-
-#ifdef __APPLE__
-#include <boost/assert.hpp>
-#endif
+#include "ScenePBR.h"
 
 // ********************************************************************************
 // Entry point
@@ -28,15 +23,10 @@ int main(
     int argc, char **argv
 #endif
 ) {
-
-#ifdef __APPLE__
-  BOOST_ASSERT_MSG(false, "Can't execute in MacOS");
-#endif
-
-  App app("Compute Particles");
+  App app("Physically Based Rendering Scene");
 
   // Create scene
-  std::unique_ptr<Scene> scene = std::make_unique<SceneParticles>();
+  std::unique_ptr<Scene> scene = std::make_unique<ScenePBR>();
 
   // Enter the main loop
   return SceneLoop::Run(app, std::move(scene));
