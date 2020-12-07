@@ -14,6 +14,10 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 
+// ********************************************************************************
+// Override functions
+// ********************************************************************************
+
 void SceneSubroutine::OnInit() {
   if (const auto msg = CompileAndLinkShader()) {
     std::cerr << msg.value() << std::endl;
@@ -47,25 +51,28 @@ void SceneSubroutine::OnRender() {
   prog_.SetUniform("LightPosition", lightPos);
 
   const GLuint hProg = prog_.GetHandle();
-  GLuint adsIndex = glGetSubroutineIndex(hProg, GL_VERTEX_SHADER, "PhongModel");
-  GLuint diffIndex =
+  const GLuint adsIndex =
+      glGetSubroutineIndex(hProg, GL_VERTEX_SHADER, "PhongModel");
+  const GLuint diffIndex =
       glGetSubroutineIndex(hProg, GL_VERTEX_SHADER, "DiffuseModel");
 
+  // 左のティーポットを描画
   glUniformSubroutinesuiv(GL_VERTEX_SHADER, 1, &adsIndex);
   model_ = glm::mat4(1.0f);
   model_ = glm::translate(model_, glm::vec3(-3.0f, -1.5f, 0.0f));
   model_ =
       glm::rotate(model_, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
   SetMatrices();
-  teapot_.Render(); // 左のティーポットを描画
+  teapot_.Render();
 
+  // 右のティーポットを描画
   glUniformSubroutinesuiv(GL_VERTEX_SHADER, 1, &diffIndex);
   model_ = glm::mat4(1.0f);
   model_ = glm::translate(model_, glm::vec3(3.0f, -1.5f, 0.0f));
   model_ =
       glm::rotate(model_, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
   SetMatrices();
-  teapot_.Render(); // 右のティーポットを描画
+  teapot_.Render();
 }
 
 void SceneSubroutine::OnResize(int w, int h) {
@@ -74,6 +81,10 @@ void SceneSubroutine::OnResize(int w, int h) {
   proj_ = glm::perspective(glm::radians(50.0f), static_cast<float>(w) / h, 0.3f,
                            100.0f);
 }
+
+// ********************************************************************************
+// Shader prepare
+// ********************************************************************************
 
 std::optional<std::string> SceneSubroutine::CompileAndLinkShader() {
   if (prog_.Compile("./Assets/Shaders/Subroutine/Subroutine.vs.glsl",

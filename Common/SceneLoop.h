@@ -19,7 +19,14 @@
 // ********************************************************************************
 
 namespace SceneLoop {
-static int Run(App &app, std::unique_ptr<Scene> &&scene) {
+
+/**
+ * @brief 一つのシーンだけでループしたい場合に使用してください。
+ * @note デストラクタの関係上、シーンの所有権はこちらに渡してもらいます。
+ * @param app ループ対象となるアプリケーション
+ * @param scene シーンへのポインタ
+ */
+static inline int Run(App &app, std::unique_ptr<Scene> &&scene) {
   return app.Run(
       [&scene](int w, int h) {
         scene->SetDimensions(w, h);

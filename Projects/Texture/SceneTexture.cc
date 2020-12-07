@@ -13,6 +13,10 @@
 #include "SceneTexture.h"
 #include "Texture.h"
 
+// ********************************************************************************
+// Override functions
+// ********************************************************************************
+
 void SceneTexture::OnInit() {
   if (const auto msg = CompileAndLinkShader()) {
     std::cerr << msg.value() << std::endl;
@@ -65,6 +69,10 @@ void SceneTexture::OnResize(int w, int h) {
   proj_ = glm::perspective(glm::radians(60.0f), static_cast<float>(w) / h, 0.3f,
                            100.0f);
 }
+
+// ********************************************************************************
+// Shader prepare
+// ********************************************************************************
 
 std::optional<std::string> SceneTexture::CompileAndLinkShader() {
   if (prog_.Compile("./Assets/Shaders/Texture/Texture.vs.glsl",
