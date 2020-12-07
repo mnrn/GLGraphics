@@ -51,12 +51,8 @@ GLuint GBuffer::CreateGBufferTexture(GLenum texUnit, GLenum format) {
   glGenTextures(1, &texId);
   glBindTexture(GL_TEXTURE_2D, texId);
 
-#ifdef __APPLE__
-  glTexImage2D(GL_TEXTURE_2D, 0, format, width_, height_, 0, GL_RGBA,
-               GL_UNSIGNED_BYTE, nullptr);
-#else
   glTexStorage2D(GL_TEXTURE_2D, 1, format, width_, height_);
-#endif
+
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);

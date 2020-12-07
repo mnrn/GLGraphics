@@ -13,6 +13,10 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 
+// ********************************************************************************
+// Override functions
+// ********************************************************************************
+
 void SceneDiffuse::OnInit() {
   if (const auto msg = CompileAndLinkShader()) {
     std::cerr << msg.value() << std::endl;
@@ -54,6 +58,10 @@ void SceneDiffuse::OnResize(int w, int h) {
   proj_ = glm::perspective(glm::radians(70.0f), static_cast<float>(w) / h, 0.3f,
                            100.0f);
 }
+
+// ********************************************************************************
+// Member functions
+// ********************************************************************************
 
 std::optional<std::string> SceneDiffuse::CompileAndLinkShader() {
   if (prog_.Compile("./Assets/Shaders/Diffuse/Diffuse.vs.glsl",

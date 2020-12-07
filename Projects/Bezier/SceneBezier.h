@@ -36,10 +36,7 @@ private:
   std::optional<std::string> CompileAndLinkShader();
   void CreateVAO();
   void SetUniforms();
-  void SetMatrices(const glm::mat4 &, const glm::mat4 &,
-                   const glm::mat4 &) const;
-
-  static constexpr float c = 3.5f;
+  void SetMatrices();
 
   ShaderProgram bezier_;
   ShaderProgram solid_;
