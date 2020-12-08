@@ -111,6 +111,7 @@ set(TARGETS
     PBR
     Texture
     Deferred
+    SSAO
     Bezier
     Particles
 )

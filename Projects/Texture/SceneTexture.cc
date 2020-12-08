@@ -34,7 +34,7 @@ void SceneTexture::OnInit() {
   prog_.SetUniform("Light.La", glm::vec3(0.15f));
 
   // テクスチャのロード
-  tex_ = LoadTexture("./Assets/Textures/DryCropResult.jpg");
+  tex_ = LoadTexture("./Assets/Textures/dry_crop_result.jpg");
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, tex_);
 
