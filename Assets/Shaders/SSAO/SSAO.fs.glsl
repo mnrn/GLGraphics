@@ -47,6 +47,7 @@ vec3 AmbientDiffuseModel(vec3 pos, vec3 norm, vec3 diff, float ao) {
     vec3 dirToL = normalize(vec3(Light.Position) - pos);
     float NoL = max(dot(norm, dirToL), 0.0);
     //return vec3(ao);
+    //return Light.L * diff * NoL;
     return amb + Light.L * diff * NoL;
 }
 
@@ -123,7 +124,7 @@ void Visualize() {
     float ao = texture(AOTex, TexCoord).r;
 
     // AOのパラメータ化
-    ao = ao * ao * ao * ao;
+    ao = pow(ao, 8.0);
 
     vec3 color = AmbientDiffuseModel(pos, norm, diff, ao);
     color = GammaCorrection(color);
