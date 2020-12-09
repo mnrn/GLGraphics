@@ -10,15 +10,14 @@
 #include <glm/gtc/constants.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-
 // ********************************************************************************
 // Special member functions
 // ********************************************************************************
 
 ScenePBR::ScenePBR()
-    : lightPositions_{glm::vec4(7.0f, 3.0f, 0.0f, 1.0f), glm::vec4(0.0f, 0.15f, -1.0f, 0.0f),
-       glm::vec4(-7.0f, 3.0f, 7.0f, 1.0f)} {
-}
+    : lightPositions_{glm::vec4(7.0f, 3.0f, 0.0f, 1.0f),
+                      glm::vec4(0.0f, 0.15f, 0.0f, 0.0f),
+                      glm::vec4(-7.0f, 3.0f, 7.0f, 1.0f)} {}
 
 // ********************************************************************************
 // Override functions
@@ -51,7 +50,8 @@ void ScenePBR::OnUpdate(float t) {
   if (IsAnimate()) {
     lightAngle_ = glm::mod(lightAngle_ + deltaT * lightRotationSpeed_,
                            glm::two_pi<float>());
-    lightPositions_[0] = glm::vec4(glm::cos(lightAngle_) * 7.0f, 3.0f,
+    lightPositions_[0] =
+        glm::vec4(glm::cos(lightAngle_) * 7.0f, 3.0f,
                   glm::sin(lightAngle_) * 7.0f, lightPositions_[0].w);
   }
 }
