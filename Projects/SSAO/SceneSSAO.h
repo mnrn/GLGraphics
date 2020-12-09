@@ -52,7 +52,7 @@ private:
   static constexpr inline float kRotSpeed = 1.0f;
   static constexpr inline float kFOVY = 50.0f;
 
-  Plane plane_{10.0f, 10.0f, 1, 1, 7, 7};
+  Plane plane_{10.0f, 10.0f, 1, 1, 7, 10};
   std::unique_ptr<ObjMesh> mesh_ =
       std::make_unique<ObjMesh>("./Assets/Models/Tests/Teapot/teapot.obj");
 

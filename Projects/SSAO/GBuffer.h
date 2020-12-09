@@ -21,28 +21,28 @@ public:
 private:
   GLuint CreateGBufferTexture(GLenum texUnit, GLenum format);
 
-  enum FramebufferObject {
+  enum FramebufferObjects {
     Deferred,
     SSAO,
     FramebufferObjectsNum,
   };
-  enum Renderbuffer {
+  enum Renderbuffers {
     DepthBuffer,
     RenderbuffersNum,
   };
-  enum Texture {
+  enum Textures {
     PosTex,
     NormTex,
     ColorTex,
     AOTex,
     BlurAOTex,
-    TextureNum,
+    TexturesNum,
   };
 
   int width_, height_;
   std::array<GLuint, FramebufferObjectsNum> fbo_;
   std::array<GLuint, RenderbuffersNum> renders_;
-  std::array<GLuint, TextureNum> textures_; // GBuffer textures
+  std::array<GLuint, TexturesNum> textures_; // GBuffer textures
 };
 
 #endif
