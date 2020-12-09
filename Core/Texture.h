@@ -2,13 +2,15 @@
  * @brief Texture helper
  */
 
-#ifndef TEXTURE_HPP
-#define TEXTURE_HPP
+#ifndef TEXTURE_H
+#define TEXTURE_H
 
 #include "GLInclude.h"
 #include <string>
 
-GLuint LoadTexture(const std::string &path);
-// GLuint loadCubeMap(const std::string &name);
+namespace Texture {
+  GLuint Load(const std::string &path);
+// GLuint LoadCubeMap(const std::string &name);
+}
 
 #endif

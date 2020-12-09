@@ -31,8 +31,8 @@ void SceneSSAO::OnInit() {
 
   CreateVAO();
 
-  textures_[WoodTex] = LoadTexture("./Assets/Textures/Wood/wood.jpeg");
-  textures_[BrickTex] = LoadTexture("./Assets/Textures/Brick/ruin_wall_01.png");
+  textures_[WoodTex] = Texture::Load("./Assets/Textures/Wood/wood.jpeg");
+  textures_[BrickTex] = Texture::Load("./Assets/Textures/Brick/ruin_wall_01.png");
 
   prog_.SetUniform("Light.L", glm::vec3(0.3f));
   prog_.SetUniform("Light.La", glm::vec3(0.5f));

@@ -34,7 +34,7 @@ void SceneTexture::OnInit() {
   prog_.SetUniform("Light.La", glm::vec3(0.15f));
 
   // テクスチャのロード
-  tex_ = LoadTexture("./Assets/Textures/Wood/hp_wood.png");
+  tex_ = Texture::Load("./Assets/Textures/Wood/hp_wood.png");
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, tex_);
 

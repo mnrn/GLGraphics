@@ -68,7 +68,7 @@ private:
     TextureCoordinates,
     VertexBufferSize
   };
-  enum Texture {
+  enum Textures {
     WoodTex,
     BrickTex,
     RandDirTex,
