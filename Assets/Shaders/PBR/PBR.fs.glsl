@@ -96,7 +96,7 @@ void main() {
     vec3 n = normalize(Normal);
 
     for (int i =0; i < 3; i++) {
-        color = MicroFacetModel(i, Position, n);
+        color += MicroFacetModel(i, Position, n);
     }
 
     FragColor = vec4(GammaCorrection(color), 1.0);

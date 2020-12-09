@@ -10,6 +10,16 @@
 #include <glm/gtc/constants.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+
+// ********************************************************************************
+// Special member functions
+// ********************************************************************************
+
+ScenePBR::ScenePBR()
+    : lightPositions_{glm::vec4(7.0f, 3.0f, 0.0f, 1.0f), glm::vec4(0.0f, 0.15f, -1.0f, 0.0f),
+       glm::vec4(-7.0f, 3.0f, 7.0f, 1.0f)} {
+}
+
 // ********************************************************************************
 // Override functions
 // ********************************************************************************
@@ -24,7 +34,7 @@ void ScenePBR::OnInit() {
   view_ = glm::lookAt(glm::vec3(0.0f, 4.0f, 7.0f), glm::vec3(0.0f, 0.0f, 0.0f),
                       glm::vec3(0.0f, 1.0f, 0.0f));
   proj_ = glm::perspective(glm::radians(kFOVY),
-                           static_cast<float>(width_) / height_, 0.5f, 100.0f);
+                           static_cast<float>(width_) / height_, 0.3f, 100.0f);
 
   prog_.SetUniform("Light[0].L", glm::vec3(45.0f));
   prog_.SetUniform("Light[0].Position", view_ * lightPositions_[0]);
@@ -42,7 +52,7 @@ void ScenePBR::OnUpdate(float t) {
     lightAngle_ = glm::mod(lightAngle_ + deltaT * lightRotationSpeed_,
                            glm::two_pi<float>());
     lightPositions_[0] = glm::vec4(glm::cos(lightAngle_) * 7.0f, 3.0f,
-                                   glm::sin(lightAngle_) * 7.0f, 1.0f);
+                  glm::sin(lightAngle_) * 7.0f, lightPositions_[0].w);
   }
 }
 

@@ -18,6 +18,7 @@
 
 class ScenePBR : public Scene {
 public:
+  ScenePBR();
   void OnInit() override;
   void OnUpdate(float) override;
   void OnRender() override;
@@ -48,9 +49,7 @@ private:
   float tPrev_ = 0.0f;
   float lightAngle_ = 0.0f;
   float lightRotationSpeed_ = 1.5f;
-  std::vector<glm::vec4> lightPositions_ = {glm::vec4(7.0f, 3.0f, 0.0f, 1.0f),
-                                            glm::vec4(0.0f, 0.15f, -1.0f, 0.0f),
-                                            glm::vec4(-7.0f, 3.0f, 7.0f, 1.0f)};
+  std::vector<glm::vec4> lightPositions_;
 };
 
 #endif
