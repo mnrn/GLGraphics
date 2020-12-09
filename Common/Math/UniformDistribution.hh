@@ -8,7 +8,7 @@
 class UniformDistribution {
 public:
   /** 円周上の一様乱数 */
-  template<typename RNG> glm::vec2 OnCircle(RNG& gen) {
+  template <typename RNG> glm::vec2 OnCircle(RNG &gen) {
     const float u = dist01_(gen);
     const float theta = glm::two_pi<float>() * u;
     const float x = glm::cos(theta);
@@ -17,14 +17,14 @@ public:
   }
 
   /** 円周内の一様乱数 */
-  template <typename RNG> glm::vec2 InCircle(RNG& gen) {
+  template <typename RNG> glm::vec2 InCircle(RNG &gen) {
     const float v = dist01_(gen);
     const float r = glm::sqrt(v);
     return r * OnCircle(gen);
   }
 
   /** 半球面上の一様乱数 */
-  template <typename RNG> glm::vec3 OnHemisphere(RNG& gen) {
+  template <typename RNG> glm::vec3 OnHemisphere(RNG &gen) {
     const float v = dist01_(gen);
     const float r = glm::sqrt(1.0f - v * v);
 
@@ -37,7 +37,8 @@ public:
 
   /**
    * @brief SSAO用の球体内乱数を生成します。
-   * @note 点群の密度を均一にせず、密度が距離の二乗に反比例するように近似して分布させます。
+   * @note
+   * 点群の密度を均一にせず、密度が距離の二乗に反比例するように近似して分布させます。
    */
   // template <typename RNG> glm::vec3 InSphereForSSAO(RNG& gen) {
   //   const float v = dist_11_(gen);

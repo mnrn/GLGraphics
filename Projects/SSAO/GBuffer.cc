@@ -34,9 +34,9 @@ void GBuffer::OnInit(int w, int h) {
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D,
                          textures_[ColorTex], 0);
 
-  const std::vector<GLenum> drawBuffers = {
-    GL_NONE, GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_NONE
-  };
+  const std::vector<GLenum> drawBuffers = {GL_NONE, GL_COLOR_ATTACHMENT0,
+                                           GL_COLOR_ATTACHMENT1,
+                                           GL_COLOR_ATTACHMENT2, GL_NONE};
   glDrawBuffers(static_cast<GLsizei>(drawBuffers.size()), drawBuffers.data());
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -47,9 +47,8 @@ void GBuffer::OnInit(int w, int h) {
   // テクスチャをAO用のFramebufferにアタッチします。
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
                          textures_[AOTex], 0);
-  const std::vector<GLenum> aoDrawBuffers = {
-    GL_NONE, GL_NONE, GL_NONE, GL_NONE, GL_COLOR_ATTACHMENT0
-  };
+  const std::vector<GLenum> aoDrawBuffers = {GL_NONE, GL_NONE, GL_NONE, GL_NONE,
+                                             GL_COLOR_ATTACHMENT0};
   glDrawBuffers(static_cast<GLsizei>(aoDrawBuffers.size()),
                 aoDrawBuffers.data());
   glBindFramebuffer(GL_FRAMEBUFFER, 0);

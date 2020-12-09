@@ -11,8 +11,8 @@
 #include <glm/gtc/constants.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "Texture.h"
 #include "Math/UniformDistribution.hh"
+#include "Texture.h"
 
 // ********************************************************************************
 // Overrides scene
@@ -26,13 +26,14 @@ void SceneSSAO::OnInit() {
 
   glEnable(GL_DEPTH_TEST);
 
-  sceneProj_ = glm::perspective(glm::radians(kFOVY),
-                           static_cast<float>(width_) / height_, 0.3f, 100.0f);
+  sceneProj_ = glm::perspective(
+      glm::radians(kFOVY), static_cast<float>(width_) / height_, 0.3f, 100.0f);
 
   CreateVAO();
 
   textures_[WoodTex] = Texture::Load("./Assets/Textures/Wood/wood.jpeg");
-  textures_[BrickTex] = Texture::Load("./Assets/Textures/Brick/ruin_wall_01.png");
+  textures_[BrickTex] =
+      Texture::Load("./Assets/Textures/Brick/ruin_wall_01.png");
 
   prog_.SetUniform("Light.L", glm::vec3(0.3f));
   prog_.SetUniform("Light.La", glm::vec3(0.5f));
@@ -78,8 +79,7 @@ void SceneSSAO::OnResize(int w, int h) {
 
 std::optional<std::string> SceneSSAO::CompileAndLinkShader() {
   // Compile and links
-  if (prog_.Compile("./Assets/Shaders/SSAO/SSAO.vs.glsl",
-                    ShaderType::Vertex) &&
+  if (prog_.Compile("./Assets/Shaders/SSAO/SSAO.vs.glsl", ShaderType::Vertex) &&
       prog_.Compile("./Assets/Shaders/SSAO/SSAO.fs.glsl",
                     ShaderType::Fragment) &&
       prog_.Link()) {
@@ -131,7 +131,7 @@ void SceneSSAO::SetMatrices() {
 // Drawing
 // ********************************************************************************
 
-void SceneSSAO::Pass1() { 
+void SceneSSAO::Pass1() {
   prog_.SetUniform("Pass", 1);
 
   const GLuint deferredFBO = gbuffer_.GetDeferredFBO();
@@ -167,7 +167,8 @@ void SceneSSAO::Pass3() {
   // AOTexを読み込み、BlurAOTexに描きこみます。
   const GLuint aoTex = gbuffer_.GetAOTex();
   const GLuint blurAOTex = gbuffer_.GetBlurAOTex();
-  glActiveTexture(GL_TEXTURE3);  // テクスチャユニット3番を有効にAOTexをバインドします。
+  glActiveTexture(
+      GL_TEXTURE3); // テクスチャユニット3番を有効にAOTexをバインドします。
   glBindTexture(GL_TEXTURE_2D, aoTex);
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
                          blurAOTex, 0);
@@ -181,7 +182,8 @@ void SceneSSAO::Pass4() {
 
   // BlurAOTexを読み込みます。
   const GLuint blurAOTex = gbuffer_.GetBlurAOTex();
-  glActiveTexture(GL_TEXTURE3); // テクスチャユニット3番を有効にしblurAOTexをバインドします。
+  glActiveTexture(
+      GL_TEXTURE3); // テクスチャユニット3番を有効にしblurAOTexをバインドします。
   glBindTexture(GL_TEXTURE_2D, blurAOTex);
 
   // デフォルトのFramebufferに戻して描きこみます。
@@ -212,7 +214,8 @@ void SceneSSAO::DrawScene() {
   plane_.Render();
 
   model_ = glm::translate(glm::mat4(1.0f), glm::vec3(-2.0f, 0.0f, 0.0f));
-  model_ = glm::rotate(model_, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+  model_ =
+      glm::rotate(model_, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
   model_ =
       glm::rotate(model_, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
   SetMatrices();
@@ -229,7 +232,7 @@ void SceneSSAO::DrawScene() {
   mesh_->Render();
 }
 
-void SceneSSAO::DrawQuad() { 
+void SceneSSAO::DrawQuad() {
   view_ = glm::mat4(1.0f);
   proj_ = glm::mat4(1.0f);
   model_ = glm::mat4(1.0f);
@@ -251,7 +254,8 @@ void SceneSSAO::BuildKernel(std::uint32_t seed) {
   std::vector<float> kern(3 * kKernelSize);
   for (size_t i = 0; i < kKernelSize; i++) {
     glm::vec3 randDir = dist.OnHemisphere(engine);
-    const float kScale = static_cast<float>(i * i) / (kKernelSize * kKernelSize);
+    const float kScale =
+        static_cast<float>(i * i) / (kKernelSize * kKernelSize);
     randDir *= glm::mix(0.1f, 1.0f, kScale);
 
     kern[3 * i + 0] = randDir.x;
@@ -268,7 +272,7 @@ void SceneSSAO::BuildRandDirTex(std::uint32_t seed) {
   std::mt19937 engine(seed);
   UniformDistribution dist;
 
-  const size_t kRotTexSize = 4;  // 4x4 texture
+  const size_t kRotTexSize = 4; // 4x4 texture
   std::vector<GLfloat> randDir(3 * kRotTexSize * kRotTexSize);
 
   for (size_t i = 0; i < kRotTexSize * kRotTexSize; i++) {

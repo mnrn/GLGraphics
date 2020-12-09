@@ -5,7 +5,6 @@
 #ifndef SCENE_SSAO_H
 #define SCENE_SSAO_H
 
-
 #include "Scene.h"
 
 #include <glm/gtc/constants.hpp>
@@ -13,12 +12,11 @@
 #include <string>
 
 #include "GBuffer.h"
+#include "Mesh/ObjMesh.h"
 #include "Primitive/Plane.h"
 #include "Primitive/Teapot.h"
 #include "Primitive/Torus.h"
 #include "Shader.hh"
-#include "Mesh/ObjMesh.h"
-
 
 // ********************************************************************************
 // Classes
@@ -48,7 +46,8 @@ private:
   void DrawScene();
   void DrawQuad();
 
-  static constexpr inline size_t kKernelSize = 64; // NOTE: シェーダーのカーネルサイズと一致させる必要があります。
+  static constexpr inline size_t kKernelSize =
+      64; // NOTE: シェーダーのカーネルサイズと一致させる必要があります。
   static constexpr inline float kRotSpeed = 1.0f;
   static constexpr inline float kFOVY = 50.0f;
 
@@ -66,7 +65,7 @@ private:
   enum VertexBuffer {
     VertexPosition,
     TextureCoordinates,
-    VertexBufferSize
+    VertexBufferSize,
   };
   enum Textures {
     WoodTex,
