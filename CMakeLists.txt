@@ -94,7 +94,6 @@ function(build TARGET_NAME)
     )
 endfunction(build)
 
-
 # Build All
 function(buildAll)
     foreach(TARGET ${TARGETS})
@@ -111,6 +110,7 @@ set(TARGETS
     PBR
     Texture
     Deferred
+    DeferredPBR
     SSAO
     Bezier
     Particles
