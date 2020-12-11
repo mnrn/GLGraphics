@@ -27,7 +27,7 @@ void SceneShadowMap::OnInit() {
   SetupFBO();
 
   shadowBias_ = glm::mat4(
-      glm::vec4(0.5f, 0.0f, 0.0f, 0.0f), glm::vec4(0.0f, 0.5f, 0.0f, 0.0f),
+      glm::vec4(0.5f, 0.0f, 0.0f, 0.0f), glm::vec4(0-.0f, 0.5f, 0.0f, 0.0f),
       glm::vec4(0.0f, 0.0f, 0.5f, 0.0f), glm::vec4(0.5f, 0.5f, 0.5f, 1.0f));
 
   const float kCenter = 1.65f;
@@ -110,10 +110,10 @@ void SceneShadowMap::SetupFBO() {
                  kShadowMapHeight);
 
   // テクスチャの拡大・縮小の方法を指定します。
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   // テクスチャの繰り返しの方法を指定します。
-  static const GLfloat border[] = {1.0f, 0.0f, 0.0f, 0.0f};
+  const GLfloat border[] = {1.0f, 0.0f, 0.0f, 0.0f};
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
   glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, border);

@@ -1,5 +1,7 @@
 #version 410
 
+#define USE_PCF 1
+
 in vec3 Position;
 in vec3 Normal;
 in vec4 ShadowCoord;
@@ -49,7 +51,15 @@ void ShadeWithShadow() {
 
     float shadow = 1.0;
     if (ShadowCoord.z >= 0.0) {
+#if USE_PCF
+        shadow += textureProjOffset(ShadowMap, ShadowCoord, ivec2(-1, -1));
+        shadow += textureProjOffset(ShadowMap, ShadowCoord, ivec2(-1, 1));
+        shadow += textureProjOffset(ShadowMap, ShadowCoord, ivec2(1, 1));
+        shadow += textureProjOffset(ShadowMap, ShadowCoord, ivec2(1, -1));
+        shadow *= 0.25;
+#else
         shadow = textureProj(ShadowMap, ShadowCoord);
+#endif
     }
     // ピクセルが影の中にある場合、Ambient Light (環境光)のみ使用することになります。
     vec4 color = vec4(diffSpec * shadow + amb, 1.0);
