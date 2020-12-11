@@ -112,6 +112,7 @@ set(TARGETS
     Deferred
     DeferredPBR
     SSAO
+    ShadowMap
     Bezier
     Particles
 )

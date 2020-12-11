@@ -40,7 +40,6 @@ void SceneDeferredPBR::OnInit() {
   prog_.SetUniform("PositionTex", 0);
   prog_.SetUniform("NormalTex", 1);
   prog_.SetUniform("ColorTex", 2);
-
 }
 
 void SceneDeferredPBR::OnDestroy() {
@@ -204,7 +203,7 @@ void SceneDeferredPBR::DrawFloor() {
 }
 
 void SceneDeferredPBR::DrawMesh(const glm::vec3 &pos, float rough, int metal,
-                        const glm::vec3 &color) {
+                                const glm::vec3 &color) {
   model_ = glm::mat4(1.0f);
   prog_.SetUniform("Material.Roughness", rough);
   prog_.SetUniform("Material.metallic", metal);
