@@ -99,7 +99,7 @@ void SceneShadowMap::SetMatrices() {
   prog_.SetUniform("ModelViewMatrix", mv);
   prog_.SetUniform("NormalMatrix", glm::mat3(mv));
   prog_.SetUniform("MVP", proj_ * mv);
-  prog_.SetUniform("Shadowmatrix", lightPV_ * model_);
+  prog_.SetUniform("ShadowMatrix", lightPV_ * model_);
 }
 
 void SceneShadowMap::SetupFBO() {
