@@ -1,6 +1,6 @@
 #version 410
 
-#define USE_PCF 1
+#define USE_PCF 0
 
 in vec3 Position;
 in vec3 Normal;
