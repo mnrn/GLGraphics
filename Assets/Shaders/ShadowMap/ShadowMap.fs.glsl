@@ -52,11 +52,12 @@ void ShadeWithShadow() {
     float shadow = 1.0;
     if (ShadowCoord.z >= 0.0) {
 #if USE_PCF
-        shadow += textureProjOffset(ShadowMap, ShadowCoord, ivec2(-1, -1));
-        shadow += textureProjOffset(ShadowMap, ShadowCoord, ivec2(-1, 1));
-        shadow += textureProjOffset(ShadowMap, ShadowCoord, ivec2(1, 1));
-        shadow += textureProjOffset(ShadowMap, ShadowCoord, ivec2(1, -1));
-        shadow *= 0.25;
+        float acc = 0.0;
+        acc += textureProjOffset(ShadowMap, ShadowCoord, ivec2(-1, -1));
+        acc += textureProjOffset(ShadowMap, ShadowCoord, ivec2(-1, 1));
+        acc += textureProjOffset(ShadowMap, ShadowCoord, ivec2(1, 1));
+        acc += textureProjOffset(ShadowMap, ShadowCoord, ivec2(1, -1));
+        shadow = acc * 0.25;
 #else
         shadow = textureProj(ShadowMap, ShadowCoord);
 #endif
