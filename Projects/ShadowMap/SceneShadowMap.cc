@@ -26,12 +26,6 @@ void SceneShadowMap::OnInit() {
   // フレームバッファオブジェクトの生成
   SetupFBO();
 
-  const GLuint kProgHandle = prog_.GetHandle();
-  passIndices_[RecordDepth] =
-      glGetSubroutineIndex(kProgHandle, GL_FRAGMENT_SHADER, "RecordDepth");
-  passIndices_[ShadeWithShadow] =
-      glGetSubroutineIndex(kProgHandle, GL_FRAGMENT_SHADER, "ShadeWithShadow");
-
   shadowBias_ = glm::mat4(
       glm::vec4(0.5f, 0.0f, 0.0f, 0.0f), glm::vec4(0.0f, 0.5f, 0.0f, 0.0f),
       glm::vec4(0.0f, 0.0f, 0.5f, 0.0f), glm::vec4(0.5f, 0.5f, 0.5f, 1.0f));
@@ -43,10 +37,11 @@ void SceneShadowMap::OnInit() {
   lightPV_ = shadowBias_ * lightFrustum_.GetProjectionMatrix() *
              lightFrustum_.GetViewMatrix();
 
-  prog_.SetUniform("Light.La", glm::vec3(0.85f));
-  prog_.SetUniform("Light.Ld", glm::vec3(0.85f));
-  prog_.SetUniform("Light.Ls", glm::vec3(0.85f));
-  prog_.SetUniform("ShadowMap", 0);
+  progs_[kShadeWithShadow].Use();
+  progs_[kShadeWithShadow].SetUniform("Light.La", glm::vec3(0.85f));
+  progs_[kShadeWithShadow].SetUniform("Light.Ld", glm::vec3(0.85f));
+  progs_[kShadeWithShadow].SetUniform("Light.Ls", glm::vec3(0.85f));
+  progs_[kShadeWithShadow].SetUniform("ShadowMap", 0);
 }
 
 void SceneShadowMap::OnDestroy() {
@@ -81,31 +76,42 @@ void SceneShadowMap::OnResize(int w, int h) {
 
 std::optional<std::string> SceneShadowMap::CompileAndLinkShader() {
   // compile and links
-  if (!(prog_.Compile("./Assets/Shaders/ShadowMap/ShadowMap.vs.glsl",
+  if (!(progs_[kRecordDepth].Compile("./Assets/Shaders/ShadowMap/RecordDepth.vs.glsl",
                       ShaderType::Vertex) &&
-        prog_.Compile("./Assets/Shaders/ShadowMap/ShadowMap.fs.glsl",
+        progs_[kRecordDepth].Compile("./Assets/Shaders/ShadowMap/RecordDepth.fs.glsl",
                       ShaderType::Fragment) &&
-        prog_.Link())) {
-    return prog_.GetLog();
+        progs_[kRecordDepth].Link())) {
+    return progs_[kRecordDepth].GetLog();
   }
-  prog_.Use();
 
-  if (!(solid_.Compile("./Assets/Shaders/Solid/Solid.vs.glsl",
+  if (!(progs_[kShadeWithShadow].Compile("./Assets/Shaders/ShadowMap/ShadowMap.vs.glsl",
+                      ShaderType::Vertex) &&
+        progs_[kShadeWithShadow].Compile("./Assets/Shaders/ShadowMap/ShadowMap.fs.glsl",
+                      ShaderType::Fragment) &&
+        progs_[kShadeWithShadow].Link())) {
+    return progs_[kShadeWithShadow].GetLog();
+  }
+
+  if (!(progs_[kDebugFrustum].Compile("./Assets/Shaders/Solid/Solid.vs.glsl",
                        ShaderType::Vertex) &&
-        solid_.Compile("./Assets/Shaders/Solid/Solid.fs.glsl",
+        progs_[kDebugFrustum].Compile("./Assets/Shaders/Solid/Solid.fs.glsl",
                        ShaderType::Fragment) &&
-        solid_.Link())) {
-    return solid_.GetLog();
+        progs_[kDebugFrustum].Link())) {
+    return progs_[kDebugFrustum].GetLog();
   }
   return std::nullopt;
 }
 
 void SceneShadowMap::SetMatrices() {
   const glm::mat4 mv = view_ * model_;
-  prog_.SetUniform("ModelViewMatrix", mv);
-  prog_.SetUniform("NormalMatrix", glm::mat3(mv));
-  prog_.SetUniform("MVP", proj_ * mv);
-  prog_.SetUniform("ShadowMatrix", lightPV_ * model_);
+  if (pass_ == kRecordDepth) {
+    progs_[kRecordDepth].SetUniform("MVP", proj_ * mv);
+  } else if (pass_ == kShadeWithShadow) {
+    progs_[kShadeWithShadow].SetUniform("ModelViewMatrix", mv);
+    progs_[kShadeWithShadow].SetUniform("NormalMatrix", glm::mat3(mv));
+    progs_[kShadeWithShadow].SetUniform("MVP", proj_ * mv);
+    progs_[kShadeWithShadow].SetUniform("ShadowMatrix", lightPV_ * model_);
+  }
 }
 
 void SceneShadowMap::SetupFBO() {
@@ -153,21 +159,33 @@ void SceneShadowMap::SetupFBO() {
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
+void SceneShadowMap::SetMatrialUniforms(const glm::vec3& diff, const glm::vec3& amb,
+  const glm::vec3& spec,
+  float shininess) {
+
+  if (pass_ != kShadeWithShadow) {
+    return;
+  }
+  progs_[kShadeWithShadow].SetUniform("Material.Ka", amb);
+  progs_[kShadeWithShadow].SetUniform("Material.Kd", diff);
+  progs_[kShadeWithShadow].SetUniform("Material.Ks", spec);
+  progs_[kShadeWithShadow].SetUniform("Material.Shininess", shininess);
+}
+
 // ********************************************************************************
 // Drawing
 // ********************************************************************************
 
 // Shadow map generation
 void SceneShadowMap::Pass1() {
-  prog_.Use();
-
+  pass_ = RenderPass::kRecordDepth;
+  progs_[kRecordDepth].Use();
   view_ = lightFrustum_.GetViewMatrix();
   proj_ = lightFrustum_.GetProjectionMatrix();
 
   glBindFramebuffer(GL_FRAMEBUFFER, shadowFBO_);
   glClear(GL_DEPTH_BUFFER_BIT);
   glViewport(0, 0, kShadowMapWidth, kShadowMapHeight);
-  glUniformSubroutinesuiv(GL_FRAGMENT_SHADER, 1, &passIndices_[RecordDepth]); 
 
   // 前面をカリングします。
   glEnable(GL_CULL_FACE);
@@ -186,12 +204,14 @@ void SceneShadowMap::Pass1() {
 
 // render
 void SceneShadowMap::Pass2() {
+  pass_ = RenderPass::kShadeWithShadow;
   const float kCenter = 2.0f;
   const glm::vec3 camPt =
       glm::vec3(kCenter * 11.5f * cos(angle_), kCenter * 7.0f,
                 kCenter * 11.5f * sin(angle_));
   view_ = glm::lookAt(camPt, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-  prog_.SetUniform("Light.Position",
+  progs_[kShadeWithShadow].Use();
+  progs_[kShadeWithShadow].SetUniform("Light.Position",
                    view_ * glm::vec4(lightFrustum_.GetOrigin(), 1.0f));
   proj_ = glm::perspective(glm::radians(kFOVY),
                            static_cast<float>(width_) / height_, 0.1f, 100.0f);
@@ -199,17 +219,17 @@ void SceneShadowMap::Pass2() {
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glViewport(0, 0, width_, height_);
-  glUniformSubroutinesuiv(GL_FRAGMENT_SHADER, 1, &passIndices_[ShadeWithShadow]);
 
   DrawScene();
 }
 
 // draw the light's frustum
 void SceneShadowMap::Pass3() {
-  solid_.Use();
-  solid_.SetUniform("Color", glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
+  pass_ = kDebugFrustum;
+  progs_[kDebugFrustum].Use();
+  progs_[kDebugFrustum].SetUniform("Color", glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
   const glm::mat4 mv = view_ * lightFrustum_.GetInvViewMatrix();
-  solid_.SetUniform("MVP", proj_ * mv);
+  progs_[kDebugFrustum].SetUniform("MVP", proj_ * mv);
   lightFrustum_.Render();
 }
 
@@ -219,10 +239,7 @@ void SceneShadowMap::DrawScene() {
   const glm::vec3 spec = glm::vec3(0.9f, 0.9f, 0.9f);
 
   // ティーポットの描画
-  prog_.SetUniform("Material.Ka", amb);
-  prog_.SetUniform("Material.Kd", diff);
-  prog_.SetUniform("Material.Ks", spec);
-  prog_.SetUniform("Material.Shininess", 150.0f);
+  SetMatrialUniforms(diff, amb, spec, 150.0f);
   model_ = glm::mat4(1.0f);
   model_ =
       glm::rotate(model_, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
@@ -230,10 +247,7 @@ void SceneShadowMap::DrawScene() {
   teapot_.Render();
 
   // トーラスの描画
-  prog_.SetUniform("Material.Ka", amb);
-  prog_.SetUniform("Material.Kd", diff);
-  prog_.SetUniform("Material.Ks", spec);
-  prog_.SetUniform("Material.Shininess", 150.0f);
+  SetMatrialUniforms(diff, amb, spec, 150.0f);
   model_ = glm::mat4(1.0f);
   model_ = glm::translate(model_, glm::vec3(0.0f, 2.0f, 5.0f));
   model_ =
@@ -242,10 +256,9 @@ void SceneShadowMap::DrawScene() {
   torus_.Render();
 
   // 平面の描画
-  prog_.SetUniform("Material.Kd", 0.25f, 0.25f, 0.25f);
-  prog_.SetUniform("Material.Ks", 0.0f, 0.0f, 0.0f);
-  prog_.SetUniform("Material.Ka", 0.05f, 0.05f, 0.05f);
-  prog_.SetUniform("Material.Shininess", 1.0f);
+  SetMatrialUniforms(glm::vec3(0.25f, 0.25f, 0.25f),
+                     glm::vec3(0.0f, 0.0f, 0.0f),
+                     glm::vec3(0.05f, 0.05f, 0.05f), 1.0f);
   model_ = glm::mat4(1.0f);
   SetMatrices();
   plane_.Render();

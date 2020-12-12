@@ -44,10 +44,6 @@ vec3 PhongDSModel(vec3 pos, vec3 n) {
     return diff + spec;
 }
 
-subroutine void RenderPassType();
-subroutine uniform RenderPassType RenderPass;
-
-subroutine(RenderPassType)
 void ShadeWithShadow() {
     vec3 amb = Light.La * Material.Ka;
     vec3 diffSpec = PhongDSModel(Position, Normal);
@@ -70,11 +66,6 @@ void ShadeWithShadow() {
     FragColor = GammaCorrection(color);
 }
 
-subroutine(RenderPassType)
-void RecordDepth(){
-
-}
-
 void main() {
-    RenderPass();
+    ShadeWithShadow();
 }

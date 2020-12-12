@@ -27,9 +27,11 @@ public:
   void OnResize(int, int) override;
 
 private:
+  void SetupFBO();
   std::optional<std::string> CompileAndLinkShader();
   void SetMatrices();
-  void SetupFBO();
+  void SetMatrialUniforms(const glm::vec3 &diff, const glm::vec3 &amb,
+                          const glm::vec3& spec, float shininess);
 
   void Pass1();
   void Pass2();
@@ -52,16 +54,17 @@ private:
   float tPrev_ = 0.0f;
   float angle_ = glm::quarter_pi<float>();
 
-  ShaderProgram prog_{};
-  ShaderProgram solid_{};
+  enum RenderPass : std::int32_t {
+    kRecordDepth,
+    kShadeWithShadow,
+    kDebugFrustum,
+    kPassNum,
+  };
+  std::array<ShaderProgram, kPassNum> progs_{};
+  RenderPass pass_ = kRecordDepth;
+
   GLuint depthTex_ = 0;
   GLuint shadowFBO_ = 0;
-  enum Pass {
-    RecordDepth,
-    ShadeWithShadow,
-    PassNum,
-  };
-  std::array<GLuint, PassNum> passIndices_{};
 };
 
 #endif
