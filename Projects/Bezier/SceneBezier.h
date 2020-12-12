@@ -15,7 +15,7 @@
 #include <glm/glm.hpp>
 
 #include "Scene.h"
-#include "Shader.hh"
+#include "Shader.h"
 
 // ********************************************************************************
 // Class

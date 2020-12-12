@@ -16,7 +16,7 @@
 #include "Primitive/Plane.h"
 #include "Primitive/Teapot.h"
 #include "Primitive/Torus.h"
-#include "Shader.hh"
+#include "Shader.h"
 
 class SceneShadowMap : public Scene {
 public:

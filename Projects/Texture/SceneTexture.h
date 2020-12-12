@@ -3,7 +3,7 @@
 
 #include "Primitive/Cube.h"
 #include "Scene.h"
-#include "Shader.hh"
+#include "Shader.h"
 
 class SceneTexture : public Scene {
 public:

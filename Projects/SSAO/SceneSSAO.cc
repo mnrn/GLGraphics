@@ -11,7 +11,7 @@
 #include <glm/gtc/constants.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "Math/UniformDistribution.hh"
+#include "Math/UniformDistribution.h"
 #include "Texture.h"
 
 // ********************************************************************************

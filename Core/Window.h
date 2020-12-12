@@ -14,7 +14,6 @@
 #include <thread>
 
 #include "Debug.h"
-#include "Timer.hh"
 
 // ********************************************************************************
 // Namespace

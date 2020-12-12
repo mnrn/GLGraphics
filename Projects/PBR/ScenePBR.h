@@ -14,7 +14,7 @@
 #include "Mesh/ObjMesh.h"
 #include "Primitive/Plane.h"
 #include "Primitive/Teapot.h"
-#include "Shader.hh"
+#include "Shader.h"
 
 class ScenePBR : public Scene {
 public:

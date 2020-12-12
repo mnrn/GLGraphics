@@ -14,7 +14,7 @@
 
 #include "Primitive/Teapot.h"
 #include "Scene.h"
-#include "Shader.hh"
+#include "Shader.h"
 
 // ********************************************************************************
 // Class
