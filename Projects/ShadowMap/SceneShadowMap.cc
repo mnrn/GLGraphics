@@ -26,6 +26,12 @@ void SceneShadowMap::OnInit() {
   // フレームバッファオブジェクトの生成
   SetupFBO();
 
+  const GLuint kProgHandle = prog_.GetHandle();
+  passIndices_[RecordDepth] =
+      glGetSubroutineIndex(kProgHandle, GL_FRAGMENT_SHADER, "RecordDepth");
+  passIndices_[ShadeWithShadow] =
+      glGetSubroutineIndex(kProgHandle, GL_FRAGMENT_SHADER, "ShadeWithShadow");
+
   shadowBias_ = glm::mat4(
       glm::vec4(0.5f, 0.0f, 0.0f, 0.0f), glm::vec4(0.0f, 0.5f, 0.0f, 0.0f),
       glm::vec4(0.0f, 0.0f, 0.5f, 0.0f), glm::vec4(0.5f, 0.5f, 0.5f, 1.0f));
@@ -61,7 +67,7 @@ void SceneShadowMap::OnUpdate(float t) {
 void SceneShadowMap::OnRender() {
   Pass1();
   Pass2();
-  Pass3();
+  // Pass3();
 }
 
 void SceneShadowMap::OnResize(int w, int h) {
@@ -154,7 +160,6 @@ void SceneShadowMap::SetupFBO() {
 // Shadow map generation
 void SceneShadowMap::Pass1() {
   prog_.Use();
-  prog_.SetUniform("Pass", 1);
 
   view_ = lightFrustum_.GetViewMatrix();
   proj_ = lightFrustum_.GetProjectionMatrix();
@@ -162,6 +167,7 @@ void SceneShadowMap::Pass1() {
   glBindFramebuffer(GL_FRAMEBUFFER, shadowFBO_);
   glClear(GL_DEPTH_BUFFER_BIT);
   glViewport(0, 0, kShadowMapWidth, kShadowMapHeight);
+  glUniformSubroutinesuiv(GL_FRAGMENT_SHADER, 1, &passIndices_[RecordDepth]); 
 
   // 前面をカリングします。
   glEnable(GL_CULL_FACE);
@@ -180,8 +186,6 @@ void SceneShadowMap::Pass1() {
 
 // render
 void SceneShadowMap::Pass2() {
-  prog_.SetUniform("Pass", 2);
-
   const float kCenter = 2.0f;
   const glm::vec3 camPt =
       glm::vec3(kCenter * 11.5f * cos(angle_), kCenter * 7.0f,
@@ -195,6 +199,8 @@ void SceneShadowMap::Pass2() {
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glViewport(0, 0, width_, height_);
+  glUniformSubroutinesuiv(GL_FRAGMENT_SHADER, 1, &passIndices_[ShadeWithShadow]);
+
   DrawScene();
 }
 

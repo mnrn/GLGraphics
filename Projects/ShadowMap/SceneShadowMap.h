@@ -41,7 +41,7 @@ private:
   static constexpr inline int kShadowMapWidth = 512;
   static constexpr inline int kShadowMapHeight = 512;
 
-  Frustum lightFrustum_;
+  Frustum lightFrustum_{};
 
   Teapot teapot_{14, glm::mat4(1.0f)};
   Plane plane_{40.0f, 40.0f, 2, 2};
@@ -56,6 +56,12 @@ private:
   ShaderProgram solid_{};
   GLuint depthTex_ = 0;
   GLuint shadowFBO_ = 0;
+  enum Pass {
+    RecordDepth,
+    ShadeWithShadow,
+    PassNum,
+  };
+  std::array<GLuint, PassNum> passIndices_{};
 };
 
 #endif

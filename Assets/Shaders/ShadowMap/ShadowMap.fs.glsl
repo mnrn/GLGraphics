@@ -1,6 +1,6 @@
 #version 410
 
-#define USE_PCF 0
+#define USE_PCF 1
 
 in vec3 Position;
 in vec3 Normal;
@@ -25,7 +25,6 @@ uniform struct MaterialInfo {
 } Material;
 
 uniform sampler2DShadow ShadowMap;
-uniform int Pass;
 
 vec4 GammaCorrection(vec4 color) {
     return pow(color, vec4(1.0 / kGamma));
@@ -45,6 +44,10 @@ vec3 PhongDSModel(vec3 pos, vec3 n) {
     return diff + spec;
 }
 
+subroutine void RenderPassType();
+subroutine uniform RenderPassType RenderPass;
+
+subroutine(RenderPassType)
 void ShadeWithShadow() {
     vec3 amb = Light.La * Material.Ka;
     vec3 diffSpec = PhongDSModel(Position, Normal);
@@ -67,14 +70,11 @@ void ShadeWithShadow() {
     FragColor = GammaCorrection(color);
 }
 
+subroutine(RenderPassType)
 void RecordDepth(){
 
 }
 
 void main() {
- if (Pass == 1) {
-     RecordDepth();
- } else if (Pass == 2) {
-     ShadeWithShadow();
- }
+    RenderPass();
 }
