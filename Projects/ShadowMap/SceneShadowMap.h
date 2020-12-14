@@ -12,7 +12,7 @@
 #include <optional>
 #include <string>
 
-#include "Frustum.h"
+#include "View/Frustum.h"
 #include "Primitive/Plane.h"
 #include "Primitive/Teapot.h"
 #include "Primitive/Torus.h"

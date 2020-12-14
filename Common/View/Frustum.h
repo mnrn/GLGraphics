@@ -2,20 +2,22 @@
 #define FRUSTUM_H
 
 #include "GLInclude.h"
+
 #include "Primitive/Drawable.h"
-#include <array>
+#include "Box/AABB.h"
 
-class Frustum : public Drawable {
+#include <vector>
+
+class Frustum {
 public:
-  ~Frustum();
-
   void OnInit(const glm::vec3 &eyePt, const glm::vec3 &lookatPt,
               const glm::vec3 &upVec, float fovy, float aspectRatio, float near,
               float far);
   void Orient(const glm::vec3 &eyePt, const glm::vec3 &lookatPt,
               const glm::vec3 &upVec);
   void SetPerspective(float fovy, float aspectRatio, float near, float far);
-  void Render() const;
+  void SetupCorners();
+  AABB ComputeAABB(const glm::mat4 &m) const;
 
   glm::mat4 GetViewMatrix() const;
   glm::mat4 GetInvViewMatrix() const;
@@ -23,22 +25,13 @@ public:
   glm::vec3 GetOrigin() const;
 
 private:
-  void DeleteBuffers();
-
   float fovy_;
   float ar_;
   float near_;
   float far_;
 
   glm::vec3 center_, u_, v_, n_;
-
-  enum VertexBuffer {
-    VertexPosition,
-    IndexBuffer,
-    VertexBufferSize,
-  };
-  std::array<GLuint, VertexBufferSize> vbo_{};
-  GLuint vao_ = 0;
+  std::vector<glm::vec4> corners_;
 };
 
 #endif

@@ -3,6 +3,7 @@
 #include <glm/glm.hpp>
 #include <limits>
 #include <cmath>
+#include <utility>
 
 class AABB {
 public:
@@ -12,7 +13,7 @@ public:
     max_ = glm::vec3(std::numeric_limits<float>::min());
   }
 
-  void Compute(const glm::vec3& pt) {
+  void Merge(const glm::vec3& pt) {
     min_.x = std::fmin(min_.x, pt.x);
     max_.x = std::fmax(max_.x, pt.x);
 

@@ -230,7 +230,7 @@ void SceneShadowMap::Pass3() {
   progs_[kDebugFrustum].SetUniform("Color", glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
   const glm::mat4 mv = view_ * lightFrustum_.GetInvViewMatrix();
   progs_[kDebugFrustum].SetUniform("MVP", proj_ * mv);
-  lightFrustum_.Render();
+  //lightFrustum_.Render();
 }
 
 void SceneShadowMap::DrawScene() {
