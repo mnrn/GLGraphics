@@ -12,9 +12,9 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/integer.hpp>
 
+#include "HID/KeyInput.h"
 #include "Math/UniformDistribution.h"
 #include "Texture.h"
-#include "HID/KeyInput.h"
 
 // ********************************************************************************
 // Overrides scene

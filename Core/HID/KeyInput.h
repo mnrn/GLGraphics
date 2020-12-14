@@ -85,7 +85,7 @@ public:
     }
 
     // トリガーを更新
-    state_.trg = state_.fresh ^ state_.old & state_.fresh;
+    state_.trg = state_.fresh ^ (state_.old & state_.fresh);
   }
 
   void SetInputType(InputType type) {
