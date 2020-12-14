@@ -38,21 +38,19 @@ private:
   void DrawMesh(const glm::vec3 &pos, float rough, int metal,
                 const glm::vec3 &color);
 
-  static constexpr inline float kFOVY = 60.0f;
+  static constexpr inline float kFOVY = 90.0f;
   static constexpr inline float kMetalRough = 0.43f;
   static constexpr inline int kNumCows = 9;
+  static constexpr inline float kLightRotationSpeed = 0.5f;
   static constexpr glm::vec3 kBaseCowColor{0.2f, 0.33f, 0.17f};
 
-  std::unique_ptr<ObjMesh> mesh_ =
-      std::make_unique<ObjMesh>("./Assets/Models/Spot/spot_triangulated.obj");
-  Plane plane_{20, 20, 1, 1};
+  std::unique_ptr<ObjMesh> teapot_ =
+      std::make_unique<ObjMesh>("./Assets/Models/Tests/Teapot/teapot.obj");
+  Plane plane_{50, 50, 1, 1};
 
   float tPrev_ = 0.0f;
   float lightAngle_ = 0.0f;
-  float lightRotationSpeed_ = 1.5f;
-  std::vector<glm::vec4> lightPositions_{glm::vec4(7.0f, 3.0f, 0.0f, 1.0f),
-                                         glm::vec4(0.0f, 0.15f, 0.0f, 0.0f),
-                                         glm::vec4(-7.0f, 3.0f, 7.0f, 1.0f)};
+  std::vector<glm::vec4> lightPositions_{};
   ShaderProgram prog_;
   GBuffer gbuffer_;
   GLuint quad_ = 0;

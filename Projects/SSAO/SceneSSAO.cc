@@ -194,7 +194,7 @@ void SceneSSAO::Pass4() {
 }
 
 void SceneSSAO::DrawScene() {
-  prog_.SetUniform("Light.Position", view_ * glm::vec4(3.0f, 3.0f, 1.5f, 1.0f));
+  prog_.SetUniform("Light.Position", view_ * lightPos_);
 
   // 床の描画
   glActiveTexture(GL_TEXTURE5);

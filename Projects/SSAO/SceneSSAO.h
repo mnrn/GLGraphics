@@ -57,6 +57,8 @@ private:
 
   float angle_ = glm::pi<float>() / 2.0f;
   float tPrev_ = 0.0f;
+
+  glm::vec4 lightPos_{3.0f, 3.0f, 1.5f, 1.0f};
   glm::mat4 sceneProj_{1.0f};
 
   ShaderProgram prog_{};
