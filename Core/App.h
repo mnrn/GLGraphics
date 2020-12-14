@@ -17,6 +17,7 @@
 #include "GLInclude.h"
 
 #include "Debug.h"
+#include "HID/KeyInput.h"
 #include "Window.h"
 
 // ********************************************************************************
@@ -58,6 +59,7 @@ public:
 #if (!NDEBUG)
       Debug::CheckForOpenGLError(__FILE__, __LINE__);
 #endif
+      OnPreUpdate(window_);
       onUpdate(static_cast<float>(glfwGetTime()));
       onRender();
 
@@ -80,6 +82,17 @@ private:
     // Initialize GLAD
     if (!gladLoadGL()) {
       BOOST_ASSERT_MSG(false, "Something went wrong!");
+    }
+  }
+
+  static void OnPreUpdate(GLFWwindow *hwd) {
+    if (hwd == nullptr) {
+      return;
+    }
+
+    // キー入力更新を行いますが、キー入力初期化は各々に任せます。
+    if (KeyInput::IsExist()) {
+      KeyInput::Get().OnUpdate(hwd);
     }
   }
 };
