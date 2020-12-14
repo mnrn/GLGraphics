@@ -78,6 +78,14 @@ private:
   std::array<GLuint, VertexBufferSize> vbo_{};
   std::array<GLuint, TexturesNum> textures_{};
   GLuint quad_ = 0;
+
+  enum struct RenderType {
+    SSAO,
+    NoSSAO,
+    SSAOOnly,
+    RenderTypeNum,
+  };
+  RenderType type_ = RenderType::SSAO;
 };
 
 #endif

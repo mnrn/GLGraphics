@@ -91,11 +91,11 @@ public:
   void SetInputType(InputType type) {
     state_.type |= static_cast<std::uint32_t>(type);
   }
-  bool GetFrash(Key key) const {
-    return state_.fresh & static_cast<std::uint32_t>(key);
+  bool IsFresh(Key key) const {
+    return (state_.fresh & static_cast<std::uint32_t>(key)) != 0;
   }
-  bool GetTrg(Key key) const {
-    return state_.trg & static_cast<std::uint32_t>(key);
+  bool IsTrg(Key key) const {
+    return (state_.trg & static_cast<std::uint32_t>(key)) != 0;
   }
 
 private:

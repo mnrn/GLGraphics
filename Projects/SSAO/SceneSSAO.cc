@@ -10,9 +10,11 @@
 
 #include <glm/gtc/constants.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/integer.hpp>
 
 #include "Math/UniformDistribution.h"
 #include "Texture.h"
+#include "HID/KeyInput.h"
 
 // ********************************************************************************
 // Overrides scene
@@ -26,6 +28,7 @@ void SceneSSAO::OnInit() {
 
   glEnable(GL_DEPTH_TEST);
 
+  KeyInput::Create();
   sceneProj_ = glm::perspective(
       glm::radians(kFOVY), static_cast<float>(width_) / height_, 0.3f, 100.0f);
 
@@ -58,6 +61,16 @@ void SceneSSAO::OnUpdate(float t) {
   angle_ += kRotSpeed * deltaT;
   if (angle_ > glm::two_pi<float>()) {
     angle_ -= glm::two_pi<float>();
+  }
+
+  if (KeyInput::Get().IsFresh(Key::Left)) {
+    type_ = static_cast<RenderType>(
+        glm::mod(static_cast<int>(type_) - 1,
+                 static_cast<int>(RenderType::RenderTypeNum)));
+  } else if (KeyInput::Get().IsFresh(Key::Right)) {
+    type_ = static_cast<RenderType>(
+        glm::mod(static_cast<int>(type_) + 1,
+                 static_cast<int>(RenderType::RenderTypeNum)));
   }
 }
 
