@@ -63,14 +63,10 @@ void SceneSSAO::OnUpdate(float t) {
     angle_ -= glm::two_pi<float>();
   }
 
-  if (KeyInput::Get().IsFresh(Key::Left)) {
-    type_ = static_cast<RenderType>(
-        glm::mod(static_cast<int>(type_) - 1,
-                 static_cast<int>(RenderType::RenderTypeNum)));
-  } else if (KeyInput::Get().IsFresh(Key::Right)) {
-    type_ = static_cast<RenderType>(
-        glm::mod(static_cast<int>(type_) + 1,
-                 static_cast<int>(RenderType::RenderTypeNum)));
+  if (KeyInput::Get().IsTrg(Key::Left)) {
+    type_ = glm::mod(type_ - 1, RenderType::RenderTypeNum);
+  } else if (KeyInput::Get().IsTrg(Key::Right)) {
+    type_ = glm::mod(type_ + 1, RenderType::RenderTypeNum);
   }
 }
 
@@ -192,6 +188,7 @@ void SceneSSAO::Pass3() {
 
 void SceneSSAO::Pass4() {
   prog_.SetUniform("Pass", 4);
+  prog_.SetUniform("Type", type_);
 
   // BlurAOTexを読み込みます。
   const GLuint blurAOTex = gbuffer_.GetBlurAOTex();

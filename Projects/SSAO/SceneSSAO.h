@@ -79,13 +79,13 @@ private:
   std::array<GLuint, TexturesNum> textures_{};
   GLuint quad_ = 0;
 
-  enum struct RenderType {
+  enum RenderType {
     SSAO,
-    NoSSAO,
     SSAOOnly,
+    NoSSAO,
     RenderTypeNum,
   };
-  RenderType type_ = RenderType::SSAO;
+  int type_ = RenderType::SSAO;
 };
 
 #endif
