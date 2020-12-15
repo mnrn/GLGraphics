@@ -53,6 +53,8 @@ void Text::Render(const std::string &text, float x, float y, float scale,
 
   glBindVertexArray(vao_);
   glBindBuffer(GL_ARRAY_BUFFER, vbo_);
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
   for (const auto &c : text) {
     const auto &ch = obj->GetChar(c);
@@ -76,6 +78,8 @@ void Text::Render(const std::string &text, float x, float y, float scale,
 
     x += static_cast<float>(ch.advance >> 6) * scale;
   }
+
+  glDisable(GL_BLEND);
 }
 
 std::optional<std::string> Text::CompileAndLinkShader() {

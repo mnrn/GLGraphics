@@ -39,7 +39,8 @@ public:
   ~FontObj() { OnDestroy(); }
   FontObj(const FontObj &) = default;
 
-  bool Load(unsigned int size);
+  static constexpr inline unsigned int kDefaultSize = 48;
+  bool Setup(unsigned int size = kDefaultSize);
   const FontChar &GetChar(GLchar c) const { return chars_.at(c); }
 
 private:
@@ -56,7 +57,7 @@ public:
   bool OnInit();
   bool OnDestroy();
 
-  std::optional<FontObj> Entry(const std::string &fontpath);
+  std::unique_ptr<FontObj> Entry(const std::string &fontpath);
 
 private:
   FT_Library ft_ = nullptr;

@@ -38,13 +38,13 @@ bool Font::OnDestroy() {
   return FT_Done_FreeType(ft_) == 0;
 }
 
-std::optional<FontObj> Font::Entry(const std::string &fontpath) {
+std::unique_ptr<FontObj> Font::Entry(const std::string &fontpath) {
   FT_Face face;
   if (FT_New_Face(ft_, fontpath.c_str(), 0, &face)) {
     BOOST_ASSERT_MSG(false, "Could not open font");
-    return std::nullopt;
+    return nullptr;
   }
-  return std::make_optional<FontObj>(face);
+  return std::make_unique<FontObj>(face);
 }
 
 // ********************************************************************************
@@ -62,7 +62,7 @@ void FontObj::OnDestroy() {
   }
 }
 
-bool FontObj::Load(unsigned int size) {
+bool FontObj::Setup(unsigned int size) {
   if (face_ == nullptr) {
     return false;
   }
@@ -72,20 +72,17 @@ bool FontObj::Load(unsigned int size) {
   glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
   // とりあえずasciiのみに絞っておきます。
-  for (GLubyte c = 0; c < 128; c++) {
+  for (unsigned int c = 0; c < 256; c++) {
     if (FT_Load_Char(face_, c, FT_LOAD_RENDER)) {
       continue;
     }
 
     GLuint tex;
-    glCreateTextures(GL_TEXTURE_2D, 1, &tex);
-    glTextureStorage2D(tex, 1, GL_R8, face_->glyph->bitmap.width,
-                       face_->glyph->bitmap.rows);
-    glTextureSubImage2D(tex, 0, 0, 0, face_->glyph->bitmap.width,
-                        face_->glyph->bitmap.rows, GL_RED, GL_UNSIGNED_BYTE,
-                        face_->glyph->bitmap.buffer);
-
+    glGenTextures(1, &tex);
     glBindTexture(GL_TEXTURE_2D, tex);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, face_->glyph->bitmap.width,
+                 face_->glyph->bitmap.rows, 0, GL_RED, GL_UNSIGNED_BYTE,
+                 face_->glyph->bitmap.buffer);
 
     // アーティファクトを防ぐためのクランプ
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
