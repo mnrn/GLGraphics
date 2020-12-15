@@ -32,8 +32,6 @@ void SceneSSAO::OnInit() {
   glEnable(GL_DEPTH_TEST);
 
   KeyInput::Create();
-  Font::Create();
-  Text::Create();
 
   sceneProj_ = glm::perspective(
       glm::radians(kFOVY), static_cast<float>(width_) / height_, 0.3f, 100.0f);
@@ -257,6 +255,10 @@ void SceneSSAO::DrawQuad() {
   glBindVertexArray(quad_);
   glDrawArrays(GL_TRIANGLES, 0, 6);
   glBindVertexArray(0);
+}
+
+void SceneSSAO::DrawText() {
+
 }
 
 // ********************************************************************************

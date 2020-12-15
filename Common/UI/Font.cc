@@ -12,6 +12,7 @@
 #include <boost/assert.hpp>
 
 Font::Font() { OnInit(); }
+Font::~Font() { OnDestroy(); }
 
 bool Font::OnInit() {
   if (ft_ != nullptr) {
@@ -23,6 +24,13 @@ bool Font::OnInit() {
     return false;
   }
   return true;
+}
+
+bool Font::OnDestroy() {
+  if (ft_ == nullptr) {
+    return true;
+  }
+  return FT_Done_FreeType(ft_) == 0;
 }
 
 std::optional<FT_Face> Font::Load(const std::string &fontpath) {

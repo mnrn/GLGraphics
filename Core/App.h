@@ -45,8 +45,8 @@ public:
     glfwTerminate();
   }
 
-  template <typename Initialize, typename Update, typename Render>
-  int Run(Initialize onInit, Update onUpdate, Render onRender) {
+  template <typename Initialize, typename Update, typename Render, typename Destroy>
+  int Run(Initialize onInit, Update onUpdate, Render onRender, Destroy onDestroy) {
     if (window_ == nullptr) {
       return EXIT_FAILURE;
     }
@@ -67,6 +67,7 @@ public:
       glfwPollEvents();
     }
 
+    onDestroy();
 #if (!NDEBUG)
     Debug::CleanupInfo();
 #endif

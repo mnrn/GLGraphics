@@ -28,8 +28,11 @@
 class Font : public Singleton<Font> {
 public:
   Font();
+  ~Font();
 
   bool OnInit();
+  bool OnDestroy();
+  
   std::optional<FT_Face> Load(const std::string &fontpath);
 
 private:
