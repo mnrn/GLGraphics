@@ -21,7 +21,7 @@
  */
 class Scene {
 public:
-  virtual ~Scene() { OnDestroy(); }
+  virtual ~Scene() = default;
 
   virtual void OnInit() = 0;
   virtual void OnDestroy() {}
