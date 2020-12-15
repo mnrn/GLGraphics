@@ -11,9 +11,6 @@
 #include <optional>
 #include <string>
 
-#include <freetype2/ft2build.h>
-#include FT_FREETYPE_H
-
 #include "GBuffer.h"
 #include "Mesh/ObjMesh.h"
 #include "Primitive/Plane.h"

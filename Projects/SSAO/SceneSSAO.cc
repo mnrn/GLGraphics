@@ -15,9 +15,6 @@
 #include "HID/KeyInput.h"
 #include "Math/UniformDistribution.h"
 #include "Texture.h"
-#include "UI/Font.h"
-#include "UI/Text.h"
-
 
 // ********************************************************************************
 // Overrides scene

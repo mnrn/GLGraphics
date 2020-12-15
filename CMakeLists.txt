@@ -63,11 +63,16 @@ if (UNIX)
         message("@@ FREETYPE_LIBRARIES: ${FREETYPE_LIBRARIES}")
     endif()
 else()
+    if ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
+        set(FREETYPE_LIBRARIES_HINTS ${CMAKE_SOURCE_DIR}/Lib/freetype/debug)
+    else ()
+        set(FREETYPE_LIBRARIES_HINTS ${CMAKE_SOURCE_DIR}/Lib/freetype/release)
+    endif()
     find_library(FREETYPE_LIBRARIES
       NAMES
         freetype
       HINTS
-        ${CMAKE_SOURCE_DIR}/Lib/freetype/win64
+        ${FREETYPE_LIBRARIES_HINTS}
     )
     message("@@ FREETYPE_LIBRARIES: ${FREETYPE_LIBRARIES}")
 endif()
