@@ -61,7 +61,9 @@ if (UNIX)
         message(FATAL_ERROR "Could not find freetype!")
     else()
         message("@@ FREETYPE_LIBRARIES: ${FREETYPE_LIBRARIES}")
+        message("@@ FREETYPE_INCLUDE_DIRS: ${FREETYPE_INCLUDE_DIRS}")
     endif()
+    include_directories(SYSTEM /usr/local/include/freetype2)
 else()
     if ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
         set(FREETYPE_LIBRARIES_HINTS ${CMAKE_SOURCE_DIR}/Lib/freetype/debug)
@@ -75,8 +77,9 @@ else()
         ${FREETYPE_LIBRARIES_HINTS}
     )
     message("@@ FREETYPE_LIBRARIES: ${FREETYPE_LIBRARIES}")
+    include_directories(SYSTEM third-party/freetype2)
 endif()
-include_directories(SYSTEM third-party/freetype2)
+
 
 # Set preprocessor defines
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNOMINMAX -D_USE_MATH_DEFINES")
@@ -141,5 +144,6 @@ set(TARGETS
     ShadowMap
     Bezier
     Particles
+    Text
 )
 buildAll()

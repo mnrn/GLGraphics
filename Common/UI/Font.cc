@@ -10,6 +10,7 @@
 #include "UI/Font.h"
 
 #include <boost/assert.hpp>
+#include <iostream>
 
 // ********************************************************************************
 // Font class
@@ -43,7 +44,7 @@ std::optional<FontObj> Font::Entry(const std::string &fontpath) {
     BOOST_ASSERT_MSG(false, "Could not open font");
     return std::nullopt;
   }
-  return FontObj(face);
+  return std::make_optional<FontObj>(face);
 }
 
 // ********************************************************************************

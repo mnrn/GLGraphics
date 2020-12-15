@@ -57,10 +57,10 @@ void Text::Render(const std::string &text, float x, float y, float scale,
   for (const auto &c : text) {
     const auto &ch = obj->GetChar(c);
 
-    const float x2 = x + ch.bearing.x * scale;
-    const float y2 = y - (ch.size.y - ch.bearing.y) * scale;
-    const float w = ch.size.x * scale;
-    const float h = ch.size.y * scale;
+    const float x2 = x + static_cast<float>(ch.bearing.x) * scale;
+    const float y2 = y - static_cast<float>(ch.size.y - ch.bearing.y) * scale;
+    const float w = static_cast<float>(ch.size.x) * scale;
+    const float h = static_cast<float>(ch.size.y) * scale;
 
     // VBOの更新
     GLfloat box[6 * 4] = {x2,   y2 + h, 0.0f,   0.0f,   x2,     y2,
@@ -74,7 +74,7 @@ void Text::Render(const std::string &text, float x, float y, float scale,
     glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(box), box);
     glDrawArrays(GL_TRIANGLES, 0, 6);
 
-    x += (ch.advance >> 6) * scale;
+    x += static_cast<float>(ch.advance >> 6) * scale;
   }
 }
 
