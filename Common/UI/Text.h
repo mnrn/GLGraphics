@@ -22,6 +22,7 @@
 #include "Primitive/Drawable.h"
 #include "Shader.h"
 #include "Utils/Singleton.h"
+#include "UI/Font.h"
 
 // ********************************************************************************
 // Classes
@@ -31,13 +32,15 @@ class Text : public Singleton<Text> {
 public:
   Text();
   ~Text();
-  void Render(const std::string &text, float x, float y, float sx, float sy,
-              FT_Face face) const;
+  void Render(const std::string &text, 
+    float x, float y, float scale,
+    float winWidth, float winHeight, const glm::vec4& color, 
+    const std::unique_ptr<FontObj>& obj) const;
 
 private:
   std::optional<std::string> CompileAndLinkShader();
 
   ShaderProgram prog_{};
-  GLuint tex_ = 0;
-  GLuint fbo_ = 0;
+  GLuint vao_ = 0;
+  GLuint vbo_ = 0;
 };

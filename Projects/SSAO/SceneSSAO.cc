@@ -15,6 +15,8 @@
 #include "HID/KeyInput.h"
 #include "Math/UniformDistribution.h"
 #include "Texture.h"
+#include "UI/Font.h"
+#include "UI/Text.h"
 
 // ********************************************************************************
 // Overrides scene
@@ -76,6 +78,7 @@ void SceneSSAO::OnRender() {
   Pass2();
   Pass3();
   Pass4();
+  DrawText();
 }
 
 void SceneSSAO::OnResize(int w, int h) {
@@ -255,7 +258,6 @@ void SceneSSAO::DrawQuad() {
 }
 
 void SceneSSAO::DrawText() {
-
 }
 
 // ********************************************************************************

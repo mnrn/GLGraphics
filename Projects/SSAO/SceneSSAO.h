@@ -10,6 +10,10 @@
 #include <glm/gtc/constants.hpp>
 #include <optional>
 #include <string>
+#include <memory>
+
+#include <freetype2/ft2build.h>
+#include FT_FREETYPE_H
 
 #include "GBuffer.h"
 #include "Mesh/ObjMesh.h"
