@@ -15,6 +15,9 @@
 #include "HID/KeyInput.h"
 #include "Math/UniformDistribution.h"
 #include "Texture.h"
+#include "UI/Font.h"
+#include "UI/Text.h"
+
 
 // ********************************************************************************
 // Overrides scene
@@ -29,6 +32,9 @@ void SceneSSAO::OnInit() {
   glEnable(GL_DEPTH_TEST);
 
   KeyInput::Create();
+  Font::Create();
+  Text::Create();
+
   sceneProj_ = glm::perspective(
       glm::radians(kFOVY), static_cast<float>(width_) / height_, 0.3f, 100.0f);
 

@@ -9,5 +9,5 @@ uniform vec4 Color;
 
 void main()
 {
-    FragColor = vec4(1.0, 1.0, 1.0, texture2D(Tex, TexCoord).a) * Color;
+    FragColor = vec4(1.0, 1.0, 1.0, texture(Tex, TexCoord).a) * Color;
 }

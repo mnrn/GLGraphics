@@ -54,6 +54,25 @@ endif()
 add_subdirectory(Lib/glad)
 set(GLAD_LIBRARIES glad)
 
+# freetype
+if (UNIX)
+    find_package(FREETYPE)
+    if (NOT FREETYPE_FOUND)
+        message(FATAL_ERROR "Could not find freetype!")
+    else()
+        message("@@ FREETYPE_LIBRARIES: ${FREETYPE_LIBRARIES}")
+    endif()
+else()
+    find_library(FREETYPE_LIBRARIES
+      NAMES
+        freetype
+      HINTS
+        ${CMAKE_SOURCE_DIR}/Lib/freetype/win64
+    )
+    message("@@ FREETYPE_LIBRARIES: ${FREETYPE_LIBRARIES}")
+endif()
+include_directories(SYSTEM third-party/freetype2)
+
 # Set preprocessor defines
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNOMINMAX -D_USE_MATH_DEFINES")
 
@@ -92,6 +111,7 @@ function(build TARGET_NAME)
         ${CMAKE_THREAD_LIBS_INIT}
         ${GLFW_LIBRARIES}
         ${GLAD_LIBRARIES}
+        ${FREETYPE_LIBRARIES}
     )
 endfunction(build)
 
