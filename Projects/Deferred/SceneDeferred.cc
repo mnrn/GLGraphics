@@ -57,7 +57,6 @@ void SceneDeferred::OnInit() {
   prog_.SetUniform("PositionTex", 0);
   prog_.SetUniform("NormalTex", 1);
   prog_.SetUniform("ColorTex", 2);
-
 }
 
 void SceneDeferred::OnDestroy() {
@@ -120,8 +119,9 @@ void SceneDeferred::Pass1() {
 
   view_ = glm::lookAt(glm::vec3(7.0f * cos(angle_), 4.0f, 7.0f * sin(angle_)),
                       glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-  proj_ = glm::perspective(glm::radians(60.0f),
-                           static_cast<float>(width_) / height_, 0.3f, 100.0f);
+  proj_ = glm::perspective(
+      glm::radians(60.0f),
+      static_cast<float>(width_) / static_cast<float>(height_), 0.3f, 100.0f);
 
   // ティーポットの描画
   prog_.SetUniform("Light.Position", glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));

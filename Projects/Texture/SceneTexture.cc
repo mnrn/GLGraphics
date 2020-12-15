@@ -66,7 +66,8 @@ void SceneTexture::OnRender() {
 void SceneTexture::OnResize(int w, int h) {
   SetDimensions(w, h);
   glViewport(0, 0, w, h);
-  proj_ = glm::perspective(glm::radians(60.0f), static_cast<float>(w) / h, 0.3f,
+  proj_ = glm::perspective(glm::radians(60.0f),
+                           static_cast<float>(w) / static_cast<float>(h), 0.3f,
                            100.0f);
 }
 

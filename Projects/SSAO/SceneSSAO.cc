@@ -33,7 +33,8 @@ void SceneSSAO::OnInit() {
   KeyInput::Create();
 
   sceneProj_ = glm::perspective(
-      glm::radians(kFOVY), static_cast<float>(width_) / height_, 0.3f, 100.0f);
+      glm::radians(kFOVY),
+      static_cast<float>(width_) / static_cast<float>(height_), 0.3f, 100.0f);
 
   CreateVAO();
 
@@ -257,8 +258,7 @@ void SceneSSAO::DrawQuad() {
   glBindVertexArray(0);
 }
 
-void SceneSSAO::DrawText() {
-}
+void SceneSSAO::DrawText() {}
 
 // ********************************************************************************
 // Sampling for SSAO

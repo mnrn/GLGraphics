@@ -23,7 +23,7 @@ void SceneText::OnInit() {
   Font::Create();
 
   fontObj_ = Font::Get().Entry("./Assets/Fonts/Cica/Cica-Regular.ttf");
-  fontObj_->Setup(48);
+  fontObj_->SetupDefault();
 }
 
 void SceneText::OnDestroy() {}
@@ -35,8 +35,8 @@ void SceneText::OnRender() {
   Text::Get().Render("Hello!", 100.0f, 500.0f, 1.0f, static_cast<float>(width_),
                      static_cast<float>(height_),
                      glm::vec4(0.8f, 0.3f, 0.1f, 1.0f), fontObj_);
-  Text::Get().Render("Goodbye!", 500.0f, 100.0f, 1.0f, static_cast<float>(width_),
-                     static_cast<float>(height_),
+  Text::Get().Render("Goodbye!", 500.0f, 100.0f, 1.0f,
+                     static_cast<float>(width_), static_cast<float>(height_),
                      glm::vec4(0.3f, 0.5f, 0.8f, 1.0f), fontObj_);
 }
 

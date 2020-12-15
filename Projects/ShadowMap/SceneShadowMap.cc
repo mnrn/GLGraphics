@@ -76,26 +76,30 @@ void SceneShadowMap::OnResize(int w, int h) {
 
 std::optional<std::string> SceneShadowMap::CompileAndLinkShader() {
   // compile and links
-  if (!(progs_[kRecordDepth].Compile("./Assets/Shaders/ShadowMap/RecordDepth.vs.glsl",
-                      ShaderType::Vertex) &&
-        progs_[kRecordDepth].Compile("./Assets/Shaders/ShadowMap/RecordDepth.fs.glsl",
-                      ShaderType::Fragment) &&
+  if (!(progs_[kRecordDepth].Compile(
+            "./Assets/Shaders/ShadowMap/RecordDepth.vs.glsl",
+            ShaderType::Vertex) &&
+        progs_[kRecordDepth].Compile(
+            "./Assets/Shaders/ShadowMap/RecordDepth.fs.glsl",
+            ShaderType::Fragment) &&
         progs_[kRecordDepth].Link())) {
     return progs_[kRecordDepth].GetLog();
   }
 
-  if (!(progs_[kShadeWithShadow].Compile("./Assets/Shaders/ShadowMap/ShadowMap.vs.glsl",
-                      ShaderType::Vertex) &&
-        progs_[kShadeWithShadow].Compile("./Assets/Shaders/ShadowMap/ShadowMap.fs.glsl",
-                      ShaderType::Fragment) &&
+  if (!(progs_[kShadeWithShadow].Compile(
+            "./Assets/Shaders/ShadowMap/ShadowMap.vs.glsl",
+            ShaderType::Vertex) &&
+        progs_[kShadeWithShadow].Compile(
+            "./Assets/Shaders/ShadowMap/ShadowMap.fs.glsl",
+            ShaderType::Fragment) &&
         progs_[kShadeWithShadow].Link())) {
     return progs_[kShadeWithShadow].GetLog();
   }
 
   if (!(progs_[kDebugFrustum].Compile("./Assets/Shaders/Solid/Solid.vs.glsl",
-                       ShaderType::Vertex) &&
+                                      ShaderType::Vertex) &&
         progs_[kDebugFrustum].Compile("./Assets/Shaders/Solid/Solid.fs.glsl",
-                       ShaderType::Fragment) &&
+                                      ShaderType::Fragment) &&
         progs_[kDebugFrustum].Link())) {
     return progs_[kDebugFrustum].GetLog();
   }
@@ -159,9 +163,10 @@ void SceneShadowMap::SetupFBO() {
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void SceneShadowMap::SetMatrialUniforms(const glm::vec3& diff, const glm::vec3& amb,
-  const glm::vec3& spec,
-  float shininess) {
+void SceneShadowMap::SetMatrialUniforms(const glm::vec3 &diff,
+                                        const glm::vec3 &amb,
+                                        const glm::vec3 &spec,
+                                        float shininess) {
 
   if (pass_ != kShadeWithShadow) {
     return;
@@ -211,10 +216,11 @@ void SceneShadowMap::Pass2() {
                 kCenter * 11.5f * sin(angle_));
   view_ = glm::lookAt(camPt, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
   progs_[kShadeWithShadow].Use();
-  progs_[kShadeWithShadow].SetUniform("Light.Position",
-                   view_ * glm::vec4(lightFrustum_.GetOrigin(), 1.0f));
-  proj_ = glm::perspective(glm::radians(kFOVY),
-                           static_cast<float>(width_) / height_, 0.1f, 100.0f);
+  progs_[kShadeWithShadow].SetUniform(
+      "Light.Position", view_ * glm::vec4(lightFrustum_.GetOrigin(), 1.0f));
+  proj_ = glm::perspective(
+      glm::radians(kFOVY),
+      static_cast<float>(width_) / static_cast<float>(height_), 0.1f, 100.0f);
 
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -230,7 +236,7 @@ void SceneShadowMap::Pass3() {
   progs_[kDebugFrustum].SetUniform("Color", glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
   const glm::mat4 mv = view_ * lightFrustum_.GetInvViewMatrix();
   progs_[kDebugFrustum].SetUniform("MVP", proj_ * mv);
-  //lightFrustum_.Render();
+  // lightFrustum_.Render();
 }
 
 void SceneShadowMap::DrawScene() {
