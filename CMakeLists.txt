@@ -56,7 +56,7 @@ set(GLAD_LIBRARIES glad)
 
 # freetype
 if (UNIX)
-    find_package(FREETYPE)
+    find_package(Freetype)
     if (NOT FREETYPE_FOUND)
         message(FATAL_ERROR "Could not find freetype!")
     else()

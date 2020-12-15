@@ -57,7 +57,7 @@ void FontObj::OnDestroy() {
   }
 
   if (face_ != nullptr) {
-    FT_Done_Face(face_);  
+    FT_Done_Face(face_);
   }
 }
 
@@ -69,7 +69,7 @@ bool FontObj::Load(unsigned int size) {
   FT_Set_Pixel_Sizes(face_, 0, size);
 
   glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-  
+
   // とりあえずasciiのみに絞っておきます。
   for (GLubyte c = 0; c < 128; c++) {
     if (FT_Load_Char(face_, c, FT_LOAD_RENDER)) {
@@ -99,7 +99,7 @@ bool FontObj::Load(unsigned int size) {
     FontChar ch{
         tex, glm::ivec2(face_->glyph->bitmap.width, face_->glyph->bitmap.rows),
         glm::ivec2(face_->glyph->bitmap_left, face_->glyph->bitmap_top),
-        face_->glyph->advance.x};
+        static_cast<GLuint>(face_->glyph->advance.x)};
     chars_.emplace(c, ch);
   }
   return true;

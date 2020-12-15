@@ -10,8 +10,8 @@
 #include "UI/Text.h"
 
 #include <boost/assert.hpp>
-#include <iostream>
 #include <glm/gtc/matrix_transform.hpp>
+#include <iostream>
 
 Text::Text() {
   if (const auto msg = CompileAndLinkShader()) {
@@ -24,8 +24,9 @@ Text::Text() {
 
   glGenBuffers(1, &vbo_);
   glBindBuffer(GL_ARRAY_BUFFER, vbo_);
-  
-  glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 6 * 4, nullptr, GL_DYNAMIC_DRAW);
+
+  glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 6 * 4, nullptr,
+               GL_DYNAMIC_DRAW);
   glEnableVertexAttribArray(0);
   glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
 
@@ -43,7 +44,7 @@ Text::~Text() {
 }
 
 void Text::Render(const std::string &text, float x, float y, float scale,
-                  float winWidth, float winHeight, const glm::vec4 &color, 
+                  float winWidth, float winHeight, const glm::vec4 &color,
                   const std::unique_ptr<FontObj> &obj) const {
   prog_.Use();
   prog_.SetUniform("Color", color);
@@ -52,28 +53,27 @@ void Text::Render(const std::string &text, float x, float y, float scale,
 
   glBindVertexArray(vao_);
   glBindBuffer(GL_ARRAY_BUFFER, vbo_);
-  
+
   for (const auto &c : text) {
-    const auto& ch = obj->GetChar(c);
+    const auto &ch = obj->GetChar(c);
 
     const float x2 = x + ch.bearing.x * scale;
-    const float y2 = y -  (ch.size.y - ch.bearing.y) * scale;
+    const float y2 = y - (ch.size.y - ch.bearing.y) * scale;
     const float w = ch.size.x * scale;
     const float h = ch.size.y * scale;
 
     // VBOの更新
-    GLfloat box[6 * 4] = {
-        x2, y2 + h, 0.0f,     0.0f,     x2,     y2,
-        0.0f, 1.0f,     x2 + w, y2,     1.0f,     1.0f,
+    GLfloat box[6 * 4] = {x2,   y2 + h, 0.0f,   0.0f,   x2,     y2,
+                          0.0f, 1.0f,   x2 + w, y2,     1.0f,   1.0f,
 
-        x2, y2 + h, 0.0f,     0.0f,     x2 + w, y2,
-        1.0f, 1.0f,     x2 + w, y2 + h, 1.0f,     0.0f}; 
+                          x2,   y2 + h, 0.0f,   0.0f,   x2 + w, y2,
+                          1.0f, 1.0f,   x2 + w, y2 + h, 1.0f,   0.0f};
 
     glBindTexture(GL_TEXTURE_2D, ch.texID);
     glBindBuffer(GL_ARRAY_BUFFER, vbo_);
     glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(box), box);
     glDrawArrays(GL_TRIANGLES, 0, 6);
-    
+
     x += (ch.advance >> 6) * scale;
   }
 }
