@@ -32,53 +32,34 @@ else()
 endif()
 
 # glfw
-if (UNIX)
-    find_package(GLFW)
-    if (NOT GLFW_FOUND)
-        message(FATAL_ERROR "Could not find glfw!")
-    else()
-        message("@@ GLFW_LIBRARIES: ${GLFW_LIBRARIES}")
-    endif()
-else()
-    find_library(GLFW_LIBRARIES
-      NAMES
-        glfw
-        glfw3
-      HINTS
-        ${CMAKE_SOURCE_DIR}/Lib/glfw
-    )
-    message("@@ GLFW_LIBRARIES: ${GLFW_LIBRARIES}")
-endif()
+find_library(GLFW_LIBRARIES
+  NAMES
+    glfw
+    glfw3
+    glfw3.3
+  HINTS
+    ${CMAKE_SOURCE_DIR}/Lib/glfw
+)
+message("@@ GLFW_LIBRARIES: ${GLFW_LIBRARIES}")
 
 ## glad
 add_subdirectory(Lib/glad)
 set(GLAD_LIBRARIES glad)
 
 # freetype
-if (UNIX)
-    find_package(Freetype)
-    if (NOT FREETYPE_FOUND)
-        message(FATAL_ERROR "Could not find freetype!")
-    else()
-        message("@@ FREETYPE_LIBRARIES: ${FREETYPE_LIBRARIES}")
-        message("@@ FREETYPE_INCLUDE_DIRS: ${FREETYPE_INCLUDE_DIRS}")
-    endif()
-    include_directories(SYSTEM /usr/local/include/freetype2)
-else()
-    if ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
-        set(FREETYPE_LIBRARIES_HINTS ${CMAKE_SOURCE_DIR}/Lib/freetype/debug)
-    else ()
-        set(FREETYPE_LIBRARIES_HINTS ${CMAKE_SOURCE_DIR}/Lib/freetype/release)
-    endif()
-    find_library(FREETYPE_LIBRARIES
-      NAMES
-        freetype
-      HINTS
-        ${FREETYPE_LIBRARIES_HINTS}
-    )
-    message("@@ FREETYPE_LIBRARIES: ${FREETYPE_LIBRARIES}")
-    include_directories(SYSTEM third-party/freetype2)
+if ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
+    set(FREETYPE_LIBRARIES_HINTS ${CMAKE_SOURCE_DIR}/Lib/freetype/debug)
+else ()
+    set(FREETYPE_LIBRARIES_HINTS ${CMAKE_SOURCE_DIR}/Lib/freetype/release)
 endif()
+find_library(FREETYPE_LIBRARIES
+  NAMES
+    freetype
+  HINTS
+    ${FREETYPE_LIBRARIES_HINTS}
+)
+message("@@ FREETYPE_LIBRARIES: ${FREETYPE_LIBRARIES}")
+include_directories(SYSTEM third-party/freetype2)
 
 
 # Set preprocessor defines
