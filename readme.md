@@ -1,14 +1,22 @@
 # OpenGL グラフィックメモ
 
+![Launguage-C++](https://img.shields.io/badge/Language-C%2B%2B-orange)
+
 グラフィックに関する実装をOpenGLで行っていきます。  
 Vulkanでの実装がもう少し楽になりそうならそちらに移行するつもりですが、しばらくはOpenGLのままになりそうです。  
 新しくPC買ってなおかつ時間があるようであればVulkanに移行したいです。ある程度目途はついています。
 
-## 制作環境
+## 制作経緯
 
 もともとはLinuxで動かしていたプログラムですが、PCが壊れたのでMacに移していたものです。  
 再入門にあたりWindowsでも動かせるようにしました。  
-現在動作確認はWindowsとMacのみになります。  
+現在動作確認はWindowsとMacのみになります。
+
+## 制作環境
+
+- OS
+  - Windows10
+  - Mac OSX Catalina 10.15
 
 ## ビルド
 
