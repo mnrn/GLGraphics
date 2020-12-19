@@ -18,10 +18,10 @@ public:
    * @param  Args&&... args  コンストラクタの引数
    */
   template <class... Args> static T &Get(Args &&... args) {
-    if (m_instance == nullptr) {
+    if (instance_ == nullptr) {
       Create(std::forward<Args>(args)...);
     }
-    return *m_instance.get();
+    return *instance_.get();
   }
 
   /**
@@ -30,23 +30,23 @@ public:
    * @param  Args&&... args  コンストラクタの引数
    */
   template <class... Args> static void Create(Args &&... args) {
-    if (m_instance != nullptr) {
+    if (instance_ != nullptr) {
       return;
     }
-    m_instance = std::make_unique<T>(std::forward<Args>(args)...);
+    instance_ = std::make_unique<T>(std::forward<Args>(args)...);
   }
 
   /**< @brief インスタンスの破棄 */
   static void Destroy() {
-    if (m_instance != nullptr) {
-      decltype(auto) res = m_instance.release();
+    if (instance_ != nullptr) {
+      decltype(auto) res = instance_.release();
       delete res;
-      m_instance = nullptr;
+      instance_ = nullptr;
     }
   }
 
   /**< @brief インスタンスが存在するか判定 */
-  static bool IsExist() { return m_instance != nullptr; }
+  static bool IsExist() { return instance_ != nullptr; }
 
 protected:
   // --------------------------------------------------------------------------------
@@ -64,6 +64,6 @@ private:
   // 静的メンバ変数
   // --------------------------------------------------------------------------------
 
-  static inline std::unique_ptr<T> m_instance =
+  static inline std::unique_ptr<T> instance_ =
       nullptr; /**< インスタンス本体   */
 };
