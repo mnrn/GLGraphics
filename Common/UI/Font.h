@@ -40,8 +40,8 @@ public:
   FontObj(const FontObj &) = default;
 
   static constexpr inline unsigned int kDefaultSize = 48;
-  bool Setup(unsigned int size);
-  bool SetupDefault() { return Setup(kDefaultSize); }
+  bool SetupWithSize(unsigned int size);
+  bool SetupDefault() { return SetupWithSize(kDefaultSize); }
   const FontChar &GetChar(GLchar c) const { return chars_.at(c); }
 
 private:

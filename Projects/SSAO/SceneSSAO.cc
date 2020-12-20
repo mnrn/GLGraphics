@@ -23,14 +23,20 @@
 // ********************************************************************************
 
 void SceneSSAO::OnInit() {
+  Text::Create();
+  Font::Create();
+  KeyInput::Create();
+
+  if (fontObj_ = Font::Get().Entry("./Assets/Fonts/UbuntuMono/UbuntuMono-Regular.ttf")) {
+    fontObj_->SetupWithSize(36);
+  }
+
   if (const auto msg = CompileAndLinkShader()) {
     std::cerr << msg.value() << std::endl;
     BOOST_ASSERT_MSG(false, "failed to compile or link!");
+  } else {
+    prog_.Use();
   }
-
-  glEnable(GL_DEPTH_TEST);
-
-  KeyInput::Create();
 
   sceneProj_ = glm::perspective(
       glm::radians(kFOVY),
@@ -48,8 +54,9 @@ void SceneSSAO::OnInit() {
   std::uint32_t seed = std::random_device()();
   BuildKernel(seed);
   BuildRandDirTex(seed);
-
+  
   gbuffer_.OnInit(width_, height_);
+  
 }
 
 void SceneSSAO::OnDestroy() {
@@ -75,10 +82,12 @@ void SceneSSAO::OnUpdate(float t) {
 }
 
 void SceneSSAO::OnRender() {
+  prog_.Use();
   Pass1();
   Pass2();
   Pass3();
   Pass4();
+
   DrawText();
 }
 
@@ -97,7 +106,6 @@ std::optional<std::string> SceneSSAO::CompileAndLinkShader() {
       prog_.Compile("./Assets/Shaders/SSAO/SSAO.fs.glsl",
                     ShaderType::Fragment) &&
       prog_.Link()) {
-    prog_.Use();
     return std::nullopt;
   } else {
     return prog_.GetLog();
@@ -156,6 +164,9 @@ void SceneSSAO::Pass1() {
   view_ = glm::lookAt(glm::vec3(2.1f, 1.5f, 2.1f), glm::vec3(0.0f, 1.0f, 0.0f),
                       glm::vec3(0.0f, 1.0f, 0.0f));
   proj_ = sceneProj_;
+
+  gbuffer_.OnPreRender();
+
   DrawScene();
 }
 
@@ -164,6 +175,10 @@ void SceneSSAO::Pass2() {
 
   const GLuint ssaoFBO = gbuffer_.GetSSAOFBO();
   glBindFramebuffer(GL_FRAMEBUFFER, ssaoFBO);
+
+  // テクスチャユニット4番にRandDirTexを設定します。
+  glActiveTexture(GL_TEXTURE4);
+  glBindTexture(GL_TEXTURE_2D, textures_[RandDirTex]);
 
   // AOTexに描きこみます。
   const GLuint aoTex = gbuffer_.GetAOTex();
@@ -206,6 +221,7 @@ void SceneSSAO::Pass4() {
   glClear(GL_COLOR_BUFFER_BIT);
   glDisable(GL_DEPTH_TEST);
   DrawQuad();
+  glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void SceneSSAO::DrawScene() {
@@ -258,7 +274,30 @@ void SceneSSAO::DrawQuad() {
   glBindVertexArray(0);
 }
 
-void SceneSSAO::DrawText() {}
+void SceneSSAO::DrawText() {
+  if (!fontObj_) {
+    return;
+  }
+
+  const float kOffsetX = 25.0f;
+  const float kOffsetY = static_cast<float>(height_) - 40.0f;
+  const std::map<int, std::string> kTexts = {
+      {RenderType::SSAO, "RenderType: SSAO"},
+      {RenderType::SSAOOnly, "RenderType: SSAO Only"},
+      {RenderType::NoSSAO, "RenderType: Diffuse Only"},
+  };
+  if (kTexts.count(static_cast<RenderType>(type_)) > 0) {
+    Text::Get().Render(kTexts.at(type_).c_str(), kOffsetX, kOffsetY,
+                       1.0f, static_cast<float>(width_),
+                       static_cast<float>(height_),
+                       glm::vec4(0.0f, 0.0f, 0.0f, 1.0f), fontObj_);
+
+    Text::Get().Render("Press <- or ->: Switch RenderType", kOffsetX,
+                       kOffsetY - 36.0f, 1.0f, static_cast<float>(width_),
+                       static_cast<float>(height_),
+                       glm::vec4(0.0f, 0.0f, 0.0f, 1.0f), fontObj_);
+  }
+}
 
 // ********************************************************************************
 // Sampling for SSAO
@@ -308,7 +347,5 @@ void SceneSSAO::BuildRandDirTex(std::uint32_t seed) {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
 
-  // テクスチャユニット4番にRandDirTexを設定
-  glActiveTexture(GL_TEXTURE4);
-  glBindTexture(GL_TEXTURE_2D, textures_[RandDirTex]);
+  glBindTexture(GL_TEXTURE_2D, 0);
 }

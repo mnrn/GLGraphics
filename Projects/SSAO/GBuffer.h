@@ -11,10 +11,15 @@ public:
   ~GBuffer();
 
   void OnInit(int w, int h);
+  void OnPreRender();
   void OnDestroy();
 
   GLuint GetDeferredFBO() const { return fbo_[Deferred]; }
   GLuint GetSSAOFBO() const { return fbo_[SSAO]; }
+
+  GLuint GetPosTex() const { return textures_[PosTex]; }
+  GLuint GetNormTex() const { return textures_[NormTex]; }
+  GLuint GetColorTex() const { return textures_[ColorTex]; }
   GLuint GetAOTex() const { return textures_[AOTex]; }
   GLuint GetBlurAOTex() const { return textures_[BlurAOTex]; }
 

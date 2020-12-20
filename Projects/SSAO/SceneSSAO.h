@@ -21,6 +21,7 @@
 #include "Primitive/Teapot.h"
 #include "Primitive/Torus.h"
 #include "Shader.h"
+#include "UI/Font.h"
 
 // ********************************************************************************
 // Classes
@@ -91,6 +92,8 @@ private:
     RenderTypeNum,
   };
   int type_ = RenderType::SSAO;
+
+  std::unique_ptr<FontObj> fontObj_;
 };
 
 #endif

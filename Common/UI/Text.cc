@@ -51,10 +51,13 @@ void Text::Render(const std::string &text, float x, float y, float scale,
   const glm::mat4 proj = glm::ortho(0.0f, winWidth, 0.0f, winHeight);
   prog_.SetUniform("ProjMatrix", proj);
 
-  glBindVertexArray(vao_);
-  glBindBuffer(GL_ARRAY_BUFFER, vbo_);
+  // WARN:ブレンドステートの切り替えをここで行ってしまいます。
+  // 頻繁に切り替えたくなくなったら変えましょう。
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  
+  glActiveTexture(GL_TEXTURE0);
+  glBindVertexArray(vao_);
 
   for (const auto &c : text) {
     const auto &ch = obj->GetChar(c);
@@ -72,13 +75,18 @@ void Text::Render(const std::string &text, float x, float y, float scale,
                           1.0f, 1.0f,   x2 + w, y2 + h, 1.0f,   0.0f};
 
     glBindTexture(GL_TEXTURE_2D, ch.texID);
+
+    // VBO内容の更新
     glBindBuffer(GL_ARRAY_BUFFER, vbo_);
     glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(box), box);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    
     glDrawArrays(GL_TRIANGLES, 0, 6);
-
     x += static_cast<float>(ch.advance >> 6) * scale;
   }
 
+  glBindVertexArray(0);
+  glBindTexture(GL_TEXTURE_2D, 0);
   glDisable(GL_BLEND);
 }
 

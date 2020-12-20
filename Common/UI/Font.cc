@@ -62,7 +62,7 @@ void FontObj::OnDestroy() {
   }
 }
 
-bool FontObj::Setup(unsigned int size) {
+bool FontObj::SetupWithSize(unsigned int size) {
   if (face_ == nullptr) {
     return false;
   }
