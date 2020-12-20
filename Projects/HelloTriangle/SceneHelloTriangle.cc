@@ -26,17 +26,20 @@ void SceneHelloTriangle::OnInit() {
 
 void SceneHelloTriangle::OnDestroy() {
   glDeleteVertexArrays(1, &vao_);
-  glDeleteBuffers(vbo_.size(), vbo_.data());
+  glDeleteBuffers(static_cast<GLsizei>(vbo_.size()), vbo_.data());
 }
 
 void SceneHelloTriangle::OnUpdate(float d) { static_cast<void>(d); }
 
 void SceneHelloTriangle::OnRender() {
+  prog_.Use();
+
   glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT);
 
   glBindVertexArray(vao_);
   glDrawArrays(GL_TRIANGLES, 0, 3);
+  glBindVertexArray(0);
 }
 
 void SceneHelloTriangle::OnResize(int w, int h) {
@@ -55,7 +58,6 @@ std::optional<std::string> SceneHelloTriangle::CompileAndLinkShader() {
       prog_.Compile("./Assets/Shaders/Basic/Basic.fs.glsl",
                      ShaderType::Fragment) &&
       prog_.Link()) {
-    prog_.Use();
     return std::nullopt;
   } else {
     return prog_.GetLog();
@@ -91,5 +93,6 @@ void SceneHelloTriangle::CreateVBO() {
   glBindBuffer(GL_ARRAY_BUFFER, vbo_[Color]);
   glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindVertexArray(0);
 }
