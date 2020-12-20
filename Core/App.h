@@ -26,12 +26,13 @@
 
 class App : private boost::noncopyable {
 public:
-  App(const char *appName, int w = 1280, int h = 720) {
+  App(const char *appName, int w = 1280, int h = 720, int samples = 0) {
     if (glfwInit() == GL_FALSE) {
       BOOST_ASSERT_MSG(false, "glfw Initialization failed!");
+      return;
     }
 
-    window_ = Window::Create(w, h, appName);
+    window_ = Window::Create(w, h, appName, samples);
     glfwGetFramebufferSize(window_, &width_, &height_);
 
     InitGlad();
@@ -45,8 +46,10 @@ public:
     glfwTerminate();
   }
 
-  template <typename Initialize, typename Update, typename Render, typename Destroy>
-  int Run(Initialize onInit, Update onUpdate, Render onRender, Destroy onDestroy) {
+  template <typename Initialize, typename Update, typename Render,
+            typename Destroy>
+  int Run(Initialize onInit, Update onUpdate, Render onRender,
+          Destroy onDestroy) {
     if (window_ == nullptr) {
       return EXIT_FAILURE;
     }

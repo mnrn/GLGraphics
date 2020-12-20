@@ -129,6 +129,7 @@ set(TARGETS
     Texture
     Deferred
     DeferredPBR
+    MSAA
     SSAO
     ShadowMap
     Bezier

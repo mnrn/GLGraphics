@@ -19,7 +19,6 @@
 
 #include <boost/noncopyable.hpp>
 
-
 //*--------------------------------------------------------------------------------
 // Special member functions
 //*--------------------------------------------------------------------------------
@@ -49,7 +48,7 @@ ShaderProgram::~ShaderProgram() {
 // Compile & Link
 //*--------------------------------------------------------------------------------
 
-bool ShaderProgram::Compile(const std::string& filepath, ShaderType type) {
+bool ShaderProgram::Compile(const std::string &filepath, ShaderType type) {
 
   if (!IsFileExists(filepath)) {
     log_ = std::string("File Not Found : ") + filepath;
@@ -137,7 +136,6 @@ GLuint ShaderProgram::CreateShader(ShaderType type) const {
   default:
     return 0;
   }
-  return 0;
 }
 
 //*--------------------------------------------------------------------------------
@@ -174,7 +172,7 @@ void ShaderProgram::StoreLog(GLuint handle) {
 //*--------------------------------------------------------------------------------
 
 std::optional<std::string> ShaderProgram::CompileAndLink(
-  const std::vector<std::pair<std::string, ShaderType>>& shaders) {
+    const std::vector<std::pair<std::string, ShaderType>> &shaders) {
   for (const auto &info : shaders) {
     if (!Compile(info.first, info.second)) {
       return std::make_optional(log_);
