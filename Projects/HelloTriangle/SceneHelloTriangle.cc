@@ -21,7 +21,7 @@ void SceneHelloTriangle::OnInit() {
     BOOST_ASSERT_MSG(false, "failed to compile or link!");
   }
 
-  CreateVBO();
+  CreateVAO();
 }
 
 void SceneHelloTriangle::OnDestroy() {
@@ -64,7 +64,7 @@ std::optional<std::string> SceneHelloTriangle::CompileAndLinkShader() {
   }
 }
 
-void SceneHelloTriangle::CreateVBO() {
+void SceneHelloTriangle::CreateVAO() {
   float position[] = {
       -0.8f, -0.8f, 0.0f, 0.8f, -0.8f, 0.0f, 0.0f, 0.8f, 0.0f,
   };

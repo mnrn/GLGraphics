@@ -34,7 +34,7 @@ public:
 
 private:
   std::optional<std::string> CompileAndLinkShader();
-  void CreateVBO();
+  void CreateVAO();
 
   enum VertexBuffer {
     Position,
