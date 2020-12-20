@@ -18,6 +18,12 @@ void SceneDeferred::OnInit() {
   if (const auto msg = CompileAndLinkShader()) {
     std::cerr << msg.value() << std::endl;
     BOOST_ASSERT_MSG(false, "failed to compile or link!");
+  } else {
+    prog_.Use();
+    prog_.SetUniform("Light.Ld", glm::vec3(1.0f));
+    prog_.SetUniform("PositionTex", 0);
+    prog_.SetUniform("NormalTex", 1);
+    prog_.SetUniform("ColorTex", 2);
   }
 
   glEnable(GL_DEPTH_TEST);
@@ -51,12 +57,6 @@ void SceneDeferred::OnInit() {
   glBindVertexArray(0);
 
   gbuffer_.OnInit(width_, height_);
-
-  prog_.SetUniform("Light.Ld", glm::vec3(1.0f));
-
-  prog_.SetUniform("PositionTex", 0);
-  prog_.SetUniform("NormalTex", 1);
-  prog_.SetUniform("ColorTex", 2);
 }
 
 void SceneDeferred::OnDestroy() {
@@ -75,6 +75,7 @@ void SceneDeferred::OnUpdate(float t) {
 }
 
 void SceneDeferred::OnRender() {
+  gbuffer_.OnPreRender();
   Pass1();
   Pass2();
 }
@@ -98,16 +99,9 @@ void SceneDeferred::SetMatrices() {
 
 std::optional<std::string> SceneDeferred::CompileAndLinkShader() {
   // Compile and links
-  if (prog_.Compile("./Assets/Shaders/Deferred/Deferred.vs.glsl",
-                    ShaderType::Vertex) &&
-      prog_.Compile("./Assets/Shaders/Deferred/Deferred.fs.glsl",
-                    ShaderType::Fragment) &&
-      prog_.Link()) {
-    prog_.Use();
-    return std::nullopt;
-  } else {
-    return prog_.GetLog();
-  }
+  return prog_.CompileAndLink(
+      {{"./Assets/Shaders/Deferred/Deferred.vs.glsl", ShaderType::Vertex},
+       {"./Assets/Shaders/Deferred/Deferred.fs.glsl", ShaderType::Fragment}});
 }
 
 void SceneDeferred::Pass1() {
@@ -151,6 +145,7 @@ void SceneDeferred::Pass1() {
   torus_.Render();
 
   glFinish();
+  glDisable(GL_DEPTH_TEST);
 }
 
 void SceneDeferred::Pass2() {
@@ -158,9 +153,7 @@ void SceneDeferred::Pass2() {
 
   // デフォルトのフレームバッファに戻します
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  glDisable(GL_DEPTH_TEST);
 
   view_ = glm::mat4(1.0f);
   proj_ = glm::mat4(1.0f);
@@ -170,4 +163,5 @@ void SceneDeferred::Pass2() {
   // 四角形ポリゴンとして描画していく
   glBindVertexArray(quad_);
   glDrawArrays(GL_TRIANGLES, 0, 6);
+  glBindVertexArray(0);
 }

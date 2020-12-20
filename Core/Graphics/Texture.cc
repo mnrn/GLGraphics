@@ -2,7 +2,7 @@
  * @brief Texture helper
  */
 
-#include "Texture.h"
+#include "Graphics/Texture.h"
 
 #include <boost/assert.hpp>
 #include <iostream>
@@ -31,6 +31,7 @@ namespace Texture {
       return 0;
     }
     GLuint tex = 0;
+
     glGenTextures(1, &tex);
     glBindTexture(GL_TEXTURE_2D, tex);
 
@@ -40,7 +41,10 @@ namespace Texture {
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    
+    glBindTexture(GL_TEXTURE_2D, 0);
     Pixels::Free(data);
+    
     return tex;
   }
 }

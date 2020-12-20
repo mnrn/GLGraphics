@@ -80,12 +80,20 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-documentation")
 endif()
 
-file(GLOB SOURCE *.cc Core/*.cc Common/*.cc Common/Primitive/*.cc Common/Mesh/*cc Common/View/*.cc Common/UI/*.cc)
-
 # Function for building
 function(build TARGET_NAME)
     # Main
-    file(GLOB SOURCE *.cc Core/*.cc Common/*.cc Common/Primitive/*.cc Common/Mesh/*cc Common/View/*.cc Common/UI/*.cc ${PROJECTS_DIR_NAME}/${TARGET_NAME}/*.cc)
+    file(GLOB SOURCE 
+        *.cc 
+        Core/*.cc 
+        Core/Graphics/*.cc 
+        Common/*.cc 
+        Common/Primitive/*.cc 
+        Common/Mesh/*cc 
+        Common/View/*.cc 
+        Common/UI/*.cc
+        ${PROJECTS_DIR_NAME}/${TARGET_NAME}/*.cc
+    )
     set(MAIN_CC ${TARGET_NAME}/${TARGET_NAME}/Main.cc)
     if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECTS_DIR_NAME}/${TARGET_NAME}/Main.cc)
         set(MAIN_CC ${PROJECTS_DIR_NAME}/${TARGET_NAME}/Main.cc)

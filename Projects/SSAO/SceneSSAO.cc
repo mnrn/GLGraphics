@@ -14,7 +14,7 @@
 
 #include "HID/KeyInput.h"
 #include "Math/UniformDistribution.h"
-#include "Texture.h"
+#include "Graphics/Texture.h"
 #include "UI/Font.h"
 #include "UI/Text.h"
 
@@ -36,6 +36,8 @@ void SceneSSAO::OnInit() {
     BOOST_ASSERT_MSG(false, "failed to compile or link!");
   } else {
     prog_.Use();
+    prog_.SetUniform("Light.L", glm::vec3(0.3f));
+    prog_.SetUniform("Light.La", glm::vec3(0.5f));
   }
 
   sceneProj_ = glm::perspective(
@@ -48,15 +50,11 @@ void SceneSSAO::OnInit() {
   textures_[BrickTex] =
       Texture::Load("./Assets/Textures/Brick/ruin_wall_01.png");
 
-  prog_.SetUniform("Light.L", glm::vec3(0.3f));
-  prog_.SetUniform("Light.La", glm::vec3(0.5f));
-
   std::uint32_t seed = std::random_device()();
   BuildKernel(seed);
   BuildRandDirTex(seed);
   
   gbuffer_.OnInit(width_, height_);
-  
 }
 
 void SceneSSAO::OnDestroy() {

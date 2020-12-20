@@ -11,6 +11,7 @@ public:
   ~GBuffer();
 
   void OnInit(int w, int h);
+  void OnPreRender() const;
   void OnDestroy();
 
   GLuint GetDeferredFBO() const { return buffers_[DeferredFBO]; }

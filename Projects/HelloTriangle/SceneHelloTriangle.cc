@@ -53,27 +53,24 @@ void SceneHelloTriangle::OnResize(int w, int h) {
 
 std::optional<std::string> SceneHelloTriangle::CompileAndLinkShader() {
   // compile and links
-  if (prog_.Compile("./Assets/Shaders/Basic/Basic.vs.glsl",
-                     ShaderType::Vertex) &&
-      prog_.Compile("./Assets/Shaders/Basic/Basic.fs.glsl",
-                     ShaderType::Fragment) &&
-      prog_.Link()) {
-    return std::nullopt;
-  } else {
-    return prog_.GetLog();
-  }
+  return prog_.CompileAndLink(
+    {
+      {"./Assets/Shaders/Basic/Basic.vs.glsl", ShaderType::Vertex},
+      {"./Assets/Shaders/Basic/Basic.fs.glsl", ShaderType::Fragment}
+    }
+  );
 }
 
 void SceneHelloTriangle::CreateVAO() {
-  float position[] = {
+  const float position[] = {
       -0.8f, -0.8f, 0.0f, 0.8f, -0.8f, 0.0f, 0.0f, 0.8f, 0.0f,
   };
 
-  float color[] = {
+  const float color[] = {
       1.0f, 0.0f, 0.0, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
   };
 
-  glGenBuffers(vbo_.size(), vbo_.data());
+  glGenBuffers(static_cast<GLsizei>(vbo_.size()), vbo_.data());
 
   glBindBuffer(GL_ARRAY_BUFFER, vbo_[Position]);
   glBufferData(GL_ARRAY_BUFFER, sizeof(position), position, GL_STATIC_DRAW);

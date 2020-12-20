@@ -20,7 +20,7 @@
 #include "Primitive/Plane.h"
 #include "Primitive/Teapot.h"
 #include "Primitive/Torus.h"
-#include "Shader.h"
+#include "Graphics/Shader.h"
 #include "UI/Font.h"
 
 // ********************************************************************************

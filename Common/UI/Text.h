@@ -20,7 +20,7 @@
 #include FT_FREETYPE_H
 
 #include "Primitive/Drawable.h"
-#include "Shader.h"
+#include "Graphics/Shader.h"
 #include "UI/Font.h"
 #include "Utils/Singleton.h"
 

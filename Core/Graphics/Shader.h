@@ -23,6 +23,8 @@
 #include <sstream>
 #include <string>
 #include <utility>
+#include <vector>
+#include <optional>
 
 #include <boost/noncopyable.hpp>
 
@@ -39,9 +41,7 @@ enum class ShaderType {
   Geometry,
   TessControl,
   TessEvaluation,
-#ifndef __APPLE__
   Compute,
-#endif
 };
 
 /**
@@ -50,92 +50,28 @@ enum class ShaderType {
 class ShaderProgram : private boost::noncopyable {
 public:
   ShaderProgram() = default;
-  ~ShaderProgram() {
-    if (handle_ == 0) {
-      return;
-    }
-
-    // Query the number of attached shaders
-    GLint num = 0;
-    glGetProgramiv(handle_, GL_ATTACHED_SHADERS, &num);
-
-    // Get the shader names
-    GLuint *names = new GLuint[static_cast<std::size_t>(num)];
-    glGetAttachedShaders(handle_, num, nullptr, names);
-
-    // Delete
-    for (GLint i = 0; i < num; i++) {
-      glDeleteShader(names[i]);
-    }
-    delete[] names;
-    glDeleteProgram(handle_);
-  }
+  ~ShaderProgram();
 
   //*--------------------------------------------------------------------------------
   // Compile & Link
   //*--------------------------------------------------------------------------------
 
-  bool Compile(const char *filepath, ShaderType type) {
-
-    if (!IsFileExists(filepath)) {
-      log_ = std::string("File Not Found : ") + filepath;
-      return false;
-    }
-
-    if (handle_ <= 0) {
-
-      handle_ = glCreateProgram();
-      if (handle_ == 0) {
-        log_ = "Unable to create shader program.";
-        return false;
-      }
-    }
-
-    std::ifstream infile(filepath, std::ios::in);
-    if (!infile) {
-      log_ = std::string("Can't open file : ") + filepath;
-      return false;
-    }
-
-    std::stringstream code;
-    code << infile.rdbuf();
-    infile.close();
-
-    return Compile(code.str(), type);
-  }
-
-  bool Link() {
-
-    if (isLinked_) {
-      return true;
-    }
-    if (handle_ == 0) {
-      return false;
-    }
-
-    glLinkProgram(handle_);
-
-    // Check for errors
-    int status = GL_FALSE;
-    glGetProgramiv(handle_, GL_LINK_STATUS, &status);
-    if (GL_FALSE == status) {
-      StoreLog(handle_);
-      return false;
-    } else {
-      isLinked_ = true;
-      return isLinked_;
-    }
-  }
+  bool Compile(const std::string& filepath, ShaderType type);
+  bool Link();
 
   //*--------------------------------------------------------------------------------
   // Use Shader Program
   //*--------------------------------------------------------------------------------
 
-  void Use() const {
-    if (handle_ > 0 && isLinked_) {
-      glUseProgram(handle_);
-    }
-  }
+  void Use() const;
+
+  //*--------------------------------------------------------------------------------
+  // Utility
+  //*--------------------------------------------------------------------------------
+
+  std::optional<std::string>
+  CompileAndLink(const std::vector<std::pair<std::string, ShaderType>> &shaders);
+
 
   //*--------------------------------------------------------------------------------
   // Bind Location
@@ -205,69 +141,15 @@ private:
     return glGetUniformLocation(handle_, name);
   }
 
-  bool IsFileExists(const char *filepath) const {
+  bool IsFileExists(const std::string &filepath) const {
     std::error_code ec;
     const bool result = std::filesystem::exists(filepath, ec);
     return !ec && result;
   }
 
-  bool Compile(const std::string &src, ShaderType type) {
-    GLuint handle = 0;
-    switch (type) {
-    case ShaderType::Vertex:
-      handle = glCreateShader(GL_VERTEX_SHADER);
-      break;
-    case ShaderType::Fragment:
-      handle = glCreateShader(GL_FRAGMENT_SHADER);
-      break;
-    case ShaderType::Geometry:
-      handle = glCreateShader(GL_GEOMETRY_SHADER);
-      break;
-    case ShaderType::TessControl:
-      handle = glCreateShader(GL_TESS_CONTROL_SHADER);
-      break;
-    case ShaderType::TessEvaluation:
-      handle = glCreateShader(GL_TESS_EVALUATION_SHADER);
-      break;
-#ifndef __APPLE__
-    case ShaderType::Compute:
-      handle = glCreateShader(GL_COMPUTE_SHADER);
-      break;
-#endif
-    default:
-      return false;
-    }
-
-    const char *code = src.c_str();
-    glShaderSource(handle, 1, std::addressof(code), nullptr);
-    glCompileShader(handle);
-
-    // Check for errors
-    int res = GL_FALSE;
-    glGetShaderiv(handle, GL_COMPILE_STATUS, &res);
-    if (GL_FALSE == res) {
-      StoreLog(handle);
-      return false;
-    } else {
-      glAttachShader(handle_, handle);
-      return true;
-    }
-  }
-
-  void StoreLog(GLuint handle) {
-    int length = 0;
-    log_ = "";
-
-    glGetShaderiv(handle, GL_INFO_LOG_LENGTH, &length);
-    if (length <= 0) {
-      return;
-    }
-
-    std::string log(length, ' ');
-    int written = 0;
-    glGetProgramInfoLog(handle, length, &written, &log[0]);
-    log_ = log;
-  }
+  bool CompileShader(const std::string &src, ShaderType type);
+  GLuint CreateShader(ShaderType type) const;
+  void StoreLog(GLuint handle);
 
   //*--------------------------------------------------------------------------------
   // Member Variable(s)
