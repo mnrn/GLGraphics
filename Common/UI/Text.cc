@@ -43,21 +43,41 @@ Text::~Text() {
   }
 }
 
-void Text::Render(const std::string &text, float x, float y, float scale,
-                  float winWidth, float winHeight, const glm::vec4 &color,
-                  const std::unique_ptr<FontObj> &obj) const {
-  prog_.Use();
-  prog_.SetUniform("Color", color);
-  const glm::mat4 proj = glm::ortho(0.0f, winWidth, 0.0f, winHeight);
-  prog_.SetUniform("ProjMatrix", proj);
+std::optional<std::string> Text::CompileAndLinkShader() {
+  return prog_.CompileAndLink(
+      {{"./Assets/Shaders/UI/Text.vs.glsl", ShaderType::Vertex},
+       {"./Assets/Shaders/UI/Text.fs.glsl", ShaderType::Fragment}});
+}
 
-  // WARN:ブレンドステートの切り替えをここで行ってしまいます。
-  // 頻繁に切り替えたくなくなったら変えましょう。
+void Text::Begin(const TextConfig &config) {
+  config_ = config;
+  prog_.Use();
+  if (config.windowWidth && config.windowHeight) {
+    const glm::mat4 proj = glm::ortho(0.0f, config.windowWidth.value(), 0.0f,
+                                      config.windowHeight.value());
+    prog_.SetUniform("ProjMatrix", proj);
+  } else {
+    BOOST_ASSERT_MSG(false, "Need to set Window Width And Window Height.");
+  }
+
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-  
+
   glActiveTexture(GL_TEXTURE0);
   glBindVertexArray(vao_);
+}
+
+void Text::End() {
+  config_.Cleanup();
+  glBindVertexArray(0);
+  glBindTexture(GL_TEXTURE_2D, 0);
+  glDisable(GL_BLEND);
+}
+
+void Text::Render(const std::string &text, float x, float y, float scale,
+                  const glm::vec4 &color, const std::unique_ptr<FontObj> &obj) {
+
+  prog_.SetUniform("Color", color);
 
   for (const auto &c : text) {
     const auto &ch = obj->GetChar(c);
@@ -80,22 +100,8 @@ void Text::Render(const std::string &text, float x, float y, float scale,
     glBindBuffer(GL_ARRAY_BUFFER, vbo_);
     glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(box), box);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
-    
+
     glDrawArrays(GL_TRIANGLES, 0, 6);
     x += static_cast<float>(ch.advance >> 6) * scale;
-  }
-
-  glBindVertexArray(0);
-  glBindTexture(GL_TEXTURE_2D, 0);
-  glDisable(GL_BLEND);
-}
-
-std::optional<std::string> Text::CompileAndLinkShader() {
-  if (prog_.Compile("./Assets/Shaders/UI/Text.vs.glsl", ShaderType::Vertex) &&
-      prog_.Compile("./Assets/Shaders/UI/Text.fs.glsl", ShaderType::Fragment) &&
-      prog_.Link()) {
-    return std::nullopt;
-  } else {
-    return prog_.GetLog();
   }
 }

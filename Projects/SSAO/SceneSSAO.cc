@@ -12,9 +12,9 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/integer.hpp>
 
+#include "Graphics/Texture.h"
 #include "HID/KeyInput.h"
 #include "Math/UniformDistribution.h"
-#include "Graphics/Texture.h"
 #include "UI/Font.h"
 #include "UI/Text.h"
 
@@ -27,7 +27,8 @@ void SceneSSAO::OnInit() {
   Font::Create();
   KeyInput::Create();
 
-  if (fontObj_ = Font::Get().Entry("./Assets/Fonts/UbuntuMono/UbuntuMono-Regular.ttf")) {
+  if ((fontObj_ = Font::Get().Entry(
+           "./Assets/Fonts/UbuntuMono/UbuntuMono-Regular.ttf"))) {
     fontObj_->SetupWithSize(36);
   }
 
@@ -53,7 +54,7 @@ void SceneSSAO::OnInit() {
   std::uint32_t seed = std::random_device()();
   BuildKernel(seed);
   BuildRandDirTex(seed);
-  
+
   gbuffer_.OnInit(width_, height_);
 }
 
@@ -284,17 +285,16 @@ void SceneSSAO::DrawText() {
       {RenderType::SSAOOnly, "RenderType: SSAO Only"},
       {RenderType::NoSSAO, "RenderType: Diffuse Only"},
   };
-  if (kTexts.count(static_cast<RenderType>(type_)) > 0) {
-    Text::Get().Render(kTexts.at(type_).c_str(), kOffsetX, kOffsetY,
-                       1.0f, static_cast<float>(width_),
-                       static_cast<float>(height_),
-                       glm::vec4(0.0f, 0.0f, 0.0f, 1.0f), fontObj_);
-
-    Text::Get().Render("Press <- or ->: Switch RenderType", kOffsetX,
-                       kOffsetY - 36.0f, 1.0f, static_cast<float>(width_),
-                       static_cast<float>(height_),
-                       glm::vec4(0.0f, 0.0f, 0.0f, 1.0f), fontObj_);
+  if (kTexts.count(static_cast<RenderType>(type_)) <= 0) {
+    return;
   }
+  Text::Get().Begin(width_, height_);
+  {
+    Text::Get().Render(kTexts.at(type_).c_str(), kOffsetX, kOffsetY, fontObj_);
+    Text::Get().Render("Press <- or ->: Switch RenderType", kOffsetX,
+                       kOffsetY - 36.0f, fontObj_);
+  }
+  Text::Get().End();
 }
 
 // ********************************************************************************
