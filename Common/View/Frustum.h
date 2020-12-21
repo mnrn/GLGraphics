@@ -2,6 +2,7 @@
 
 #include "GLInclude.h"
 
+#include <array>
 #include <vector>
 
 #include "Box/AABB.h"
@@ -23,5 +24,27 @@ private:
   float near_;
   float far_;
 
-  std::vector<glm::vec4> corners_;
+  /**
+   * @brief frustum from 8 corner coordinates.
+   * @param corners the corners of the frustum
+   *
+   * The corners should be specified in this order:
+   * 0. near bottom left
+   * 1. near top left
+   * 2. near top right
+   * 3. near bottom right
+   * 4. far bottom left
+   * 5. far top left
+   * 6. far top right
+   * 7. far bottom right
+   *
+   *     5----6
+   *    /|   /|
+   *   1----2 |
+   *   | 4--|-7      far
+   *   |/   |/       /
+   *   0----3      near
+   *
+   */
+  std::array<glm::vec3, 8> corners_;
 };

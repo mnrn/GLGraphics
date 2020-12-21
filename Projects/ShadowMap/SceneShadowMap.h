@@ -18,7 +18,6 @@
 #include "Primitive/Torus.h"
 #include "View/Camera.h"
 #include "View/Frustum.h"
-#include "View/Light.h"
 
 class SceneShadowMap : public Scene {
 public:

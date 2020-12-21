@@ -32,32 +32,27 @@ void Frustum::SetupCorners(const glm::vec3 &eyePt, const glm::vec3 &lookatPt,
   const float fdx = ar_ * fdy;
   const glm::vec3 fc = eyePt + n * far_;
 
-  corners_.clear();
-  corners_.resize(8);
-
   // near plane
-  corners_[0] = glm::vec4(nc - u * ndx - v * ndy, 1.0f);
-  corners_[1] = glm::vec4(nc - u * ndx + v * ndy, 1.0f);
-  corners_[2] = glm::vec4(nc + u * ndx + v * ndy, 1.0f);
-  corners_[3] = glm::vec4(nc + u * ndx - v * ndy, 1.0f);
+  corners_[0] = nc - u * ndx - v * ndy;
+  corners_[1] = nc - u * ndx + v * ndy;
+  corners_[2] = nc + u * ndx + v * ndy;
+  corners_[3] = nc + u * ndx - v * ndy;
 
   // far plane
-  corners_[4] = glm::vec4(fc - u * fdx - v * fdy, 1.0f);
-  corners_[5] = glm::vec4(fc - u * fdx + v * fdy, 1.0f);
-  corners_[6] = glm::vec4(fc + u * fdx + v * fdy, 1.0f);
-  corners_[7] = glm::vec4(fc + u * fdx - v * fdy, 1.0f);
-}
-
-AABB Frustum::ComputeAABB(const glm::mat4 &m) const {
-  AABB box;
-
-  for (int i = 0; i < 8; i++) {
-    box.Merge(glm::vec3(m * corners_[i]));
-  }
-
-  return box;
+  corners_[4] = fc - u * fdx - v * fdy;
+  corners_[5] = fc - u * fdx + v * fdy;
+  corners_[6] = fc + u * fdx + v * fdy;
+  corners_[7] = fc + u * fdx - v * fdy;
 }
 
 glm::mat4 Frustum::GetProjectionMatrix() const {
   return glm::perspective(glm::radians(fovy_), ar_, near_, far_);
+}
+
+AABB Frustum::ComputeAABB(const glm::mat4 &m) const {
+  AABB box;
+  for (const auto corner : corners_) {
+    box.Merge(glm::vec3(m * glm::vec4(corner, 1.0f)));
+  }
+  return box;
 }

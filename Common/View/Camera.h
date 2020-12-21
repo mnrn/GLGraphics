@@ -25,7 +25,7 @@ public:
   glm::mat4 GetInverseViewMatrix() const;
   glm::mat4 GetProjectionMatrix() const;
 
-  void OnPostUpdate() { frustum_.SetupCorners(eyePt_, lookatPt_, upVec_); }
+  // void OnPostUpdate() { frustum_.SetupCorners(eyePt_, lookatPt_, upVec_); }
 
 private:
   // ProjectionType type_ = ProjectionType::Perspective;
