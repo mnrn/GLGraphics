@@ -11,37 +11,41 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 // ********************************************************************************
+// constexpr variables
+// ********************************************************************************
+
+static constexpr glm::mat4 kShadowBias{
+    glm::vec4(0.5f, 0.0f, 0.0f, 0.0f), glm::vec4(0.0f, 0.5f, 0.0f, 0.0f),
+    glm::vec4(0.0f, 0.0f, 0.5f, 0.0f), glm::vec4(0.5f, 0.5f, 0.5f, 1.0f)};
+
+static constexpr float kCameraCenter = 2.0f;
+
+static constexpr glm::vec3 kLightColor{0.85f};
+static constexpr float kLightCenter = 1.65f;
+static constexpr glm::vec3 kDefaultLightPosition{0.0f, kLightCenter * 5.25f,
+                                                 kLightCenter * 7.5f};
+
+// ********************************************************************************
 // Override functions
 // ********************************************************************************
 
 void SceneShadowMap::OnInit() {
+  SetupCamera();
+  SetupLight();
+
   if (const auto msg = CompileAndLinkShader()) {
     std::cerr << msg.value() << std::endl;
     BOOST_ASSERT_MSG(false, "failed to compile or link!");
+  } else {
+    progs_[kShadeWithShadow].Use();
+    progs_[kShadeWithShadow].SetUniform("Light.La", kLightColor);
+    progs_[kShadeWithShadow].SetUniform("Light.Ld", kLightColor);
+    progs_[kShadeWithShadow].SetUniform("Light.Ls", kLightColor);
+    progs_[kShadeWithShadow].SetUniform("ShadowMap", 0);
   }
-
-  glClearColor(0.9f, 0.9f, 0.9f, 1.0f);
-  glEnable(GL_DEPTH_TEST);
 
   // フレームバッファオブジェクトの生成
   SetupFBO();
-
-  shadowBias_ = glm::mat4(
-      glm::vec4(0.5f, 0.0f, 0.0f, 0.0f), glm::vec4(0.0f, 0.5f, 0.0f, 0.0f),
-      glm::vec4(0.0f, 0.0f, 0.5f, 0.0f), glm::vec4(0.5f, 0.5f, 0.5f, 1.0f));
-
-  const float kCenter = 1.65f;
-  glm::vec3 lightPos = glm::vec3(0.0f, kCenter * 5.25f, kCenter * 7.5f);
-  lightFrustum_.Orient(lightPos, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-  lightFrustum_.SetPerspective(kFOVY, 1.0f, 1.0f, 25.0f);
-  lightPV_ = shadowBias_ * lightFrustum_.GetProjectionMatrix() *
-             lightFrustum_.GetViewMatrix();
-
-  progs_[kShadeWithShadow].Use();
-  progs_[kShadeWithShadow].SetUniform("Light.La", glm::vec3(0.85f));
-  progs_[kShadeWithShadow].SetUniform("Light.Ld", glm::vec3(0.85f));
-  progs_[kShadeWithShadow].SetUniform("Light.Ls", glm::vec3(0.85f));
-  progs_[kShadeWithShadow].SetUniform("ShadowMap", 0);
 }
 
 void SceneShadowMap::OnDestroy() {
@@ -57,12 +61,26 @@ void SceneShadowMap::OnUpdate(float t) {
   if (angle_ > glm::two_pi<float>()) {
     angle_ -= glm::two_pi<float>();
   }
+
+  const glm::vec3 kCamPt =
+      glm::vec3(kCameraCenter * 11.5f * cos(angle_), kCameraCenter * 7.0f,
+                kCameraCenter * 11.5f * sin(angle_));
+  camera_.SetPosition(kCamPt);
 }
 
 void SceneShadowMap::OnRender() {
-  Pass1();
-  Pass2();
-  // Pass3();
+  glClearColor(0.9f, 0.9f, 0.9f, 1.0f);
+  glEnable(GL_DEPTH_TEST);
+  glEnable(GL_CULL_FACE);
+
+  // シャドウマップをチャンネル0に登録します。
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, depthTex_);
+  {
+    Pass1();
+    Pass2();
+  }
+  glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void SceneShadowMap::OnResize(int w, int h) {
@@ -76,32 +94,18 @@ void SceneShadowMap::OnResize(int w, int h) {
 
 std::optional<std::string> SceneShadowMap::CompileAndLinkShader() {
   // compile and links
-  if (!(progs_[kRecordDepth].Compile(
-            "./Assets/Shaders/ShadowMap/RecordDepth.vs.glsl",
-            ShaderType::Vertex) &&
-        progs_[kRecordDepth].Compile(
-            "./Assets/Shaders/ShadowMap/RecordDepth.fs.glsl",
-            ShaderType::Fragment) &&
-        progs_[kRecordDepth].Link())) {
-    return progs_[kRecordDepth].GetLog();
+  if (const auto msg = progs_[kRecordDepth].CompileAndLink(
+          {{"./Assets/Shaders/ShadowMap/RecordDepth.vs.glsl",
+            ShaderType::Vertex},
+           {"./Assets/Shaders/ShadowMap/RecordDepth.fs.glsl",
+            ShaderType::Fragment}})) {
+    return msg;
   }
-
-  if (!(progs_[kShadeWithShadow].Compile(
-            "./Assets/Shaders/ShadowMap/ShadowMap.vs.glsl",
-            ShaderType::Vertex) &&
-        progs_[kShadeWithShadow].Compile(
-            "./Assets/Shaders/ShadowMap/ShadowMap.fs.glsl",
-            ShaderType::Fragment) &&
-        progs_[kShadeWithShadow].Link())) {
-    return progs_[kShadeWithShadow].GetLog();
-  }
-
-  if (!(progs_[kDebugFrustum].Compile("./Assets/Shaders/Solid/Solid.vs.glsl",
-                                      ShaderType::Vertex) &&
-        progs_[kDebugFrustum].Compile("./Assets/Shaders/Solid/Solid.fs.glsl",
-                                      ShaderType::Fragment) &&
-        progs_[kDebugFrustum].Link())) {
-    return progs_[kDebugFrustum].GetLog();
+  if (const auto msg = progs_[kShadeWithShadow].CompileAndLink(
+          {{"./Assets/Shaders/ShadowMap/ShadowMap.vs.glsl", ShaderType::Vertex},
+           {"./Assets/Shaders/ShadowMap/ShadowMap.fs.glsl",
+            ShaderType::Fragment}})) {
+    return msg;
   }
   return std::nullopt;
 }
@@ -140,10 +144,6 @@ void SceneShadowMap::SetupFBO() {
   // R値がテクスチャの値よりも小さい場合に真となります。(つまり日向となります。)
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LESS);
 
-  // シャドウマップをチャンネル0に登録します。
-  glActiveTexture(GL_TEXTURE0);
-  glBindTexture(GL_TEXTURE_2D, depthTex_);
-
   // シャドウマップ用の FBO を生成し、デプステクスチャをアタッチします。
   glGenFramebuffers(1, &shadowFBO_);
   glBindFramebuffer(GL_FRAMEBUFFER, shadowFBO_);
@@ -160,6 +160,7 @@ void SceneShadowMap::SetupFBO() {
     std::cout << "Framebuffer is not complete." << std::endl;
   }
 
+  glBindTexture(GL_TEXTURE_2D, 0);
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
@@ -184,59 +185,40 @@ void SceneShadowMap::SetMatrialUniforms(const glm::vec3 &diff,
 // Shadow map generation
 void SceneShadowMap::Pass1() {
   pass_ = RenderPass::kRecordDepth;
-  progs_[kRecordDepth].Use();
-  view_ = lightFrustum_.GetViewMatrix();
-  proj_ = lightFrustum_.GetProjectionMatrix();
 
   glBindFramebuffer(GL_FRAMEBUFFER, shadowFBO_);
   glClear(GL_DEPTH_BUFFER_BIT);
   glViewport(0, 0, kShadowMapWidth, kShadowMapHeight);
 
-  // 前面をカリングします。
-  glEnable(GL_CULL_FACE);
   glCullFace(GL_FRONT);
-
-  // Polygon offset を有効にします。
   glEnable(GL_POLYGON_OFFSET_FILL);
   glPolygonOffset(2.5f, 10.0f);
 
+  // ライトから見たシーンの描画
+  view_ = lightView_.GetViewMatrix();
+  proj_ = lightView_.GetProjectionMatrix();
+  progs_[kRecordDepth].Use();
   DrawScene();
 
-  // 背面カリングに戻します。
+  glDisable(GL_POLYGON_OFFSET_FILL);
   glCullFace(GL_BACK);
-  glFlush();
 }
 
 // render
 void SceneShadowMap::Pass2() {
   pass_ = RenderPass::kShadeWithShadow;
-  const float kCenter = 2.0f;
-  const glm::vec3 camPt =
-      glm::vec3(kCenter * 11.5f * cos(angle_), kCenter * 7.0f,
-                kCenter * 11.5f * sin(angle_));
-  view_ = glm::lookAt(camPt, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+
+  proj_ = camera_.GetProjectionMatrix();
+  view_ = camera_.GetViewMatrix();
   progs_[kShadeWithShadow].Use();
   progs_[kShadeWithShadow].SetUniform(
-      "Light.Position", view_ * glm::vec4(lightFrustum_.GetOrigin(), 1.0f));
-  proj_ = glm::perspective(
-      glm::radians(kFOVY),
-      static_cast<float>(width_) / static_cast<float>(height_), 0.1f, 100.0f);
+      "Light.Position", view_ * glm::vec4(lightView_.GetPosition(), 1.0f));
 
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glViewport(0, 0, width_, height_);
 
   DrawScene();
-}
-
-// draw the light's frustum
-void SceneShadowMap::Pass3() {
-  pass_ = kDebugFrustum;
-  progs_[kDebugFrustum].Use();
-  progs_[kDebugFrustum].SetUniform("Color", glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
-  const glm::mat4 mv = view_ * lightFrustum_.GetInvViewMatrix();
-  progs_[kDebugFrustum].SetUniform("MVP", proj_ * mv);
-  // lightFrustum_.Render();
 }
 
 void SceneShadowMap::DrawScene() {
@@ -284,4 +266,26 @@ void SceneShadowMap::DrawScene() {
   plane_.Render();
 
   model_ = glm::mat4(1.0f);
+}
+
+// ********************************************************************************
+// View
+// ********************************************************************************
+
+void SceneShadowMap::SetupCamera() {
+  const glm::vec3 kCamPt =
+      glm::vec3(kCameraCenter * 11.5f * cos(angle_), kCameraCenter * 7.0f,
+                kCameraCenter * 11.5f * sin(angle_));
+  camera_.SetupOrient(kCamPt, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+  camera_.SetupPerspective(
+      kFOVY, static_cast<float>(width_) / static_cast<float>(height_), 0.1f,
+      100.0f);
+}
+
+void SceneShadowMap::SetupLight() {
+  lightView_.SetupOrient(kDefaultLightPosition, glm::vec3(0.0f),
+                         glm::vec3(0.0f, 1.0f, 0.0f));
+  lightView_.SetupPerspective(kFOVY, 1.0f, 1.0f, 25.0f);
+  lightPV_ = kShadowBias * lightView_.GetProjectionMatrix() *
+             lightView_.GetViewMatrix();
 }
