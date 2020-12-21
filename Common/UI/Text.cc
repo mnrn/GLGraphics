@@ -75,11 +75,14 @@ void Text::End() {
 }
 
 void Text::Render(const std::string &text, float x, float y, float scale,
-                  const glm::vec4 &color, const std::unique_ptr<FontObj> &obj) {
+                  const glm::vec4 &color, std::unique_ptr<FontObj> &obj) {
 
   prog_.SetUniform("Color", color);
 
   for (const auto &c : text) {
+    if (!obj->IsLoaded(c)) {
+      obj->LoadChar(c);
+    }
     const auto &ch = obj->GetChar(c);
 
     const float x2 = x + static_cast<float>(ch.bearing.x) * scale;
@@ -96,7 +99,6 @@ void Text::Render(const std::string &text, float x, float y, float scale,
 
     glBindTexture(GL_TEXTURE_2D, ch.texID);
 
-    // VBO内容の更新
     glBindBuffer(GL_ARRAY_BUFFER, vbo_);
     glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(box), box);
     glBindBuffer(GL_ARRAY_BUFFER, 0);

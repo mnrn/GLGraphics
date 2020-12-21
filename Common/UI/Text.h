@@ -67,23 +67,23 @@ public:
   void End();
 
   void Render(const std::string &text, float x, float y,
-              const std::unique_ptr<FontObj> &obj) {
+              std::unique_ptr<FontObj> &obj) {
     const float scale = config_.fontScale.value_or(1.0f);
     Render(text, x, y, scale, obj);
   }
   void Render(const std::string &text, float x, float y, const glm::vec4 &color,
-              const std::unique_ptr<FontObj> &obj) {
+              std::unique_ptr<FontObj> &obj) {
     const float scale = config_.fontScale.value_or(1.0f);
     Render(text, x, y, scale, color, obj);
   }
   void Render(const std::string &text, float x, float y, float scale,
-              const std::unique_ptr<FontObj> &obj) {
+              std::unique_ptr<FontObj> &obj) {
     const glm::vec4 color =
         config_.textColor.value_or(glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
     Render(text, x, y, scale, color, obj);
   }
   void Render(const std::string &text, float x, float y, float scale,
-              const glm::vec4 &color, const std::unique_ptr<FontObj> &obj);
+              const glm::vec4 &color, std::unique_ptr<FontObj> &obj);
 
 private:
   std::optional<std::string> CompileAndLinkShader();

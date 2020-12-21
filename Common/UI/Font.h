@@ -39,15 +39,18 @@ public:
   ~FontObj() { OnDestroy(); }
   FontObj(const FontObj &) = default;
 
-  static constexpr inline unsigned int kDefaultSize = 48;
-  bool SetupWithSize(unsigned int size);
+  static constexpr inline std::size_t kDefaultSize = 48;
+  bool SetupWithSize(std::size_t size);
   bool SetupDefault() { return SetupWithSize(kDefaultSize); }
-  const FontChar &GetChar(GLchar c) const { return chars_.at(c); }
+  bool LoadChar(char32_t c);
+
+  const FontChar &GetChar(char32_t c) const { return chars_.at(c); }
+  bool IsLoaded(char32_t c) const { return chars_.count(c) > 0; }
 
 private:
   void OnDestroy();
   FT_Face face_ = nullptr;
-  std::map<GLchar, FontChar> chars_{};
+  std::map<char32_t, FontChar> chars_{};
 };
 
 class Font : public Singleton<Font> {

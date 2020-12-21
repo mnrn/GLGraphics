@@ -62,7 +62,7 @@ void FontObj::OnDestroy() {
   }
 }
 
-bool FontObj::SetupWithSize(unsigned int size) {
+bool FontObj::SetupWithSize(std::size_t size) {
   if (face_ == nullptr) {
     return false;
   }
@@ -71,34 +71,41 @@ bool FontObj::SetupWithSize(unsigned int size) {
 
   glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
-  // とりあえずasciiのみに絞っておきます。
-  for (unsigned int c = 0; c < 256; c++) {
-    if (FT_Load_Char(face_, c, FT_LOAD_RENDER)) {
-      continue;
+  // とりあえずasciiのみに絞ってロードしておきます。
+  for (char32_t c = 0; c < 256; c++) {
+    if (!LoadChar(c)) {
+      return false;
     }
-
-    GLuint tex;
-    glGenTextures(1, &tex);
-    glBindTexture(GL_TEXTURE_2D, tex);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, face_->glyph->bitmap.width,
-                 face_->glyph->bitmap.rows, 0, GL_RED, GL_UNSIGNED_BYTE,
-                 face_->glyph->bitmap.buffer);
-
-    // アーティファクトを防ぐためのクランプ
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-    // リニアフィルタリング
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    FontChar ch{
-        tex, glm::ivec2(face_->glyph->bitmap.width, face_->glyph->bitmap.rows),
-        glm::ivec2(face_->glyph->bitmap_left, face_->glyph->bitmap_top),
-        static_cast<GLuint>(face_->glyph->advance.x)};
-    chars_.emplace(c, ch);
   }
+  return true;
+}
+
+bool FontObj::LoadChar(char32_t c) {
+  if (FT_Load_Char(face_, c, FT_LOAD_RENDER)) {
+    return false;
+  }
+
+  GLuint tex;
+  glGenTextures(1, &tex);
+  glBindTexture(GL_TEXTURE_2D, tex);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, face_->glyph->bitmap.width,
+               face_->glyph->bitmap.rows, 0, GL_RED, GL_UNSIGNED_BYTE,
+               face_->glyph->bitmap.buffer);
+
+  // アーティファクトを防ぐためのクランプ
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+  // リニアフィルタリング
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+  glBindTexture(GL_TEXTURE_2D, 0);
+
+  FontChar ch{tex,
+              glm::ivec2(face_->glyph->bitmap.width, face_->glyph->bitmap.rows),
+              glm::ivec2(face_->glyph->bitmap_left, face_->glyph->bitmap_top),
+              static_cast<GLuint>(face_->glyph->advance.x)};
+  chars_.emplace(c, ch);
   return true;
 }
