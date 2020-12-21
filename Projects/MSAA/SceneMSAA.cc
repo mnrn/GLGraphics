@@ -26,7 +26,7 @@ void SceneMSAA::OnInit() {
 
   if ((fontObj_ = Font::Get().Entry(
            "./Assets/Fonts/UbuntuMono/UbuntuMono-Regular.ttf"))) {
-    fontObj_->SetupWithSize(28);
+    fontObj_->SetupWithSize(20);
   }
 
   if (const auto msg = CompileAndLinkShader()) {
@@ -168,26 +168,32 @@ void SceneMSAA::DrawText() {
   if (!fontObj_) {
     return;
   }
-  const float kOffsetX = 25.0f;
-  const float kOffsetY = static_cast<float>(height_) - 40.0f;
+  const float kBaseX = 25.0f;
+  const float kBaseY = static_cast<float>(height_) - 30.0f;
+  const float kOffsetY = -30.0f;
+  const float kOffsetYL2 = -50.0f;
 
   Text::Get().Begin(width_, height_);
-
-  if (isEnabledMSAA_) {
-    Text::Get().Render("MSAA: ON", kOffsetX, kOffsetY, fontObj_);
-    Text::Get().Render("Press <- or ->: Disable MSAA", kOffsetX,
-                       kOffsetY - 36.0f, fontObj_);
-  } else {
-    Text::Get().Render("MSAA: OFF", kOffsetX, kOffsetY, fontObj_);
-    Text::Get().Render("Press <- or ->: Enable MSAA", kOffsetX,
-                       kOffsetY - 36.0f, fontObj_);
+  {
+    if (isEnabledMSAA_) {
+      Text::Get().Render("MSAA: ON", kBaseX, kBaseY, fontObj_);
+      Text::Get().Render("Press left or right arrow key: Disable MSAA", kBaseX,
+                         kBaseY + kOffsetY, fontObj_);
+    } else {
+      Text::Get().Render("MSAA: OFF", kBaseX, kBaseY, fontObj_);
+      Text::Get().Render("Press left or right arrow key: Enable MSAA", kBaseX,
+                         kBaseY + kOffsetY, fontObj_);
+    }
+    const float kCentroidBaseX = kBaseX + 120.0f;
+    if (isEnabledCentroid_) {
+      Text::Get().Render("Centroid: ON", kCentroidBaseX, kBaseY, fontObj_);
+      Text::Get().Render("Press up or down arrow key: Disable Centroid", kBaseX,
+                         kBaseY + kOffsetYL2, fontObj_);
+    } else {
+      Text::Get().Render("Centroid: OFF", kCentroidBaseX, kBaseY, fontObj_);
+      Text::Get().Render("Press up or down arrow key: Enable Centroid", kBaseX,
+                         kBaseY + kOffsetYL2, fontObj_);
+    }
   }
-  const float kCentroidOffsetX = kOffsetX + 150.0f;
-  if (isEnabledCentroid_) {
-    Text::Get().Render("Centroid: ON", kCentroidOffsetX, kOffsetY, fontObj_);
-  } else {
-    Text::Get().Render("Centroid: OFF", kCentroidOffsetX, kOffsetY, fontObj_);
-  }
-
   Text::Get().End();
 }
