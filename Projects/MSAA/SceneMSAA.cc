@@ -25,7 +25,7 @@ void SceneMSAA::OnInit() {
   Font::Create();
 
   if ((fontObj_ = Font::Get().Entry(
-           "./Assets/Fonts/UbuntuMono/UbuntuMono-Regular.ttf")) != nullptr) {
+           "./Assets/Fonts/UbuntuMono/UbuntuMono-Regular.ttf"))) {
     fontObj_->SetupWithSize(28);
   }
 
@@ -170,32 +170,24 @@ void SceneMSAA::DrawText() {
   }
   const float kOffsetX = 25.0f;
   const float kOffsetY = static_cast<float>(height_) - 40.0f;
-  if (isEnabledMSAA_) {
-    Text::Get().Render("MSAA: ON", kOffsetX, kOffsetY, 1.0f,
-                       static_cast<float>(width_), static_cast<float>(height_),
-                       glm::vec4(0.0f, 0.0f, 0.0f, 1.0f), fontObj_);
-    Text::Get().Render("Press <- or ->: Disable MSAA", kOffsetX,
-                       kOffsetY - 36.0f, 1.0f, static_cast<float>(width_),
-                       static_cast<float>(height_),
-                       glm::vec4(0.0f, 0.0f, 0.0f, 1.0f), fontObj_);
-  } else {
-    Text::Get().Render("MSAA: OFF", kOffsetX, kOffsetY, 1.0f,
-                       static_cast<float>(width_), static_cast<float>(height_),
-                       glm::vec4(0.0f, 0.0f, 0.0f, 1.0f), fontObj_);
-    Text::Get().Render("Press <- or ->: Enable MSAA", kOffsetX,
-                       kOffsetY - 36.0f, 1.0f, static_cast<float>(width_),
-                       static_cast<float>(height_),
-                       glm::vec4(0.0f, 0.0f, 0.0f, 1.0f), fontObj_);
-  }
 
+  Text::Get().Begin(width_, height_);
+
+  if (isEnabledMSAA_) {
+    Text::Get().Render("MSAA: ON", kOffsetX, kOffsetY, fontObj_);
+    Text::Get().Render("Press <- or ->: Disable MSAA", kOffsetX,
+                       kOffsetY - 36.0f, fontObj_);
+  } else {
+    Text::Get().Render("MSAA: OFF", kOffsetX, kOffsetY, fontObj_);
+    Text::Get().Render("Press <- or ->: Enable MSAA", kOffsetX,
+                       kOffsetY - 36.0f, fontObj_);
+  }
   const float kCentroidOffsetX = kOffsetX + 150.0f;
   if (isEnabledCentroid_) {
-    Text::Get().Render("Centroid: ON", kCentroidOffsetX, kOffsetY, 1.0f,
-                       static_cast<float>(width_), static_cast<float>(height_),
-                       glm::vec4(0.0f, 0.0f, 0.0f, 1.0f), fontObj_);
+    Text::Get().Render("Centroid: ON", kCentroidOffsetX, kOffsetY, fontObj_);
   } else {
-    Text::Get().Render("Centroid: OFF", kCentroidOffsetX, kOffsetY, 1.0f,
-                       static_cast<float>(width_), static_cast<float>(height_),
-                       glm::vec4(0.0f, 0.0f, 0.0f, 1.0f), fontObj_);
+    Text::Get().Render("Centroid: OFF", kCentroidOffsetX, kOffsetY, fontObj_);
   }
+
+  Text::Get().End();
 }

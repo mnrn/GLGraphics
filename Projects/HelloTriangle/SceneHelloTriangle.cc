@@ -54,11 +54,8 @@ void SceneHelloTriangle::OnResize(int w, int h) {
 std::optional<std::string> SceneHelloTriangle::CompileAndLinkShader() {
   // compile and links
   return prog_.CompileAndLink(
-    {
-      {"./Assets/Shaders/Basic/Basic.vs.glsl", ShaderType::Vertex},
-      {"./Assets/Shaders/Basic/Basic.fs.glsl", ShaderType::Fragment}
-    }
-  );
+      {{"./Assets/Shaders/Basic/Basic.vs.glsl", ShaderType::Vertex},
+       {"./Assets/Shaders/Basic/Basic.fs.glsl", ShaderType::Fragment}});
 }
 
 void SceneHelloTriangle::CreateVAO() {
