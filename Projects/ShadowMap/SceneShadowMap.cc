@@ -102,8 +102,9 @@ std::optional<std::string> SceneShadowMap::CompileAndLinkShader() {
     return msg;
   }
   if (const auto msg = progs_[kShadeWithShadow].CompileAndLink(
-          {{"./Assets/Shaders/ShadowMap/ShadowMap.vs.glsl", ShaderType::Vertex},
-           {"./Assets/Shaders/ShadowMap/ShadowMap.fs.glsl",
+          {{"./Assets/Shaders/ShadowMap/Simple/ShadowMap.vs.glsl",
+            ShaderType::Vertex},
+           {"./Assets/Shaders/ShadowMap/Simple/ShadowMap.fs.glsl",
             ShaderType::Fragment}})) {
     return msg;
   }

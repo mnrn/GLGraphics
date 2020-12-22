@@ -8,7 +8,8 @@ namespace Impl {
 
 /**
  * @brief 法線情報に関する実装
- * @ref https://github.com/tinyobjloader/tinyobjloader/blob/master/examples/viewer/viewer.cc
+ * @ref
+ * https://github.com/tinyobjloader/tinyobjloader/blob/master/examples/viewer/viewer.cc
  */
 namespace Normal {
 static void Calc(float N[3], float v0[3], float v1[3], float v2[3]) {
@@ -37,8 +38,8 @@ static void Calc(float N[3], float v0[3], float v1[3], float v2[3]) {
 }
 
 static void Compute(const tinyobj::attrib_t &attrib,
-                          const std::vector<tinyobj::shape_t> &shapes,
-                          std::vector<GLfloat> &normals) {
+                    const std::vector<tinyobj::shape_t> &shapes,
+                    std::vector<GLfloat> &normals) {
   // Shapeの数だけループする。
   const size_t ssize = shapes.size();
   for (size_t s = 0; s < ssize; s++) {
@@ -127,6 +128,7 @@ ObjMesh::ObjMesh(const std::string &path) {
         positions.emplace_back(vx);
         positions.emplace_back(vy);
         positions.emplace_back(vz);
+        bbox_.Merge(vx, vy, vz);
 
         if (!attrib.normals.empty()) {
           const tinyobj::real_t nx = attrib.normals[3 * idx.normal_index + 0];
@@ -155,7 +157,7 @@ ObjMesh::ObjMesh(const std::string &path) {
   if (attrib.normals.empty()) {
     Impl::Normal::Compute(attrib, shapes, normals);
   }
-  
+
   const auto optTexCoords =
       texCoords.empty() ? std::nullopt : std::make_optional(texCoords);
   InitBuffers(indices, positions, normals, optTexCoords);
