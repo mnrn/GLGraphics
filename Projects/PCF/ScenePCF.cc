@@ -1,5 +1,5 @@
 /**
- * @brief シャドウマッピングのテストシーン
+ * @brief PCFのテストシーン
  */
 
 #include "ScenePCF.h"
