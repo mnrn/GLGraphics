@@ -1,8 +1,8 @@
 #pragma once
 
+#include <cmath>
 #include <glm/glm.hpp>
 #include <limits>
-#include <cmath>
 #include <utility>
 
 class AABB {
@@ -13,15 +13,17 @@ public:
     max_ = glm::vec3(std::numeric_limits<float>::min());
   }
 
-  void Merge(const glm::vec3& pt) {
-    min_.x = std::fmin(min_.x, pt.x);
-    max_.x = std::fmax(max_.x, pt.x);
+  void Merge(const glm::vec3 &pt) { Merge(pt.x, pt.y, pt.z); }
 
-    min_.y = std::fmin(min_.y, pt.y);
-    max_.y = std::fmax(max_.y, pt.y);
+  void Merge(float x, float y, float z) {
+    min_.x = std::fmin(min_.x, x);
+    max_.x = std::fmax(max_.x, x);
 
-    min_.z = std::fmin(min_.z, pt.z);
-    max_.z = std::fmax(max_.z, pt.z);
+    min_.y = std::fmin(min_.y, y);
+    max_.y = std::fmax(max_.y, y);
+
+    min_.z = std::fmin(min_.z, z);
+    max_.z = std::fmax(max_.z, z);
   }
 
   std::pair<glm::vec3, glm::vec3> GetMinMax() const {

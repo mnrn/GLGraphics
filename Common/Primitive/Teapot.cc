@@ -126,7 +126,7 @@ void Teapot::BuildPatch(vec3 patch[][4], std::vector<GLfloat> &B,
                         int &tcIndex, int grid, mat3 reflect,
                         bool invertNormal) {
   const int startIndex = index / 3;
-  const float tcFactor = 1.0f / grid;
+  const float tcFactor = 1.0f / static_cast<float>(grid);
 
   for (int i = 0; i <= grid; i++) {
     for (int j = 0; j <= grid; j++) {
@@ -143,8 +143,8 @@ void Teapot::BuildPatch(vec3 patch[][4], std::vector<GLfloat> &B,
       n[index + 1] = norm.y;
       n[index + 2] = norm.z;
 
-      tc[tcIndex] = i * tcFactor;
-      tc[tcIndex + 1] = j * tcFactor;
+      tc[tcIndex] = static_cast<float>(i) * tcFactor;
+      tc[tcIndex + 1] = static_cast<float>(j) * tcFactor;
 
       index += 3;
       tcIndex += 2;
@@ -191,9 +191,9 @@ void Teapot::GetPatch(int patchNum, vec3 patch[][4], bool reverseV) {
 
 void Teapot::ComputeBasisFunctions(std::vector<GLfloat> &B,
                                    std::vector<GLfloat> &dB, int grid) {
-  const float inc = 1.0f / grid;
+  const float inc = 1.0f / static_cast<float>(grid);
   for (int i = 0; i <= grid; i++) {
-    const float t = i * inc;
+    const float t = static_cast<float>(i) * inc;
     const float tSqr = t * t;
     const float oneMinusT = (1.0f - t);
     const float oneMinusT2 = oneMinusT * oneMinusT;

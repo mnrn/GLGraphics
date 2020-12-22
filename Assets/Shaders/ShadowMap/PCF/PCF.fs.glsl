@@ -1,7 +1,5 @@
 #version 410
 
-#define USE_PCF 1
-
 in vec3 Position;
 in vec3 Normal;
 in vec4 ShadowCoord;
@@ -25,6 +23,8 @@ uniform struct MaterialInfo {
 } Material;
 
 uniform sampler2DShadow ShadowMap;
+uniform bool IsPCF = true;
+uniform bool IsShadowOnly = false;
 
 vec4 GammaCorrection(vec4 color) {
     return pow(color, vec4(1.0 / kGamma));
@@ -50,19 +50,22 @@ void ShadeWithShadow() {
 
     float shadow = 1.0;
     if (ShadowCoord.z >= 0.0) {
-#if USE_PCF
-        float acc = 0.0;
-        acc += textureProjOffset(ShadowMap, ShadowCoord, ivec2(-1, -1));
-        acc += textureProjOffset(ShadowMap, ShadowCoord, ivec2(-1, 1));
-        acc += textureProjOffset(ShadowMap, ShadowCoord, ivec2(1, 1));
-        acc += textureProjOffset(ShadowMap, ShadowCoord, ivec2(1, -1));
-        shadow = acc * 0.25;
-#else
-        shadow = textureProj(ShadowMap, ShadowCoord);
-#endif
+        if (IsPCF) {
+            float acc = 0.0;
+            acc += textureProjOffset(ShadowMap, ShadowCoord, ivec2(-1, -1));
+            acc += textureProjOffset(ShadowMap, ShadowCoord, ivec2(-1, 1));
+            acc += textureProjOffset(ShadowMap, ShadowCoord, ivec2(1, 1));
+            acc += textureProjOffset(ShadowMap, ShadowCoord, ivec2(1, -1));
+            shadow = acc * 0.25;
+        } else {
+            shadow = textureProj(ShadowMap, ShadowCoord);
+        }
     }
     // ピクセルが影の中にある場合、Ambient Light (環境光)のみ使用することになります。
     vec4 color = vec4(diffSpec * shadow + amb, 1.0);
+    if (IsShadowOnly) {
+        color = vec4(shadow, shadow, shadow, 1.0);
+    }
     FragColor = GammaCorrection(color);
 }
 

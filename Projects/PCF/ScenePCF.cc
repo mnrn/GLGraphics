@@ -2,34 +2,50 @@
  * @brief シャドウマッピングのテストシーン
  */
 
-#include "SceneShadowMap.h"
+#include "ScenePCF.h"
 
 #include <boost/assert.hpp>
-#include <iostream>
-
 #include <glm/gtc/constants.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <iostream>
+
+#include "HID/KeyInput.h"
+#include "UI/Font.h"
+#include "UI/Text.h"
 
 // ********************************************************************************
 // constexpr variables
 // ********************************************************************************
 
+static constexpr float kCameraFOVY = 50.0f;
+static constexpr float kLightFOVY = 40.0f;
+static constexpr float kRotSpeed = 0.2f;
+static constexpr int kShadowMapWidth = 1024;
+static constexpr int kShadowMapHeight = 1024;
+
 static constexpr glm::mat4 kShadowBias{
     glm::vec4(0.5f, 0.0f, 0.0f, 0.0f), glm::vec4(0.0f, 0.5f, 0.0f, 0.0f),
     glm::vec4(0.0f, 0.0f, 0.5f, 0.0f), glm::vec4(0.5f, 0.5f, 0.5f, 1.0f)};
 
-static constexpr float kCameraCenter = 2.0f;
+static constexpr float kCameraRadius = 1.8f;
 
 static constexpr glm::vec3 kLightColor{0.85f};
-static constexpr float kLightCenter = 1.65f;
-static constexpr glm::vec3 kDefaultLightPosition{0.0f, kLightCenter * 5.25f,
-                                                 kLightCenter * 7.5f};
+static constexpr glm::vec3 kDefaultLightPosition{-2.5f, 2.0f, -2.5f};
 
 // ********************************************************************************
 // Override functions
 // ********************************************************************************
 
-void SceneShadowMap::OnInit() {
+void ScenePCF::OnInit() {
+  KeyInput::Create();
+  Text::Create();
+  Font::Create();
+
+  if ((fontObj_ = Font::Get().Entry(
+           "./Assets/Fonts/UbuntuMono/UbuntuMono-Regular.ttf"))) {
+    fontObj_->SetupWithSize(28);
+  }
+
   SetupCamera();
   SetupLight();
 
@@ -48,12 +64,12 @@ void SceneShadowMap::OnInit() {
   SetupFBO();
 }
 
-void SceneShadowMap::OnDestroy() {
+void ScenePCF::OnDestroy() {
   glDeleteBuffers(1, &shadowFBO_);
   glDeleteTextures(1, &depthTex_);
 }
 
-void SceneShadowMap::OnUpdate(float t) {
+void ScenePCF::OnUpdate(float t) {
   const float deltaT = tPrev_ == 0.0f ? 0.0f : t - tPrev_;
   tPrev_ = t;
 
@@ -63,12 +79,18 @@ void SceneShadowMap::OnUpdate(float t) {
   }
 
   const glm::vec3 kCamPt =
-      glm::vec3(kCameraCenter * 11.5f * cos(angle_), kCameraCenter * 7.0f,
-                kCameraCenter * 11.5f * sin(angle_));
+      glm::vec3(kCameraRadius * cos(angle_), 0.7f, kCameraRadius * sin(angle_));
   camera_.SetPosition(kCamPt);
+
+  if (KeyInput::Get().IsTrg(Key::Left) || KeyInput::Get().IsTrg(Key::Right)) {
+    isPCF_ = !isPCF_;
+  }
+  if (KeyInput::Get().IsTrg(Key::S)) {
+    isShadowOnly_ = !isShadowOnly_;
+  }
 }
 
-void SceneShadowMap::OnRender() {
+void ScenePCF::OnRender() {
   glClearColor(0.9f, 0.9f, 0.9f, 1.0f);
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_CULL_FACE);
@@ -81,9 +103,13 @@ void SceneShadowMap::OnRender() {
     Pass2();
   }
   glBindTexture(GL_TEXTURE_2D, 0);
+  glDisable(GL_CULL_FACE);
+  glDisable(GL_DEPTH_TEST);
+
+  DrawText();
 }
 
-void SceneShadowMap::OnResize(int w, int h) {
+void ScenePCF::OnResize(int w, int h) {
   SetDimensions(w, h);
   glViewport(0, 0, w, h);
 }
@@ -92,7 +118,7 @@ void SceneShadowMap::OnResize(int w, int h) {
 // Shader settings
 // ********************************************************************************
 
-std::optional<std::string> SceneShadowMap::CompileAndLinkShader() {
+std::optional<std::string> ScenePCF::CompileAndLinkShader() {
   // compile and links
   if (const auto msg = progs_[kRecordDepth].CompileAndLink(
           {{"./Assets/Shaders/ShadowMap/RecordDepth.vs.glsl",
@@ -102,16 +128,15 @@ std::optional<std::string> SceneShadowMap::CompileAndLinkShader() {
     return msg;
   }
   if (const auto msg = progs_[kShadeWithShadow].CompileAndLink(
-          {{"./Assets/Shaders/ShadowMap/Simple/ShadowMap.vs.glsl",
-            ShaderType::Vertex},
-           {"./Assets/Shaders/ShadowMap/Simple/ShadowMap.fs.glsl",
+          {{"./Assets/Shaders/ShadowMap/PCF/PCF.vs.glsl", ShaderType::Vertex},
+           {"./Assets/Shaders/ShadowMap/PCF/PCF.fs.glsl",
             ShaderType::Fragment}})) {
     return msg;
   }
   return std::nullopt;
 }
 
-void SceneShadowMap::SetMatrices() {
+void ScenePCF::SetMatrices() {
   const glm::mat4 mv = view_ * model_;
   if (pass_ == kRecordDepth) {
     progs_[kRecordDepth].SetUniform("MVP", proj_ * mv);
@@ -123,7 +148,7 @@ void SceneShadowMap::SetMatrices() {
   }
 }
 
-void SceneShadowMap::SetupFBO() {
+void ScenePCF::SetupFBO() {
   // シャドウマップの生成を行います。
   glGenTextures(1, &depthTex_);
   glBindTexture(GL_TEXTURE_2D, depthTex_);
@@ -165,10 +190,8 @@ void SceneShadowMap::SetupFBO() {
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void SceneShadowMap::SetMatrialUniforms(const glm::vec3 &diff,
-                                        const glm::vec3 &amb,
-                                        const glm::vec3 &spec,
-                                        float shininess) {
+void ScenePCF::SetMatrialUniforms(const glm::vec3 &diff, const glm::vec3 &amb,
+                                  const glm::vec3 &spec, float shininess) {
 
   if (pass_ != kShadeWithShadow) {
     return;
@@ -184,7 +207,7 @@ void SceneShadowMap::SetMatrialUniforms(const glm::vec3 &diff,
 // ********************************************************************************
 
 // Shadow map generation
-void SceneShadowMap::Pass1() {
+void ScenePCF::Pass1() {
   pass_ = RenderPass::kRecordDepth;
 
   glBindFramebuffer(GL_FRAMEBUFFER, shadowFBO_);
@@ -206,7 +229,7 @@ void SceneShadowMap::Pass1() {
 }
 
 // render
-void SceneShadowMap::Pass2() {
+void ScenePCF::Pass2() {
   pass_ = RenderPass::kShadeWithShadow;
 
   proj_ = camera_.GetProjectionMatrix();
@@ -214,6 +237,8 @@ void SceneShadowMap::Pass2() {
   progs_[kShadeWithShadow].Use();
   progs_[kShadeWithShadow].SetUniform(
       "Light.Position", view_ * glm::vec4(lightView_.GetPosition(), 1.0f));
+  progs_[kShadeWithShadow].SetUniform("IsPCF", isPCF_);
+  progs_[kShadeWithShadow].SetUniform("IsShadowOnly", isShadowOnly_);
 
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -222,27 +247,16 @@ void SceneShadowMap::Pass2() {
   DrawScene();
 }
 
-void SceneShadowMap::DrawScene() {
-  const glm::vec3 diff = glm::vec3(0.7f, 0.5f, 0.3f);
-  const glm::vec3 amb = diff * 0.05f;
-  const glm::vec3 spec = glm::vec3(0.9f, 0.9f, 0.9f);
+void ScenePCF::DrawScene() {
+  const glm::vec3 diff = glm::vec3(1.0f, 0.85f, 0.55f);
+  const glm::vec3 amb = diff * 0.1f;
+  const glm::vec3 spec = glm::vec3(0.0f);
 
-  // ティーポットの描画
-  SetMatrialUniforms(diff, amb, spec, 150.0f);
+  // 建物の描画
+  SetMatrialUniforms(diff, amb, spec, 1.0f);
   model_ = glm::mat4(1.0f);
-  model_ =
-      glm::rotate(model_, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
   SetMatrices();
-  teapot_.Render();
-
-  // トーラスの描画
-  SetMatrialUniforms(diff, amb, spec, 150.0f);
-  model_ = glm::mat4(1.0f);
-  model_ = glm::translate(model_, glm::vec3(0.0f, 2.0f, 5.0f));
-  model_ =
-      glm::rotate(model_, glm::radians(-45.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-  SetMatrices();
-  torus_.Render();
+  building_->Render();
 
   // 平面の描画
   SetMatrialUniforms(glm::vec3(0.25f, 0.25f, 0.25f),
@@ -251,42 +265,59 @@ void SceneShadowMap::DrawScene() {
   model_ = glm::mat4(1.0f);
   SetMatrices();
   plane_.Render();
+}
 
-  model_ = glm::mat4(1.0f);
-  model_ = glm::translate(model_, glm::vec3(-5.0f, 5.0f, 0.0f));
-  model_ =
-      glm::rotate(model_, glm::radians(-90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-  SetMatrices();
-  plane_.Render();
+void ScenePCF::DrawText() {
+  if (!fontObj_) {
+    return;
+  }
+  const float kBaseX = 25.0f;
+  const float kBaseY = static_cast<float>(height_) - 40.0f;
+  const float kOffsetY = -36.0f;
 
-  model_ = glm::mat4(1.0f);
-  model_ = glm::translate(model_, glm::vec3(0.0f, 5.0f, -5.0f));
-  model_ =
-      glm::rotate(model_, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-  SetMatrices();
-  plane_.Render();
+  Text::Get().Begin(width_, height_);
 
-  model_ = glm::mat4(1.0f);
+  if (isPCF_) {
+    Text::Get().Render("PCF: ON", kBaseX, kBaseY, fontObj_);
+    Text::Get().Render("Press <- or ->: Disable PCF", kBaseX, kBaseY + kOffsetY,
+                       fontObj_);
+  } else {
+    Text::Get().Render("PCF: OFF", kBaseX, kBaseY, fontObj_);
+    Text::Get().Render("Press <- or ->: Enable PCF", kBaseX, kBaseY + kOffsetY,
+                       fontObj_);
+  }
+  const float kShadowX = kBaseX + 150.0f;
+  if (isShadowOnly_) {
+    Text::Get().Render("Shadow Only: ON", kShadowX, kBaseY, fontObj_);
+    Text::Get().Render("Press S: Disable Shadow Only", kBaseX,
+                       kBaseY + kOffsetY * 2.0f, fontObj_);
+  } else {
+    Text::Get().Render("Shadow Only: OFF", kShadowX, kBaseY, fontObj_);
+    Text::Get().Render("Press S: Enable Shadow Only", kBaseX,
+                       kBaseY + kOffsetY * 2.0f, fontObj_);
+  }
+
+  Text::Get().End();
 }
 
 // ********************************************************************************
 // View
 // ********************************************************************************
 
-void SceneShadowMap::SetupCamera() {
+void ScenePCF::SetupCamera() {
   const glm::vec3 kCamPt =
-      glm::vec3(kCameraCenter * 11.5f * cos(angle_), kCameraCenter * 7.0f,
-                kCameraCenter * 11.5f * sin(angle_));
-  camera_.SetupOrient(kCamPt, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+      glm::vec3(kCameraRadius * cos(angle_), 0.7f, kCameraRadius * sin(angle_));
+  camera_.SetupOrient(kCamPt, glm::vec3(0.0f, -0.175f, 0.0f),
+                      glm::vec3(0.0f, 1.0f, 0.0f));
   camera_.SetupPerspective(
-      kFOVY, static_cast<float>(width_) / static_cast<float>(height_), 0.1f,
-      100.0f);
+      kCameraFOVY, static_cast<float>(width_) / static_cast<float>(height_),
+      0.1f, 100.0f);
 }
 
-void SceneShadowMap::SetupLight() {
+void ScenePCF::SetupLight() {
   lightView_.SetupOrient(kDefaultLightPosition, glm::vec3(0.0f),
                          glm::vec3(0.0f, 1.0f, 0.0f));
-  lightView_.SetupPerspective(kFOVY, 1.0f, 1.0f, 25.0f);
+  lightView_.SetupPerspective(kLightFOVY, 1.0f, 1.0f, 100.0f);
   lightPV_ = kShadowBias * lightView_.GetProjectionMatrix() *
              lightView_.GetViewMatrix();
 }

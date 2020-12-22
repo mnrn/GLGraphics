@@ -5,7 +5,7 @@
 #include <array>
 #include <vector>
 
-#include "Box/AABB.h"
+#include "BBox/AABB.h"
 #include "Primitive/Drawable.h"
 
 class Frustum {

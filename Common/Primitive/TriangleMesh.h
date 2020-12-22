@@ -4,6 +4,7 @@
 #include <optional>
 #include <vector>
 
+#include "BBox/AABB.h"
 #include "Drawable.h"
 
 class TriangleMesh : public Drawable {
@@ -16,6 +17,7 @@ public:
   GLuint GetNormalBuffer() const { return buffers_[2]; }
   GLuint GetTcBuffer() const { return buffers_.size() > 3 ? buffers_[3] : 0; }
   GLuint GetNumVers() const { return nVerts_; }
+  AABB GetAABB() const { return bbox_; }
 
 protected:
   virtual void InitBuffers(
@@ -28,4 +30,6 @@ protected:
   GLuint vao_;                  // 頂点配列オブジェクト
   GLuint nVerts_;               // 頂点数
   std::vector<GLuint> buffers_; // 頂点バッファ
+
+  AABB bbox_; // AABB
 };
