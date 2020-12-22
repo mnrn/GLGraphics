@@ -132,6 +132,7 @@ set(TARGETS
     MSAA
     SSAO
     ShadowMap
+    PCF
     Bezier
     Particles
     Text

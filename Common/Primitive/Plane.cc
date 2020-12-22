@@ -14,16 +14,16 @@ Plane::Plane(float xsize, float zsize, int xdivs, int zdivs, float smax,
 
   const float x2 = xsize / 2.0f;
   const float z2 = zsize / 2.0f;
-  const float iFactor = static_cast<float>(zsize) / zdivs;
-  const float jFactor = static_cast<float>(xsize) / xdivs;
-  const float texi = smax / xdivs;
-  const float texj = tmax / zdivs;
+  const float iFactor = static_cast<float>(zsize) / static_cast<float>(zdivs);
+  const float jFactor = static_cast<float>(xsize) / static_cast<float>(xdivs);
+  const float texi = smax / static_cast<float>(xdivs);
+  const float texj = tmax / static_cast<float>(zdivs);
   float x, z;
   int vidx = 0, tidx = 0;
   for (int i = 0; i <= zdivs; i++) {
-    z = iFactor * i - z2;
+    z = iFactor * static_cast<float>(i) - z2;
     for (int j = 0; j <= xdivs; j++) {
-      x = jFactor * j - x2;
+      x = jFactor * static_cast<float>(j) - x2;
       p[vidx] = x;
       p[vidx + 1] = 0.0f;
       p[vidx + 2] = z;
@@ -31,8 +31,8 @@ Plane::Plane(float xsize, float zsize, int xdivs, int zdivs, float smax,
       n[vidx + 1] = 1.0f;
       n[vidx + 2] = 0.0f;
 
-      tex[tidx] = j * texi;
-      tex[tidx + 1] = (zdivs - i) * texj;
+      tex[tidx] = static_cast<float>(j) * texi;
+      tex[tidx + 1] = static_cast<float>(zdivs - i) * texj;
 
       vidx += 3;
       tidx += 2;

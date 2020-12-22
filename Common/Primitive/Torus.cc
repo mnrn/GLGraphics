@@ -18,15 +18,15 @@ Torus::Torus(GLfloat outerRadius, GLfloat innerRadius, GLuint nsides,
   std::vector<GLuint> el(6 * faces);
 
   // Generate the vertex data
-  const float ringFactor = glm::two_pi<float>() / nrings;
-  const float sideFactor = glm::two_pi<float>() / nsides;
+  const float ringFactor = glm::two_pi<float>() / static_cast<float>(nrings);
+  const float sideFactor = glm::two_pi<float>() / static_cast<float>(nsides);
   int idx = 0, tidx = 0;
   for (GLuint ring = 0; ring <= nrings; ring++) {
-    const float u = ring * ringFactor;
+    const float u = static_cast<float>(ring) * ringFactor;
     const float cu = cos(u);
     const float su = sin(u);
     for (GLuint side = 0; side < nsides; side++) {
-      const float v = side * sideFactor;
+      const float v = static_cast<float>(side) * sideFactor;
       const float cv = cos(v);
       const float sv = sin(v);
       const float r = (outerRadius + innerRadius * cv);
