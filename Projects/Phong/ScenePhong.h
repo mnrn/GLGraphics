@@ -14,7 +14,7 @@
 
 #include "Primitive/Torus.h"
 #include "Scene.h"
-#include "Shader.h"
+#include "Graphics/Shader.h"
 
 // ********************************************************************************
 // Class

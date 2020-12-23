@@ -38,6 +38,17 @@ void GBuffer::OnInit(int w, int h) {
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
+void GBuffer::OnPreRender() const {
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, textures_[PosTex]);
+
+  glActiveTexture(GL_TEXTURE1);
+  glBindTexture(GL_TEXTURE_2D, textures_[NormTex]);
+
+  glActiveTexture(GL_TEXTURE2);
+  glBindTexture(GL_TEXTURE_2D, textures_[ColorTex]);
+}
+
 void GBuffer::OnDestroy() {
   glDeleteTextures(textures_.size(), textures_.data());
   glDeleteRenderbuffers(1, &buffers_[DepthBuf]);
@@ -56,6 +67,8 @@ GLuint GBuffer::CreateGBufferTexture(GLenum texUnit, GLenum format) {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
+
+  glBindTexture(GL_TEXTURE_2D, 0);
 
   return texId;
 }

@@ -15,7 +15,7 @@
 #include <string>
 
 #include "Scene.h"
-#include "Shader.h"
+#include "Graphics/Shader.h"
 
 // ********************************************************************************
 // Class
@@ -34,7 +34,7 @@ public:
 
 private:
   std::optional<std::string> CompileAndLinkShader();
-  void CreateVBO();
+  void CreateVAO();
 
   enum VertexBuffer {
     Position,

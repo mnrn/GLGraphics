@@ -13,7 +13,7 @@
 
 #include <array>
 
-#include "Shader.h"
+#include "Graphics/Shader.h"
 
 // ********************************************************************************
 // Class

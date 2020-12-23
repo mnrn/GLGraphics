@@ -1,12 +1,22 @@
 # OpenGL グラフィックメモ
 
+![Launguage-C++](https://img.shields.io/badge/Language-C%2B%2B-F34B7D)
+
 グラフィックに関する実装をOpenGLで行っていきます。  
 Vulkanでの実装がもう少し楽になりそうならそちらに移行するつもりですが、しばらくはOpenGLのままになりそうです。  
 新しくPC買ってなおかつ時間があるようであればVulkanに移行したいです。ある程度目途はついています。
 
+## 制作経緯
+
+もともとはLinuxで動かしていたプログラムですが、PCが壊れたのでMacに移していたものです。  
+再入門にあたりWindowsでも動かせるようにしました。  
+現在動作確認はWindowsとMacのみになります。
+
 ## 制作環境
 
-もともとLinuxで動かしていたプログラムをMacでも保守できるようにして、その後Windowsへ移植しました。  
+- OS
+  - Windows10
+  - Mac OSX Catalina 10.15
 
 ## ビルド
 
@@ -31,6 +41,9 @@ Vulkanでの実装がもう少し楽になりそうならそちらに移行す�
 - [tinyobjloader]
   - objファイルの読み込みに使用しました。
   - objファイルの簡潔さを考えると自作でも良かったかもしれませんが、今後の拡張性と保守性などを考えてこちらにしました。
+- [freetype]
+  - フォントライブラリ。フォントをビットマップデータにして描画しています。
+  - LinuxやBSD, iOSやAndroidはこのライブラリを用いているようです。
 
 リポジトリのルートディレクトリにCMakeLists.txtがあるので詳しくはそちらを参照ください。  
 
@@ -48,3 +61,4 @@ Vulkanでの実装がもう少し楽になりそうならそちらに移行す�
 [fmt]:<https://github.com/fmtlib/fmt>
 [stb]:<https://github.com/nothings/stb>
 [tinyobjloader]:<https://github.com/tinyobjloader/tinyobjloader>
+[freetype]:<https://www.freetype.org/>

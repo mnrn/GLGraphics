@@ -21,7 +21,7 @@
 
 namespace Window {
 
-static inline GLFWwindow *Create(int w, int h, const char *title,
+static inline GLFWwindow *Create(int w, int h, const char *title, int samples,
                                  GLFWmonitor *monitor = nullptr,
                                  GLFWwindow *share = nullptr) {
 
@@ -38,12 +38,16 @@ static inline GLFWwindow *Create(int w, int h, const char *title,
 #if (_DEBUG)
   glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
 #endif
+  if (samples > 0) {
+    glfwWindowHint(GLFW_SAMPLES, samples);
+  }
 
   // create window handle
   GLFWwindow *handle = glfwCreateWindow(w, h, title, monitor, share);
   if (handle == nullptr) {
     glfwTerminate();
     BOOST_ASSERT_MSG(false, "failed to create window!");
+    return nullptr;
   }
 
   glfwMakeContextCurrent(handle);

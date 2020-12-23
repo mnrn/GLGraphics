@@ -21,20 +21,25 @@ void SceneDeferredPBR::OnInit() {
   }
 
   glEnable(GL_DEPTH_TEST);
-  view_ = glm::lookAt(glm::vec3(0.0f, 4.0f, 7.0f), glm::vec3(0.0f, 0.0f, 0.0f),
+  view_ = glm::lookAt(glm::vec3(0.0f, 3.0f, 5.0f), glm::vec3(0.0f, 0.0f, 0.0f),
                       glm::vec3(0.0f, 1.0f, 0.0f));
-  proj_ = glm::perspective(glm::radians(kFOVY),
-                           static_cast<float>(width_) / height_, 0.3f, 100.0f);
+  proj_ = glm::perspective(
+      glm::radians(kFOVY),
+      static_cast<float>(width_) / static_cast<float>(height_), 0.1f, 100.0f);
 
   CreateVAO();
 
   gbuffer_.OnInit(width_, height_);
 
+  lightPositions_ = {glm::vec4(7.0f, 3.0f, 0.0f, 1.0f),
+                     glm::vec4(0.0f, -0.15f, 0.0f, 0.0f),
+                     glm::vec4(-8.0f, 3.0f, 0.0f, 1.0f)};
+
   prog_.SetUniform("Light[0].L", glm::vec3(45.0f));
   prog_.SetUniform("Light[0].Position", view_ * lightPositions_[0]);
-  prog_.SetUniform("Light[1].L", glm::vec3(0.3f));
+  prog_.SetUniform("Light[1].L", glm::vec3(0.1f));
   prog_.SetUniform("Light[1].Position", lightPositions_[1]);
-  prog_.SetUniform("Light[2].L", glm::vec3(45.0f));
+  prog_.SetUniform("Light[2].L", glm::vec3(30.0f));
   prog_.SetUniform("Light[2].Position", view_ * lightPositions_[2]);
 
   prog_.SetUniform("PositionTex", 0);
@@ -52,7 +57,7 @@ void SceneDeferredPBR::OnUpdate(float t) {
   tPrev_ = t;
 
   if (IsAnimate()) {
-    lightAngle_ = glm::mod(lightAngle_ + deltaT * lightRotationSpeed_,
+    lightAngle_ = glm::mod(lightAngle_ + deltaT * kLightRotationSpeed,
                            glm::two_pi<float>());
     lightPositions_[0] =
         glm::vec4(glm::cos(lightAngle_) * 7.0f, 3.0f,
@@ -68,7 +73,8 @@ void SceneDeferredPBR::OnRender() {
 void SceneDeferredPBR::OnResize(int w, int h) {
   SetDimensions(w, h);
   glViewport(0, 0, w, h);
-  proj_ = glm::perspective(glm::radians(kFOVY), static_cast<float>(w) / h, 0.3f,
+  proj_ = glm::perspective(glm::radians(kFOVY),
+                           static_cast<float>(w) / static_cast<float>(h), 0.3f,
                            100.0f);
 }
 
@@ -140,8 +146,9 @@ void SceneDeferredPBR::Pass1() {
 
   view_ = glm::lookAt(glm::vec3(0.0f, 4.0f, 7.0f), glm::vec3(0.0f, 0.0f, 0.0f),
                       glm::vec3(0.0f, 1.0f, 0.0f));
-  proj_ = glm::perspective(glm::radians(kFOVY),
-                           static_cast<float>(width_) / height_, 0.3f, 100.0f);
+  proj_ = glm::perspective(
+      glm::radians(kFOVY),
+      static_cast<float>(width_) / static_cast<float>(height_), 0.3f, 100.0f);
   DrawScene();
 }
 
@@ -171,8 +178,8 @@ void SceneDeferredPBR::DrawScene() {
   DrawFloor();
 
   for (int i = 0; i < kNumCows; i++) {
-    const float cowX = i * (10.0f / (kNumCows - 1)) - 5.0f;
-    const float rough = (i + 1) * (1.0f / kNumCows);
+    const float cowX = static_cast<float>(i) * (20.0f / (kNumCows - 1)) - 10.0f;
+    const float rough = static_cast<float>(i + 1) * (1.0f / kNumCows);
     DrawMesh(glm::vec3(cowX, 0.0f, 0.0f), rough, 0, kBaseCowColor);
   }
 
@@ -183,8 +190,8 @@ void SceneDeferredPBR::DrawScene() {
       glm::vec3(0.542f, 0.497, 0.449f), // Titanium
       glm::vec3(0.95f, 0.93f, 0.88f)    // Silver
   };
-  const float kOffsetX = 1.5f;
-  float cowX = -3.0f;
+  const float kOffsetX = 2.5f;
+  float cowX = -5.0f;
   for (int i = 0; i < 5; i++) {
     DrawMesh(glm::vec3(cowX, 0.0f, 3.0f), kMetalRough, 1, kMetalColors[i]);
     cowX += kOffsetX;
@@ -198,7 +205,6 @@ void SceneDeferredPBR::DrawFloor() {
   prog_.SetUniform("Material.Color", glm::vec3(0.0f));
   model_ = glm::translate(model_, glm::vec3(0.0f, -0.75f, 0.0f));
   SetMatrices();
-
   plane_.Render();
 }
 
@@ -210,8 +216,9 @@ void SceneDeferredPBR::DrawMesh(const glm::vec3 &pos, float rough, int metal,
   prog_.SetUniform("Material.Color", color);
   model_ = glm::translate(model_, pos);
   model_ =
-      glm::rotate(model_, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+      glm::rotate(model_, glm::radians(200.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+  model_ = glm::scale(model_, glm::vec3(0.5f, 0.5f, 0.5f));
   SetMatrices();
 
-  mesh_->Render();
+  teapot_->Render();
 }

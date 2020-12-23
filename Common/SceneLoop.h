@@ -34,7 +34,8 @@ static inline int Run(App &app, std::unique_ptr<Scene> &&scene) {
         scene->OnResize(w, h);
       },
       [&scene](float t) { scene->OnUpdate(t); },
-      [&scene]() { scene->OnRender(); });
+      [&scene]() { scene->OnRender(); }, [&scene]() { scene->OnDestroy(); }
+  );
 }
 } // namespace SceneLoop
 

@@ -32,27 +32,35 @@ else()
 endif()
 
 # glfw
-if (UNIX)
-    find_package(GLFW)
-    if (NOT GLFW_FOUND)
-        message(FATAL_ERROR "Could not find glfw!")
-    else()
-        message("@@ GLFW_LIBRARIES: ${GLFW_LIBRARIES}")
-    endif()
-else()
-    find_library(GLFW_LIBRARIES
-      NAMES
-        glfw
-        glfw3
-      HINTS
-        ${CMAKE_SOURCE_DIR}/Lib/glfw
-    )
-    message("@@ GLFW_LIBRARIES: ${GLFW_LIBRARIES}")
-endif()
+find_library(GLFW_LIBRARIES
+  NAMES
+    glfw
+    glfw3
+    glfw3.3
+  HINTS
+    ${CMAKE_SOURCE_DIR}/Lib/glfw
+)
+message("@@ GLFW_LIBRARIES: ${GLFW_LIBRARIES}")
 
 ## glad
 add_subdirectory(Lib/glad)
 set(GLAD_LIBRARIES glad)
+
+# freetype
+if ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
+    set(FREETYPE_LIBRARIES_HINTS ${CMAKE_SOURCE_DIR}/Lib/freetype/debug)
+else ()
+    set(FREETYPE_LIBRARIES_HINTS ${CMAKE_SOURCE_DIR}/Lib/freetype/release)
+endif()
+find_library(FREETYPE_LIBRARIES
+  NAMES
+    freetype
+  HINTS
+    ${FREETYPE_LIBRARIES_HINTS}
+)
+message("@@ FREETYPE_LIBRARIES: ${FREETYPE_LIBRARIES}")
+include_directories(SYSTEM third-party/freetype2)
+
 
 # Set preprocessor defines
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNOMINMAX -D_USE_MATH_DEFINES")
@@ -69,14 +77,23 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-missing-prototypes -Wno-global-constructors -Wno-exit-time-destructors -Wno-padded")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-weak-vtables -Wno-covered-switch-default")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-poison-system-directories -Wno-ctad-maybe-unsupported")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-documentation")
 endif()
-
-file(GLOB SOURCE *.cc Core/*.cc Common/*.cc Common/Primitive/*.cc Common/Mesh/*cc)
 
 # Function for building
 function(build TARGET_NAME)
     # Main
-    file(GLOB SOURCE *.cc Core/*.cc Common/*.cc Common/Primitive/*.cc Common/Mesh/*cc ${PROJECTS_DIR_NAME}/${TARGET_NAME}/*.cc)
+    file(GLOB SOURCE 
+        *.cc 
+        Core/*.cc 
+        Core/Graphics/*.cc 
+        Common/*.cc 
+        Common/Primitive/*.cc 
+        Common/Mesh/*cc 
+        Common/View/*.cc 
+        Common/UI/*.cc
+        ${PROJECTS_DIR_NAME}/${TARGET_NAME}/*.cc
+    )
     set(MAIN_CC ${TARGET_NAME}/${TARGET_NAME}/Main.cc)
     if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECTS_DIR_NAME}/${TARGET_NAME}/Main.cc)
         set(MAIN_CC ${PROJECTS_DIR_NAME}/${TARGET_NAME}/Main.cc)
@@ -91,6 +108,7 @@ function(build TARGET_NAME)
         ${CMAKE_THREAD_LIBS_INIT}
         ${GLFW_LIBRARIES}
         ${GLAD_LIBRARIES}
+        ${FREETYPE_LIBRARIES}
     )
 endfunction(build)
 
@@ -111,10 +129,13 @@ set(TARGETS
     Texture
     Deferred
     DeferredPBR
+    MSAA
     SSAO
     ShadowMap
+    PCF
     CSM
     Bezier
     Particles
+    Text
 )
 buildAll()

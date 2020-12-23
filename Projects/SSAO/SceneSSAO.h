@@ -10,13 +10,18 @@
 #include <glm/gtc/constants.hpp>
 #include <optional>
 #include <string>
+#include <memory>
+
+#include <freetype2/ft2build.h>
+#include FT_FREETYPE_H
 
 #include "GBuffer.h"
 #include "Mesh/ObjMesh.h"
 #include "Primitive/Plane.h"
 #include "Primitive/Teapot.h"
 #include "Primitive/Torus.h"
-#include "Shader.h"
+#include "Graphics/Shader.h"
+#include "UI/Font.h"
 
 // ********************************************************************************
 // Classes
@@ -43,6 +48,7 @@ private:
   void Pass3();
   void Pass4();
 
+  void DrawText();
   void DrawScene();
   void DrawQuad();
 
@@ -57,6 +63,8 @@ private:
 
   float angle_ = glm::pi<float>() / 2.0f;
   float tPrev_ = 0.0f;
+
+  glm::vec4 lightPos_{3.0f, 3.0f, 1.5f, 1.0f};
   glm::mat4 sceneProj_{1.0f};
 
   ShaderProgram prog_{};
@@ -76,6 +84,16 @@ private:
   std::array<GLuint, VertexBufferSize> vbo_{};
   std::array<GLuint, TexturesNum> textures_{};
   GLuint quad_ = 0;
+
+  enum RenderType {
+    SSAO,
+    SSAOOnly,
+    NoSSAO,
+    RenderTypeNum,
+  };
+  int type_ = RenderType::SSAO;
+
+  std::unique_ptr<FontObj> fontObj_;
 };
 
 #endif

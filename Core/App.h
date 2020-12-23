@@ -17,6 +17,7 @@
 #include "GLInclude.h"
 
 #include "Debug.h"
+#include "HID/KeyInput.h"
 #include "Window.h"
 
 // ********************************************************************************
@@ -25,12 +26,13 @@
 
 class App : private boost::noncopyable {
 public:
-  App(const char *appName, int w = 1280, int h = 720) {
+  App(const char *appName, int w = 1280, int h = 720, int samples = 0) {
     if (glfwInit() == GL_FALSE) {
       BOOST_ASSERT_MSG(false, "glfw Initialization failed!");
+      return;
     }
 
-    window_ = Window::Create(w, h, appName);
+    window_ = Window::Create(w, h, appName, samples);
     glfwGetFramebufferSize(window_, &width_, &height_);
 
     InitGlad();
@@ -44,8 +46,10 @@ public:
     glfwTerminate();
   }
 
-  template <typename Initialize, typename Update, typename Render>
-  int Run(Initialize onInit, Update onUpdate, Render onRender) {
+  template <typename Initialize, typename Update, typename Render,
+            typename Destroy>
+  int Run(Initialize onInit, Update onUpdate, Render onRender,
+          Destroy onDestroy) {
     if (window_ == nullptr) {
       return EXIT_FAILURE;
     }
@@ -58,6 +62,7 @@ public:
 #if (!NDEBUG)
       Debug::CheckForOpenGLError(__FILE__, __LINE__);
 #endif
+      OnPreUpdate(window_);
       onUpdate(static_cast<float>(glfwGetTime()));
       onRender();
 
@@ -65,6 +70,7 @@ public:
       glfwPollEvents();
     }
 
+    onDestroy();
 #if (!NDEBUG)
     Debug::CleanupInfo();
 #endif
@@ -80,6 +86,17 @@ private:
     // Initialize GLAD
     if (!gladLoadGL()) {
       BOOST_ASSERT_MSG(false, "Something went wrong!");
+    }
+  }
+
+  static void OnPreUpdate(GLFWwindow *hwd) {
+    if (hwd == nullptr) {
+      return;
+    }
+
+    // キー入力更新を行いますが、キー入力初期化は各々に任せます。
+    if (KeyInput::IsExist()) {
+      KeyInput::Get().OnUpdate(hwd);
     }
   }
 };

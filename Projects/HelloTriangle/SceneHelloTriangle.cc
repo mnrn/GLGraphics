@@ -21,22 +21,25 @@ void SceneHelloTriangle::OnInit() {
     BOOST_ASSERT_MSG(false, "failed to compile or link!");
   }
 
-  CreateVBO();
+  CreateVAO();
 }
 
 void SceneHelloTriangle::OnDestroy() {
   glDeleteVertexArrays(1, &vao_);
-  glDeleteBuffers(vbo_.size(), vbo_.data());
+  glDeleteBuffers(static_cast<GLsizei>(vbo_.size()), vbo_.data());
 }
 
 void SceneHelloTriangle::OnUpdate(float d) { static_cast<void>(d); }
 
 void SceneHelloTriangle::OnRender() {
+  prog_.Use();
+
   glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT);
 
   glBindVertexArray(vao_);
   glDrawArrays(GL_TRIANGLES, 0, 3);
+  glBindVertexArray(0);
 }
 
 void SceneHelloTriangle::OnResize(int w, int h) {
@@ -50,28 +53,21 @@ void SceneHelloTriangle::OnResize(int w, int h) {
 
 std::optional<std::string> SceneHelloTriangle::CompileAndLinkShader() {
   // compile and links
-  if (prog_.Compile("./Assets/Shaders/Basic/Basic.vs.glsl",
-                     ShaderType::Vertex) &&
-      prog_.Compile("./Assets/Shaders/Basic/Basic.fs.glsl",
-                     ShaderType::Fragment) &&
-      prog_.Link()) {
-    prog_.Use();
-    return std::nullopt;
-  } else {
-    return prog_.GetLog();
-  }
+  return prog_.CompileAndLink(
+      {{"./Assets/Shaders/Basic/Basic.vs.glsl", ShaderType::Vertex},
+       {"./Assets/Shaders/Basic/Basic.fs.glsl", ShaderType::Fragment}});
 }
 
-void SceneHelloTriangle::CreateVBO() {
-  float position[] = {
+void SceneHelloTriangle::CreateVAO() {
+  const float position[] = {
       -0.8f, -0.8f, 0.0f, 0.8f, -0.8f, 0.0f, 0.0f, 0.8f, 0.0f,
   };
 
-  float color[] = {
+  const float color[] = {
       1.0f, 0.0f, 0.0, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
   };
 
-  glGenBuffers(vbo_.size(), vbo_.data());
+  glGenBuffers(static_cast<GLsizei>(vbo_.size()), vbo_.data());
 
   glBindBuffer(GL_ARRAY_BUFFER, vbo_[Position]);
   glBufferData(GL_ARRAY_BUFFER, sizeof(position), position, GL_STATIC_DRAW);
@@ -91,5 +87,6 @@ void SceneHelloTriangle::CreateVBO() {
   glBindBuffer(GL_ARRAY_BUFFER, vbo_[Color]);
   glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindVertexArray(0);
 }

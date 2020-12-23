@@ -10,33 +10,46 @@
 
 #include <glm/gtc/constants.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/integer.hpp>
 
+#include "Graphics/Texture.h"
+#include "HID/KeyInput.h"
 #include "Math/UniformDistribution.h"
-#include "Texture.h"
+#include "UI/Font.h"
+#include "UI/Text.h"
 
 // ********************************************************************************
 // Overrides scene
 // ********************************************************************************
 
 void SceneSSAO::OnInit() {
+  Text::Create();
+  Font::Create();
+  KeyInput::Create();
+
+  if ((fontObj_ = Font::Get().Entry(
+           "./Assets/Fonts/UbuntuMono/UbuntuMono-Regular.ttf"))) {
+    fontObj_->SetupWithSize(36);
+  }
+
   if (const auto msg = CompileAndLinkShader()) {
     std::cerr << msg.value() << std::endl;
     BOOST_ASSERT_MSG(false, "failed to compile or link!");
+  } else {
+    prog_.Use();
+    prog_.SetUniform("Light.L", glm::vec3(0.3f));
+    prog_.SetUniform("Light.La", glm::vec3(0.5f));
   }
 
-  glEnable(GL_DEPTH_TEST);
-
   sceneProj_ = glm::perspective(
-      glm::radians(kFOVY), static_cast<float>(width_) / height_, 0.3f, 100.0f);
+      glm::radians(kFOVY),
+      static_cast<float>(width_) / static_cast<float>(height_), 0.3f, 100.0f);
 
   CreateVAO();
 
   textures_[WoodTex] = Texture::Load("./Assets/Textures/Wood/wood.jpeg");
   textures_[BrickTex] =
       Texture::Load("./Assets/Textures/Brick/ruin_wall_01.png");
-
-  prog_.SetUniform("Light.L", glm::vec3(0.3f));
-  prog_.SetUniform("Light.La", glm::vec3(0.5f));
 
   std::uint32_t seed = std::random_device()();
   BuildKernel(seed);
@@ -59,13 +72,22 @@ void SceneSSAO::OnUpdate(float t) {
   if (angle_ > glm::two_pi<float>()) {
     angle_ -= glm::two_pi<float>();
   }
+
+  if (KeyInput::Get().IsTrg(Key::Left)) {
+    type_ = glm::mod(type_ - 1, RenderType::RenderTypeNum);
+  } else if (KeyInput::Get().IsTrg(Key::Right)) {
+    type_ = glm::mod(type_ + 1, RenderType::RenderTypeNum);
+  }
 }
 
 void SceneSSAO::OnRender() {
+  prog_.Use();
   Pass1();
   Pass2();
   Pass3();
   Pass4();
+
+  DrawText();
 }
 
 void SceneSSAO::OnResize(int w, int h) {
@@ -83,7 +105,6 @@ std::optional<std::string> SceneSSAO::CompileAndLinkShader() {
       prog_.Compile("./Assets/Shaders/SSAO/SSAO.fs.glsl",
                     ShaderType::Fragment) &&
       prog_.Link()) {
-    prog_.Use();
     return std::nullopt;
   } else {
     return prog_.GetLog();
@@ -142,6 +163,9 @@ void SceneSSAO::Pass1() {
   view_ = glm::lookAt(glm::vec3(2.1f, 1.5f, 2.1f), glm::vec3(0.0f, 1.0f, 0.0f),
                       glm::vec3(0.0f, 1.0f, 0.0f));
   proj_ = sceneProj_;
+
+  gbuffer_.OnPreRender();
+
   DrawScene();
 }
 
@@ -150,6 +174,10 @@ void SceneSSAO::Pass2() {
 
   const GLuint ssaoFBO = gbuffer_.GetSSAOFBO();
   glBindFramebuffer(GL_FRAMEBUFFER, ssaoFBO);
+
+  // テクスチャユニット4番にRandDirTexを設定します。
+  glActiveTexture(GL_TEXTURE4);
+  glBindTexture(GL_TEXTURE_2D, textures_[RandDirTex]);
 
   // AOTexに描きこみます。
   const GLuint aoTex = gbuffer_.GetAOTex();
@@ -179,6 +207,7 @@ void SceneSSAO::Pass3() {
 
 void SceneSSAO::Pass4() {
   prog_.SetUniform("Pass", 4);
+  prog_.SetUniform("Type", type_);
 
   // BlurAOTexを読み込みます。
   const GLuint blurAOTex = gbuffer_.GetBlurAOTex();
@@ -191,10 +220,11 @@ void SceneSSAO::Pass4() {
   glClear(GL_COLOR_BUFFER_BIT);
   glDisable(GL_DEPTH_TEST);
   DrawQuad();
+  glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void SceneSSAO::DrawScene() {
-  prog_.SetUniform("Light.Position", view_ * glm::vec4(3.0f, 3.0f, 1.5f, 1.0f));
+  prog_.SetUniform("Light.Position", view_ * lightPos_);
 
   // 床の描画
   glActiveTexture(GL_TEXTURE5);
@@ -241,6 +271,30 @@ void SceneSSAO::DrawQuad() {
   glBindVertexArray(quad_);
   glDrawArrays(GL_TRIANGLES, 0, 6);
   glBindVertexArray(0);
+}
+
+void SceneSSAO::DrawText() {
+  if (!fontObj_) {
+    return;
+  }
+
+  const float kOffsetX = 25.0f;
+  const float kOffsetY = static_cast<float>(height_) - 40.0f;
+  const std::map<int, std::string> kTexts = {
+      {RenderType::SSAO, "RenderType: SSAO"},
+      {RenderType::SSAOOnly, "RenderType: SSAO Only"},
+      {RenderType::NoSSAO, "RenderType: Diffuse Only"},
+  };
+  if (kTexts.count(static_cast<RenderType>(type_)) <= 0) {
+    return;
+  }
+  Text::Get().Begin(width_, height_);
+  {
+    Text::Get().Render(kTexts.at(type_).c_str(), kOffsetX, kOffsetY, fontObj_);
+    Text::Get().Render("Press <- or ->: Switch RenderType", kOffsetX,
+                       kOffsetY - 36.0f, fontObj_);
+  }
+  Text::Get().End();
 }
 
 // ********************************************************************************
@@ -291,7 +345,5 @@ void SceneSSAO::BuildRandDirTex(std::uint32_t seed) {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
 
-  // テクスチャユニット4番にRandDirTexを設定
-  glActiveTexture(GL_TEXTURE4);
-  glBindTexture(GL_TEXTURE_2D, textures_[RandDirTex]);
+  glBindTexture(GL_TEXTURE_2D, 0);
 }

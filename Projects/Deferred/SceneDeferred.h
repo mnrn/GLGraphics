@@ -15,7 +15,7 @@
 #include "Primitive/Plane.h"
 #include "Primitive/Teapot.h"
 #include "Primitive/Torus.h"
-#include "Shader.h"
+#include "Graphics/Shader.h"
 
 class SceneDeferred : public Scene {
 public:
