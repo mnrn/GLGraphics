@@ -43,7 +43,7 @@ private:
   void Pass2();
 
   void DrawScene();
-  void DrawText();
+  void DrawStatus();
 
   Camera camera_;
   Camera lightView_;
@@ -54,8 +54,6 @@ private:
 
   float tPrev_ = 0.0f;
   float angle_ = glm::two_pi<float>() * 0.85f;
-
-  glm::mat4 lightPV_{1.0f};
 
   enum RenderPass : std::int32_t {
     kRecordDepth,

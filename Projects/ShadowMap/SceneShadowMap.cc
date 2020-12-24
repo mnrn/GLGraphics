@@ -14,9 +14,9 @@
 // constexpr variables
 // ********************************************************************************
 
-static constexpr glm::mat4 kShadowBias{
-    glm::vec4(0.5f, 0.0f, 0.0f, 0.0f), glm::vec4(0.0f, 0.5f, 0.0f, 0.0f),
-    glm::vec4(0.0f, 0.0f, 0.5f, 0.0f), glm::vec4(0.5f, 0.5f, 0.5f, 1.0f)};
+static constexpr glm::mat4 kShadowBias{0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 0.5f,
+                                       0.0f, 0.0f, 0.0f, 0.0f, 0.5f, 0.0f,
+                                       0.5f, 0.5f, 0.5f, 1.0f};
 
 static constexpr float kCameraCenter = 2.0f;
 

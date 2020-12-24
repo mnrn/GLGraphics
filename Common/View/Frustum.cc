@@ -16,6 +16,20 @@ void Frustum::SetupPerspective(float fovy, float aspectRatio, float near,
   ar_ = aspectRatio;
   near_ = near;
   far_ = far;
+
+  type_ = ProjectionType::Perspective;
+}
+
+void Frustum::SetupOrtho(float left, float right, float bottom, float top,
+  float near, float far) {
+  left_ = left;
+  right_ = right;
+  bottom_ = bottom;
+  top_ = top;
+  near_ = near;
+  far_ = far;
+
+  type_ = ProjectionType::Ortho;
 }
 
 void Frustum::SetupCorners(const glm::vec3 &eyePt, const glm::vec3 &lookatPt,
@@ -46,7 +60,11 @@ void Frustum::SetupCorners(const glm::vec3 &eyePt, const glm::vec3 &lookatPt,
 }
 
 glm::mat4 Frustum::GetProjectionMatrix() const {
-  return glm::perspective(glm::radians(fovy_), ar_, near_, far_);
+  if (type_ == ProjectionType::Perspective) {
+    return glm::perspective(glm::radians(fovy_), ar_, near_, far_);
+  } else {
+    return glm::ortho(left_, right_, bottom_, top_, near_, far_);
+  }
 }
 
 AABB Frustum::ComputeAABB(const glm::mat4 &m) const {

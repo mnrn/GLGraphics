@@ -10,63 +10,45 @@
 CascadedShadowMapsFBO::~CascadedShadowMapsFBO() { OnDestroy(); }
 
 bool CascadedShadowMapsFBO::OnInit(int cascades, int w, int h) {
-  // ƒVƒƒƒhƒEƒ}ƒbƒv‚Ì¶¬‚ðs‚¢‚Ü‚·B
-  shadowMaps_.resize(cascades);
-
-  glGenTextures(static_cast<GLsizei>(shadowMaps_.size()), shadowMaps_.data());
-  for (int i = 0; i < cascades; i++) {
-    glBindTexture(GL_TEXTURE_2D, shadowMaps_[i]);
-    glTexStorage2D(GL_TEXTURE_2D, 1, GL_DEPTH_COMPONENT32, w, h);
-
-    // ƒeƒNƒXƒ`ƒƒ‚ÌŠg‘åEk¬‚Ì•û–@‚ðŽw’è‚µ‚Ü‚·B
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-
-    // ƒeƒNƒXƒ`ƒƒ‚ÌŒJ‚è•Ô‚µ‚Ì•û–@‚ðŽw’è‚µ‚Ü‚·B
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-    // ƒeƒNƒXƒ`ƒƒ‚Æƒtƒ‰ƒOƒƒ“ƒg‚Ì”äŠr‚Í‚µ‚Ü‚¹‚ñB
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE);
+  // ã‚·ãƒ£ãƒ‰ã‚¦ãƒžãƒƒãƒ—ç”¨ã®FBOã‚’ç”Ÿæˆã—ã¾ã™ã€‚
+  if (shadowFBO_ != 0) {
+    glDeleteFramebuffers(1, &shadowFBO_);
   }
-
-  // ƒVƒƒƒhƒEƒ}ƒbƒv—p‚ÌFBO‚ð¶¬‚µAƒeƒNƒXƒ`ƒƒ‚ðƒAƒ^ƒbƒ`‚µ‚Ü‚·B
   glGenFramebuffers(1, &shadowFBO_);
   glBindFramebuffer(GL_FRAMEBUFFER, shadowFBO_);
-  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D,
-                         shadowMaps_[0], 0);
-
   glDrawBuffer(GL_NONE);
   glReadBuffer(GL_NONE);
-
-  glBindTexture(GL_TEXTURE_2D, 0);
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+  // ã‚·ãƒ£ãƒ‰ã‚¦ãƒžãƒƒãƒ—ã«ä½¿ç”¨ã™ã‚‹æ·±åº¦ãƒ†ã‚¯ã‚¹ãƒãƒ£é…åˆ—ã‚’ç”Ÿæˆã—ã¾ã™ã€‚
+  if (depthTexAry_ != 0) {
+    glDeleteTextures(1, &depthTexAry_);
+  }
+  glGenTextures(1, &depthTexAry_);
+  glBindTexture(GL_TEXTURE_2D_ARRAY, depthTexAry_);
+  glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_DEPTH_COMPONENT24, w, h, cascades, 0,
+               GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
+  glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_COMPARE_FUNC, GL_EQUAL);
+#ifdef USE_PCF
+  glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
+#else
+  glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_COMPARE_MODE, GL_NONE);
+#endif  
+  glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
 
   const GLenum result = glCheckFramebufferStatus(GL_FRAMEBUFFER);
   return result == GL_FRAMEBUFFER_COMPLETE;
 }
 
 void CascadedShadowMapsFBO::OnDestroy() {
+  if (depthTexAry_ != 0) {
+    glDeleteTextures(1, &depthTexAry_);
+  }
   if (shadowFBO_ != 0) {
     glDeleteFramebuffers(1, &shadowFBO_);
   }
-  if (!shadowMaps_.empty()) {
-    glDeleteTextures(static_cast<GLsizei>(shadowMaps_.size()),
-                     shadowMaps_.data());
-  }
-}
-
-
-void CascadedShadowMapsFBO::BindForReading(const std::vector<GLuint>& texUnits) {
-  BOOST_ASSERT_MSG(texUnits.size() == shadowMaps_.size(), "ƒVƒƒƒhƒEƒ}ƒbƒv‚Ì–‡”‚ðŠm”F‚µ‚Ä‚­‚¾‚³‚¢B");
-  for (std::size_t i = 0; i < texUnits.size(); i++) {
-    glActiveTexture(texUnits[i]);
-    glBindTexture(GL_TEXTURE_2D, shadowMaps_[i]);
-  }
-}
-
-void CascadedShadowMapsFBO::BindForWriting(int index) { 
-  glBindFramebuffer(GL_FRAMEBUFFER, shadowFBO_);
-  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D,
-                         shadowMaps_[index], 0);
 }

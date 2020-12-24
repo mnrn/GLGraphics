@@ -22,7 +22,7 @@ uniform struct MaterialInfo {
     float Shininess;  // Specular shininess factor (鏡面反射の強さの係数)
 } Material;
 
-uniform sampler2DShadow ShadowMap;
+uniform sampler2D ShadowMap;
 
 vec4 GammaCorrection(vec4 color) {
     return pow(color, vec4(1.0 / kGamma));
@@ -42,14 +42,23 @@ vec3 PhongDSModel(vec3 pos, vec3 n) {
     return diff + spec;
 }
 
+float ComputeShadow() {
+    float bias = 0.005;
+    float z = (ShadowCoord.z - bias) / ShadowCoord.w;
+    float depth = texture(ShadowMap, ShadowCoord.xy / ShadowCoord.w).r;
+    if (depth < z) {
+        return 0.1;
+    } else {
+        return 1.0;
+    }
+}
+
 void ShadeWithShadow() {
     vec3 amb = Light.La * Material.Ka;
     vec3 diffSpec = PhongDSModel(Position, Normal);
 
-    float shadow = 1.0;
-    if (ShadowCoord.z >= 0.0) {
-        shadow = textureProj(ShadowMap, ShadowCoord);
-    }
+    float shadow = ComputeShadow();
+
     // ピクセルが影の中にある場合、Ambient Light (環境光)のみ使用することになります。
     vec4 color = vec4(diffSpec * shadow + amb, 1.0);
     FragColor = GammaCorrection(color);

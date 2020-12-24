@@ -5,7 +5,7 @@ const int kCascadesNum = 3;
 
 in vec3 Position;
 in vec3 Normal;
-in vec4 LightSpacePos[kCascadesNum];
+in vec4 ShadowCoords[kCascadesNum];
 
 layout(location=0) out vec4 FragColor;
 
@@ -23,10 +23,13 @@ uniform struct MaterialInfo {
     float Shininess;  // Specular shininess factor (鏡面反射の強さの係数)
 } Material;
 
-uniform sampler2D ShadowMaps[kCascadesNum];
+uniform sampler2DArray ShadowMaps;
 uniform float CameraHomogeneousSplitPlanes[kCascadesNum];
-uniform bool IsShadowOnly = false;
-uniform bool IsVisibleIndicator = true;
+//uniform mat4 ShadowMatrices[kCascadesNum];
+
+uniform bool IsShadowOnly = true;
+uniform bool IsVisibleIndicator = false;
+uniform bool IsNoShadow = false;
 
 vec4 GammaCorrection(vec4 color) {
     return pow(color, vec4(1.0 / kGamma));
@@ -46,23 +49,40 @@ vec3 PhongDSModel(vec3 pos, vec3 n) {
     return diff + spec;
 }
 
-float ComputeShadow(int cascadeIdx) {
-    return 1.0f;
+float ComputeShadow(int idx) {
+    if (IsNoShadow) {
+        return 1.0;
+    }
+    vec4 shadowCoord = ShadowCoords[idx] / ShadowCoords[idx].w;
+
+    // GLSLにどのレイヤーのテクスチャを参照すればよいのか教えます。
+    shadowCoord.w = shadowCoord.z;
+    shadowCoord.z = float(idx);
+
+    // 深度値をテクスチャから取り出します。
+    float depth = texture(ShadowMaps, shadowCoord.xyz).x;
+    
+    // フラグメントとライトの距離と深度値の差分を計算します。
+    float diff = depth - shadowCoord.w;
+    
+    // エイリアシングを避けるために少し補間をかけます。
+    return clamp(diff * 250.0 + 1.0, 0.0, 1.0);
 }
 
 void ShadeWithShadow() {
     vec3 amb = Light.La * Material.Ka;
     vec3 diffSpec = PhongDSModel(Position, Normal);
 
-    float shadow = 1.0;
+    // 該当するシャドウマップを探します。
     int idx = 0;
     for (int i = 0; i < kCascadesNum; i++) {
-        if (gl_FragCoord.z < CameraHomogeneousSplitPlanes[i]) {
-            shadow = ComputeShadow(i);
+        if (gl_FragCoord.z <= CameraHomogeneousSplitPlanes[i]) {
             idx = i;
             break;
         }
     }
+    // 影の算出を行います。
+    float shadow = ComputeShadow(idx);
 
     // ピクセルが影の中にある場合、Ambient Light (環境光)のみ使用することになります。
     vec4 color = vec4(diffSpec * shadow + amb, 1.0);
@@ -73,11 +93,11 @@ void ShadeWithShadow() {
     if (IsVisibleIndicator) {
         vec4 indicator = vec4(0.0, 0.0, 0.0, 0.0);
         if (idx == 0) {
-            indicator = vec4(0.5, 0.0, 0.0, 0.0);
+            indicator = vec4(0.2, 0.0, 0.0, 0.0);
         } else if (idx == 1) {
-            indicator = vec4(0.0, 0.5, 0.0, 0.0);
+            indicator = vec4(0.0, 0.2, 0.0, 0.0);
         } else if (idx == 2) {
-            indicator = vec4(0.0, 0.0, 0.5, 0.0);
+            indicator = vec4(0.0, 0.0, 0.2, 0.0);
         }
         color += indicator;
     }

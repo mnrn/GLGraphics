@@ -8,6 +8,9 @@
 #include <glm/gtc/constants.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <iostream>
+#include <glm/gtx/string_cast.hpp>
+#include <spdlog/spdlog.h>
+#include <spdlog/sinks/basic_file_sink.h>
 
 #include "HID/KeyInput.h"
 #include "UI/Font.h"
@@ -18,8 +21,14 @@
 // ********************************************************************************
 
 static constexpr float kCameraFOVY = 50.0f;
+static constexpr float kCameraNear = 0.1f;
+static constexpr float kCameraFar = 10.0f;
+
 static constexpr float kLightFOVY = 40.0f;
-static constexpr float kRotSpeed = 0.2f;
+static constexpr float kLightNear = 0.1f;
+static constexpr float kLightFar = 10.0f;
+
+static constexpr float kRotSpeed = 0.0f;
 static constexpr int kShadowMapWidth = 1024;
 static constexpr int kShadowMapHeight = 1024;
 
@@ -32,11 +41,15 @@ static constexpr float kCameraRadius = 1.8f;
 static constexpr glm::vec3 kLightColor{0.85f};
 static constexpr glm::vec3 kDefaultLightPosition{-2.5f, 2.0f, -2.5f};
 
+static constexpr auto kLogName = "PCFLog";
+
 // ********************************************************************************
 // Override functions
 // ********************************************************************************
 
 void ScenePCF::OnInit() {
+  spdlog::basic_logger_mt(kLogName, "./Logs/PCFMat4.txt");
+
   KeyInput::Create();
   Text::Create();
   Font::Create();
@@ -67,6 +80,7 @@ void ScenePCF::OnInit() {
 void ScenePCF::OnDestroy() {
   glDeleteBuffers(1, &shadowFBO_);
   glDeleteTextures(1, &depthTex_);
+  spdlog::drop_all();
 }
 
 void ScenePCF::OnUpdate(float t) {
@@ -106,7 +120,7 @@ void ScenePCF::OnRender() {
   glDisable(GL_CULL_FACE);
   glDisable(GL_DEPTH_TEST);
 
-  DrawText();
+  DrawStatus();
 }
 
 void ScenePCF::OnResize(int w, int h) {
@@ -137,14 +151,24 @@ std::optional<std::string> ScenePCF::CompileAndLinkShader() {
 }
 
 void ScenePCF::SetMatrices() {
-  const glm::mat4 mv = view_ * model_;
+  const glm::mat4 kLightView = lightView_.GetViewMatrix();
+  const glm::mat4 kLightProj = lightView_.GetProjectionMatrix();
+  const glm::mat4 kLightVP = kLightProj * kLightView;
+
   if (pass_ == kRecordDepth) {
-    progs_[kRecordDepth].SetUniform("MVP", proj_ * mv);
+    const glm::mat4 mvp = kLightVP * model_;
+    progs_[kRecordDepth].SetUniform("MVP", mvp);
+    spdlog::get(kLogName)->info(glm::to_string(mvp));
   } else if (pass_ == kShadeWithShadow) {
+    const glm::mat4 mv = view_ * model_;
     progs_[kShadeWithShadow].SetUniform("ModelViewMatrix", mv);
     progs_[kShadeWithShadow].SetUniform("NormalMatrix", glm::mat3(mv));
-    progs_[kShadeWithShadow].SetUniform("MVP", proj_ * mv);
-    progs_[kShadeWithShadow].SetUniform("ShadowMatrix", lightPV_ * model_);
+
+    const glm::mat4 mvp = proj_ * mv;
+    progs_[kShadeWithShadow].SetUniform("MVP", mvp);
+    const glm::mat4 kLightMVP = kShadowBias * kLightVP * model_;
+    progs_[kShadeWithShadow].SetUniform("ShadowMatrix", kLightMVP);
+    spdlog::get(kLogName)->info(glm::to_string(kLightMVP));
   }
 }
 
@@ -267,7 +291,7 @@ void ScenePCF::DrawScene() {
   plane_.Render();
 }
 
-void ScenePCF::DrawText() {
+void ScenePCF::DrawStatus() {
   if (!fontObj_) {
     return;
   }
@@ -311,13 +335,11 @@ void ScenePCF::SetupCamera() {
                       glm::vec3(0.0f, 1.0f, 0.0f));
   camera_.SetupPerspective(
       kCameraFOVY, static_cast<float>(width_) / static_cast<float>(height_),
-      0.1f, 100.0f);
+      kCameraNear, kCameraFar);
 }
 
 void ScenePCF::SetupLight() {
   lightView_.SetupOrient(kDefaultLightPosition, glm::vec3(0.0f),
                          glm::vec3(0.0f, 1.0f, 0.0f));
-  lightView_.SetupPerspective(kLightFOVY, 1.0f, 1.0f, 100.0f);
-  lightPV_ = kShadowBias * lightView_.GetProjectionMatrix() *
-             lightView_.GetViewMatrix();
+  lightView_.SetupPerspective(kLightFOVY, 1.0f, kLightNear, kLightFar);
 }

@@ -10,18 +10,17 @@
 
 class CascadedShadowMapsFBO {
 public:
+  CascadedShadowMapsFBO() :depthTexAry_(0), shadowFBO_(0) {}
   ~CascadedShadowMapsFBO();
 
   bool OnInit(int cascades, int w, int h);
   void OnDestroy();
 
-  void BindForWriting(int index);
-  void BindForReading(const std::vector<GLuint>& texUnits);
-
   GLuint GetShadowFBO() const { return shadowFBO_; }
+  GLuint GetDepthTextureArray() const { return depthTexAry_; }
 
 private:
-  std::vector<GLuint> shadowMaps_{};
+  GLuint depthTexAry_ = 0;
   GLuint shadowFBO_ = 0;
 };
 

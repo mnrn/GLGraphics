@@ -18,6 +18,10 @@ void Camera::SetupPerspective(float fovy, float aspectRatio, float near,
   frustum_.SetupPerspective(fovy, aspectRatio, near, far);
 }
 
+void Camera::SetupOrtho(float left, float right, float bottom, float top, float near, float far) {
+  frustum_.SetupOrtho(left, right, bottom, top, near, far);
+}
+
 glm::mat4 Camera::GetViewMatrix() const {
   const glm::vec3 n = glm::normalize(eyePt_ - lookatPt_);
   const glm::vec3 u = glm::normalize(glm::cross(upVec_, n));

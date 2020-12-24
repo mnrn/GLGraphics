@@ -48,8 +48,11 @@ private:
   void DrawScene();
   void DrawStatus();
 
-  void UpdateSplitPlanes(int cascades, float near, float far);
-  void UpdateFrustumPoints(Frustum &frustum);
+  std::vector<float> ComputeSplitPlanes(int cascades, float near, float far);
+  void UpdateFrustumsInWorldSpace(int cascades, const std::vector<float> splits);
+  void UpdateSplitPlanesUniform(int cascades, const std::vector<float> splits);
+  void UpdateCropMatrices(int cascades);
+  glm::mat4 ComputeCropMatrix(const AABB &bbox) const;
 
   Camera camera_;
   Camera lightView_;
@@ -61,8 +64,6 @@ private:
   float tPrev_ = 0.0f;
   float angle_ = glm::two_pi<float>() * 0.85f;
 
-  glm::mat4 lightPV_{1.0f};
-
   enum RenderPass : std::int32_t {
     kRecordDepth,
     kShadeWithShadow,
@@ -73,10 +74,7 @@ private:
   int cascadeIdx_ = 0;
 
   CascadedShadowMapsFBO csmFBO_{};
-  std::vector<float> splitPlanes_{};
   std::vector<Frustum> cascadedFrustums_{};
-
-  std::unique_ptr<FontObj> fontObj_;
 };
 
 #endif

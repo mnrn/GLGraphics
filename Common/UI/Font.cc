@@ -53,8 +53,10 @@ std::unique_ptr<FontObj> Font::Entry(const std::string &fontpath) {
 
 void FontObj::OnDestroy() {
 
-  for (auto [k, v] : chars_) {
-    glDeleteTextures(1, &v.texID);
+  if (!chars_.empty()) {
+    for (auto [k, v] : chars_) {
+      glDeleteTextures(1, &v.texID);
+    }
   }
 
   if (face_ != nullptr) {

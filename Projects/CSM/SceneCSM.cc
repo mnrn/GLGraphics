@@ -9,6 +9,9 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <iostream>
 #include <cmath>
+#include <glm/gtx/string_cast.hpp>
+#include <spdlog/spdlog.h>
+#include <spdlog/sinks/basic_file_sink.h>
 
 #define FMT_HEADER_ONLY
 #include <fmt/format.h>
@@ -54,19 +57,14 @@ static constexpr float kCameraRadius = 1.8f;
 static constexpr glm::vec3 kLightColor{0.85f};
 static constexpr glm::vec3 kDefaultLightPosition{-2.5f, 2.0f, -2.5f};
 
+static constexpr auto kLogName = "CSMLog";
+
 // ********************************************************************************
 // Override functions
 // ********************************************************************************
 
 void SceneCSM::OnInit() {
-  KeyInput::Create();
-  Text::Create();
-  Font::Create();
-
-  if ((fontObj_ = Font::Get().Entry(
-           "./Assets/Fonts/UbuntuMono/UbuntuMono-Regular.ttf"))) {
-    fontObj_->SetupWithSize(28);
-  }
+  spdlog::basic_logger_mt(kLogName, "./Logs/CSMMat4.txt");
 
   SetupCamera();
   SetupLight();
@@ -79,18 +77,16 @@ void SceneCSM::OnInit() {
     progs_[kShadeWithShadow].SetUniform("Light.La", kLightColor);
     progs_[kShadeWithShadow].SetUniform("Light.Ld", kLightColor);
     progs_[kShadeWithShadow].SetUniform("Light.Ls", kLightColor);
-    for (int i = 0; i < kCascadedNum; i++) {
-      std::string shadow = fmt::format("ShadowMaps[{}]", i);
-      progs_[kShadeWithShadow].SetUniform(shadow.c_str(), i);
-    }
+    progs_[kShadeWithShadow].SetUniform("ShadowMaps", 0);
   }
 
   // CSM用のFBOの初期化を行います。
-  csmFBO_.OnInit(kCascadedNum, kShadowMapWidth, kShadowMapHeight);
+  if (!csmFBO_.OnInit(kCascadedNum, kShadowMapWidth, kShadowMapHeight)) {
+    BOOST_ASSERT_MSG(false, "Framebuffer is not complete.");
+  }
 }
 
-void SceneCSM::OnDestroy() {
-}
+void SceneCSM::OnDestroy() { spdlog::drop_all(); }
 
 void SceneCSM::OnUpdate(float t) {
   const float deltaT = tPrev_ == 0.0f ? 0.0f : t - tPrev_;
@@ -113,10 +109,14 @@ void SceneCSM::OnRender() {
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_CULL_FACE);
 
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D_ARRAY, csmFBO_.GetDepthTextureArray());
   {
     Pass1();
     Pass2();
   }
+  glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
+
   glDisable(GL_CULL_FACE);
   glDisable(GL_DEPTH_TEST);
 
@@ -129,7 +129,10 @@ void SceneCSM::OnResize(int w, int h) {
 }
 
 void SceneCSM::OnPreRender() {
-  UpdateSplitPlanes(kCascadedNum, kCameraNear, kCameraFar);
+  const auto splits = ComputeSplitPlanes(kCascadedNum, kCameraNear, kCameraFar);
+  UpdateSplitPlanesUniform(kCascadedNum, splits);
+  //UpdateFrustumsInWorldSpace(kCascadedNum, splits);
+  //UpdateCropMatrices(kCascadedNum);
 }
 
 // ********************************************************************************
@@ -155,18 +158,28 @@ std::optional<std::string> SceneCSM::CompileAndLinkShader() {
 }
 
 void SceneCSM::SetMatrices() {
-  const glm::mat4 mv = view_ * model_;
+  const glm::mat4 kLightView = lightView_.GetViewMatrix();
+  const glm::mat4 kLightProj = lightView_.GetProjectionMatrix();
+  const glm::mat4 kLightVP = kLightProj * kLightView;
+
   if (pass_ == kRecordDepth) {
-    progs_[kRecordDepth].SetUniform("MVP", proj_ * mv);
+    const glm::mat4 mvp = kLightVP * model_;
+    progs_[kRecordDepth].SetUniform("MVP", mvp);
+    spdlog::get(kLogName)->info(glm::to_string(mvp));
   } else if (pass_ == kShadeWithShadow) {
+    const glm::mat4 mv = view_ * model_;
     progs_[kShadeWithShadow].SetUniform("ModelViewMatrix", mv);
     progs_[kShadeWithShadow].SetUniform("NormalMatrix", glm::mat3(mv));
 
     const glm::mat4 mvp = proj_ * mv;
     progs_[kShadeWithShadow].SetUniform("MVP", mvp);
-
-    std::string lightMVP = fmt::format("LightMVP[{}]", cascadeIdx_);
-    progs_[kShadeWithShadow].SetUniform(lightMVP.c_str(), lightPV_ * model_);
+    
+    const glm::mat4 kLightMVP = kShadowBias * kLightVP * model_;
+    spdlog::get(kLogName)->info(glm::to_string(kLightMVP));
+    for (int i = 0; i < kCascadedNum; i++) {
+      const std::string kUniLiMVP = fmt::format("ShadowMatrices[{}]", i);
+      progs_[kShadeWithShadow].SetUniform(kUniLiMVP.c_str(), kLightMVP);
+    }
   }
 }
 
@@ -196,17 +209,15 @@ void SceneCSM::Pass1() {
   glEnable(GL_POLYGON_OFFSET_FILL);
   glPolygonOffset(2.5f, 10.0f);
 
-  view_ = lightView_.GetViewMatrix();
-  proj_ = lightView_.GetProjectionMatrix();
-
+  glBindFramebuffer(GL_FRAMEBUFFER, csmFBO_.GetShadowFBO());
   progs_[kRecordDepth].Use();
-  for (int i = 0; i < kSplitPlanesNum; i++) {
+  for (int i = 0; i < kCascadedNum; i++) {
     cascadeIdx_ = i;
-    // TODO: ライトの射影変換行列の計算
+    glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
+                              csmFBO_.GetDepthTextureArray(), 0, i);
+    glClear(GL_DEPTH_BUFFER_BIT);
 
     // ライトから見たシーンの描画
-    glClear(GL_DEPTH_BUFFER_BIT);
-    csmFBO_.BindForWriting(i);
     DrawScene();
   }
 
@@ -225,11 +236,9 @@ void SceneCSM::Pass2() {
   progs_[kShadeWithShadow].SetUniform(
       "Light.Position", view_ * glm::vec4(lightView_.GetPosition(), 1.0f));
 
-  //glBindFramebuffer(GL_FRAMEBUFFER, 0);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glViewport(0, 0, width_, height_);
 
-  csmFBO_.BindForReading({GL_TEXTURE0, GL_TEXTURE1, GL_TEXTURE2});
   DrawScene();
 }
 
@@ -254,18 +263,6 @@ void SceneCSM::DrawScene() {
 }
 
 void SceneCSM::DrawStatus() {
-  if (!fontObj_) {
-    return;
-  }
-  const float kBaseX = 25.0f;
-  const float kBaseY = static_cast<float>(height_) - 40.0f;
-  const float kOffsetY = -36.0f;
-
-  Text::Get().Begin(width_, height_);
-  {
-
-  }
-  Text::Get().End();
 }
 
 // ********************************************************************************
@@ -286,39 +283,90 @@ void SceneCSM::SetupLight() {
   lightView_.SetupOrient(kDefaultLightPosition, glm::vec3(0.0f),
                          glm::vec3(0.0f, 1.0f, 0.0f));
   lightView_.SetupPerspective(kLightFOVY, 1.0f, kLightNear, kLightFar);
-  lightPV_ = kShadowBias * lightView_.GetProjectionMatrix() *
-             lightView_.GetViewMatrix();
 }
 
 // ********************************************************************************
 // Calculation
 // ********************************************************************************
 
-void SceneCSM::UpdateSplitPlanes(int cascades, float near, float far) {
-  splitPlanes_.clear();
+std::vector<float> SceneCSM::ComputeSplitPlanes(int cascades, float near, float far) {
   if (cascades < 1) {
     cascades = 1;
   }
 
-  splitPlanes_.resize(cascades + 1);
-  splitPlanes_[0] = near;
-  splitPlanes_[cascades] = far;
-
+  std::vector<float> splits(cascades + 1);
+  splits[0] = near;
+  splits[cascades] = far;
   for (int i = 1; i < cascades; i++) {
     const float cilog =
         near * std::powf(far / near, static_cast<float>(i) / static_cast<float>(cascades));
     const float ciuni = near + (far - near) * static_cast<float>(i) / cascades;
-    splitPlanes_[i] = kLambda * cilog + ciuni * (1.0f - kLambda);
+    splits[i] = kLambda * cilog + ciuni * (1.0f - kLambda);
   }
+  return splits;
+}
 
-  progs_[kShadeWithShadow].Use();
+void SceneCSM::UpdateFrustumsInWorldSpace(int cascades, const std::vector<float> splits) {
+  const float kAspectRatio =
+      static_cast<float>(width_) / static_cast<float>(height_);
+
+  cascadedFrustums_.clear();
+  cascadedFrustums_.resize(cascades);
   for (int i = 0; i < cascades; i++) {
-    // カメラから見た Split Planes の同次座標系におけるz位置を計算します。
+    cascadedFrustums_[i].SetupPerspective(kCameraFOVY, kAspectRatio, splits[i],
+                                          splits[i + 1]);
+    cascadedFrustums_[i].SetupCorners(camera_.GetPosition(),
+                                      camera_.GetTarget(), camera_.GetUpVec());
+  }
+}
+
+void SceneCSM::UpdateSplitPlanesUniform(int cascades,
+  const std::vector<float> splits) {
+  progs_[kShadeWithShadow].Use();
+  // カメラから見た Split Planes の同次座標系におけるz位置を計算します。
+  for (int i = 0; i < cascades; i++) {
     const glm::mat4 proj = camera_.GetProjectionMatrix();
-    const float clip = 0.5f * (-splitPlanes_[i + 1] * proj[2][2] + proj[3][2]) /
-                           splitPlanes_[i + 1] +
-                       0.5f;
-    std::string plane = fmt::format("CameraHomogeneousSplitPlanes[{}]", i);
+    const float clip =
+        0.5f * (-splits[i + 1] * proj[2][2] + proj[3][2]) / splits[i + 1] +
+        0.5f;
+    const std::string plane = fmt::format("CameraHomogeneousSplitPlanes[{}]", i);
     progs_[kShadeWithShadow].SetUniform(plane.c_str(), clip);
   }
+}
+
+void SceneCSM::UpdateCropMatrices(int cascades) {
+  /*
+  const glm::mat4 kLightView = lightView_.GetViewMatrix();
+  const glm::mat4 kLightProj = lightView_.GetProjectionMatrix();
+
+  cropMatrices_.clear();
+  cropMatrices_.resize(cascades);
+  for (int i = 0; i < cascades; i++) {
+    // ライトから見た視錐台のAABBを計算します。
+    AABB bbox = cascadedFrustums_[i].ComputeAABB(kLightView);
+
+    // 算出した視錐台のAABBから CropMatrix を計算します。
+    cropMatrices_[i] = ComputeCropMatrix(bbox);
+    cropMatrices_[i] = glm::mat4(1.0f);
+  }
+  */
+}
+
+glm::mat4 SceneCSM::ComputeCropMatrix(const AABB& bbox) const {
+  const auto [mini, maxi] = bbox.GetMinMax();
+  const float sx = 2.0f / (maxi.x - mini.x);
+  const float sy = 2.0f / (maxi.y - mini.y);
+  const float ox = -0.5f * (maxi.x + mini.x) * sx;
+  const float oy = -0.5f * (maxi.y + mini.y) * sy;
+#if true
+  return glm::mat4(
+      glm::vec4(sx, 0.0f, 0.0f, 0.0f), glm::vec4(0.0f, sy, 0.0f, 0.0f),
+      glm::vec4(0.0f, 0.0f, 1.0f, 0.0f), glm::vec4(ox, oy, 0.0f, 1.0f));
+#else
+  const float sz = 1.0f / (maxi.z - mini.z);
+  const float oz = -mini.z * sz;
+  return glm::mat4(glm::vec4(sx, 0.0f, 0.0f, ox), glm::vec4(0.0f, sy, 0.0f, oy),
+                   glm::vec4(0.0f, 0.0f, sz, oz),
+                   glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+#endif
 }

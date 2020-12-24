@@ -35,6 +35,7 @@ struct FontChar {
 
 class FontObj {
 public:
+  FontObj() = default;
   explicit FontObj(FT_Face face) : face_(face) {}
   ~FontObj() { OnDestroy(); }
   FontObj(const FontObj &) = default;
