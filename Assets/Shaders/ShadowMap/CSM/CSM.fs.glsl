@@ -25,10 +25,9 @@ uniform struct MaterialInfo {
 
 uniform sampler2DArray ShadowMaps;
 uniform float CameraHomogeneousSplitPlanes[kCascadesNum];
-//uniform mat4 ShadowMatrices[kCascadesNum];
 
 uniform bool IsShadowOnly = false;
-uniform bool IsVisibleIndicator = true;
+uniform bool IsVisibleIndicator = false;
 uniform bool IsNoShadow = false;
 uniform bool IsShadowTarget = false;
 uniform int Target = 1;
@@ -71,12 +70,6 @@ float ComputeShadow(int idx) {
     } else {
         return 1.0;
     }
-
-    // フラグメントとライトの距離と深度値の差分を計算します。
-    float diff = depth - shadowCoord.w;
-    
-    // エイリアシングを避けるために少し補間をかけます。
-    return clamp(diff * 250.0 + 1.0, 0.0, 1.0);
 }
 
 void ShadeWithShadow() {
