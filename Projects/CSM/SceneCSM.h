@@ -49,10 +49,15 @@ private:
   void DrawStatus();
 
   std::vector<float> ComputeSplitPlanes(int cascades, float near, float far);
-  void UpdateFrustumsInWorldSpace(int cascades, const std::vector<float> splits);
+  void UpdateFrustums(int cascades, const std::vector<float> splits);
   void UpdateSplitPlanesUniform(int cascades, const std::vector<float> splits);
   void UpdateCropMatrices(int cascades);
-  glm::mat4 ComputeCropMatrix(const AABB &bbox) const;
+  glm::mat4 ComputeCropMatrix(const glm::vec3& min, const glm::vec3& max) const;
+
+  std::pair<float, float> FindZRange(const Frustum &frustum,
+                                     const glm::mat4 &mv) const;
+  std::pair<glm::vec2, glm::vec2> FindExtendsProj(const Frustum &frustum,
+                                                  const glm::mat4 &mvp) const;
 
   Camera camera_;
   Camera lightView_;
@@ -74,7 +79,9 @@ private:
   int cascadeIdx_ = 0;
 
   CascadedShadowMapsFBO csmFBO_{};
+  std::vector<AABB> caster_{};
   std::vector<Frustum> cascadedFrustums_{};
+  std::vector<glm::mat4> projCrop_{};
 };
 
 #endif

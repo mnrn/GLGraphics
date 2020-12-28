@@ -4,7 +4,7 @@
 #include <optional>
 #include <vector>
 
-#include "BBox/AABB.h"
+#include "Geometry/AABB.h"
 #include "Drawable.h"
 
 class TriangleMesh : public Drawable {

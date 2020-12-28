@@ -5,12 +5,11 @@
 #include <limits>
 #include <utility>
 
-class AABB {
-public:
+struct AABB {
   AABB() { Reset(); }
   void Reset() {
     min_ = glm::vec3(std::numeric_limits<float>::max());
-    max_ = glm::vec3(std::numeric_limits<float>::min());
+    max_ = glm::vec3(std::numeric_limits<float>::lowest());
   }
 
   void Merge(const glm::vec3 &pt) { Merge(pt.x, pt.y, pt.z); }
@@ -26,11 +25,6 @@ public:
     max_.z = std::fmax(max_.z, z);
   }
 
-  std::pair<glm::vec3, glm::vec3> GetMinMax() const {
-    return std::make_pair(min_, max_);
-  }
-
-private:
   glm::vec3 min_;
   glm::vec3 max_;
 };

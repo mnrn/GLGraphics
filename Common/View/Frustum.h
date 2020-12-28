@@ -5,7 +5,6 @@
 #include <array>
 #include <vector>
 
-#include "BBox/AABB.h"
 #include "Primitive/Drawable.h"
 
 enum struct ProjectionType {
@@ -30,7 +29,6 @@ public:
 
   glm::mat4 GetProjectionMatrix() const;
   glm::vec3 GetCorner(std::size_t idx) const { return corners_.at(idx); }
-  AABB ComputeAABB(const glm::mat4 &m) const;
 
 private:
   ProjectionType type_;

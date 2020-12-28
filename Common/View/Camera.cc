@@ -23,15 +23,7 @@ void Camera::SetupOrtho(float left, float right, float bottom, float top, float 
 }
 
 glm::mat4 Camera::GetViewMatrix() const {
-  const glm::vec3 n = glm::normalize(eyePt_ - lookatPt_);
-  const glm::vec3 u = glm::normalize(glm::cross(upVec_, n));
-  const glm::vec3 v = glm::normalize(glm::cross(n, u));
-
-  const glm::mat4 rot(u.x, v.x, n.x, 0.0f, u.y, v.y, n.y, 0.0f, u.z, v.z, n.z,
-                      0.0f, 0.0f, 0.0f, 0.0f, 1.0f);
-  const glm::mat4 trans = glm::translate(
-      glm::mat4(1.0f), glm::vec3(-eyePt_.x, -eyePt_.y, -eyePt_.z));
-  return rot * trans;
+  return glm::lookAt(eyePt_, lookatPt_, upVec_);
 }
 
 glm::mat4 Camera::GetInverseViewMatrix() const {

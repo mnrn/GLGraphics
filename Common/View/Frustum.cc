@@ -57,6 +57,24 @@ void Frustum::SetupCorners(const glm::vec3 &eyePt, const glm::vec3 &lookatPt,
   corners_[5] = fc - u * fdx + v * fdy;
   corners_[6] = fc + u * fdx + v * fdy;
   corners_[7] = fc + u * fdx - v * fdy;
+
+  corners_[0] = glm::vec3(-1.0, 1.0, 1.0);
+  corners_[1] = glm::vec3(1.0, 1.0, 1.0);
+  corners_[2] = glm::vec3(1.0, -1.0, 1.0);
+  corners_[3] = glm::vec3(-1.0, -1.0, 1.0);
+       
+  corners_[4] = glm::vec3(-1.0, 1.0, -1.0);
+  corners_[5] = glm::vec3(1.0, 1.0, -1.0);
+  corners_[6] = glm::vec3(1.0, -1.0, -1.0);
+  corners_[7] = glm::vec3(-1.0, -1.0, -1.0);
+
+  const auto kView = glm::lookAt(eyePt, lookatPt, upVec);
+  const auto kProj = GetProjectionMatrix(); 
+  const auto kInvVP = glm::inverse(kProj * kView);
+  for (int i = 0; i < 8; i++) {
+    const auto corner = kInvVP * glm::vec4(corners_[i], 1.0f);
+    corners_[i] = glm::vec3(corner) / corner.w;
+  }
 }
 
 glm::mat4 Frustum::GetProjectionMatrix() const {
@@ -65,12 +83,4 @@ glm::mat4 Frustum::GetProjectionMatrix() const {
   } else {
     return glm::ortho(left_, right_, bottom_, top_, near_, far_);
   }
-}
-
-AABB Frustum::ComputeAABB(const glm::mat4 &m) const {
-  AABB box;
-  for (const auto corner : corners_) {
-    box.Merge(glm::vec3(m * glm::vec4(corner, 1.0f)));
-  }
-  return box;
 }

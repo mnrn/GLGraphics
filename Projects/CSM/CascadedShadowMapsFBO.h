@@ -10,7 +10,6 @@
 
 class CascadedShadowMapsFBO {
 public:
-  CascadedShadowMapsFBO() :depthTexAry_(0), shadowFBO_(0) {}
   ~CascadedShadowMapsFBO();
 
   bool OnInit(int cascades, int w, int h);

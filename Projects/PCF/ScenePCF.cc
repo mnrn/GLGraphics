@@ -41,14 +41,14 @@ static constexpr float kCameraRadius = 1.8f;
 static constexpr glm::vec3 kLightColor{0.85f};
 static constexpr glm::vec3 kDefaultLightPosition{-2.5f, 2.0f, -2.5f};
 
-static constexpr auto kLogName = "PCFLog";
+#define LOG_NAME "PCFLog"
 
 // ********************************************************************************
 // Override functions
 // ********************************************************************************
 
 void ScenePCF::OnInit() {
-  spdlog::basic_logger_mt(kLogName, "./Logs/PCFMat4.txt");
+  spdlog::basic_logger_mt(LOG_NAME, "./Logs/PCFMat4.txt");
 
   KeyInput::Create();
   Text::Create();
@@ -158,7 +158,6 @@ void ScenePCF::SetMatrices() {
   if (pass_ == kRecordDepth) {
     const glm::mat4 mvp = kLightVP * model_;
     progs_[kRecordDepth].SetUniform("MVP", mvp);
-    spdlog::get(kLogName)->info(glm::to_string(mvp));
   } else if (pass_ == kShadeWithShadow) {
     const glm::mat4 mv = view_ * model_;
     progs_[kShadeWithShadow].SetUniform("ModelViewMatrix", mv);
@@ -168,7 +167,7 @@ void ScenePCF::SetMatrices() {
     progs_[kShadeWithShadow].SetUniform("MVP", mvp);
     const glm::mat4 kLightMVP = kShadowBias * kLightVP * model_;
     progs_[kShadeWithShadow].SetUniform("ShadowMatrix", kLightMVP);
-    spdlog::get(kLogName)->info(glm::to_string(kLightMVP));
+  
   }
 }
 
