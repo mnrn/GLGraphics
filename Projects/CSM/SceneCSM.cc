@@ -5,13 +5,13 @@
 #include "SceneCSM.h"
 
 #include <boost/assert.hpp>
+#include <cmath>
 #include <glm/gtc/constants.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include <iostream>
-#include <cmath>
 #include <glm/gtx/string_cast.hpp>
-#include <spdlog/spdlog.h>
+#include <iostream>
 #include <spdlog/sinks/basic_file_sink.h>
+#include <spdlog/spdlog.h>
 
 #define FMT_HEADER_ONLY
 #include <fmt/format.h>
@@ -38,16 +38,15 @@ static constexpr float kLambda = 0.5f;
 
 static constexpr float kCameraFOVY = 50.0f;
 static constexpr float kCameraNear = 0.3f;
-static constexpr float kCameraFar = 10.0f;
+static constexpr float kCameraFar = 8.0f;
 
-static constexpr float kCameraRadius = 2.0f;
+static constexpr float kCameraRadius = 2.25f;
 static constexpr float kCameraDefaultAngle = glm::two_pi<float>() * 0.85f;
 
 static constexpr glm::vec3 kLightDefaultPosition{-2.0f, 2.0f, -2.0f};
-
-static constexpr float kLightFOVY = 50.0f;
-static constexpr float kLightNear = 0.1f;
-static constexpr float kLightFar = 20.1f;
+static constexpr glm::vec3 kLightDefaultTarget{0.0f};
+static constexpr glm::vec3 kLightDefaultDir =
+    kLightDefaultTarget - kLightDefaultPosition;
 
 static constexpr float kLightRadius = 20.0f;
 static constexpr float kLightLeft = kLightDefaultPosition.x - kLightRadius;
@@ -55,9 +54,10 @@ static constexpr float kLightRight = kLightDefaultPosition.x + kLightRadius;
 static constexpr float kLightBottom = kLightDefaultPosition.y - kLightRadius;
 static constexpr float kLightTop = kLightDefaultPosition.y + kLightRadius;
 
-static constexpr float kRotSpeed = 0.0f;
-static constexpr int kShadowMapWidth = 1024;
-static constexpr int kShadowMapHeight = 1024;
+static constexpr float kRotSpeed = 0.5f;
+static constexpr int kShadowMapSize = 2048;
+static constexpr int kShadowMapWidth = kShadowMapSize;
+static constexpr int kShadowMapHeight = kShadowMapSize;
 
 static constexpr glm::vec3 kLightColor{0.85f};
 static constexpr glm::mat4 kShadowBias{0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 0.5f,
@@ -66,7 +66,6 @@ static constexpr glm::mat4 kShadowBias{0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 0.5f,
 
 #define CROP_LOG_NAME "CSM_CropLog"
 #define CROP_LOG_PATH "./Logs/CSMCrop.txt"
-
 #define SPLIT_LOG_NAME "CSM_SplitLog"
 #define SPLIT_LOG_PATH "./Logs/CSMSplit.txt"
 
@@ -170,10 +169,8 @@ std::optional<std::string> SceneCSM::CompileAndLinkShader() {
 }
 
 void SceneCSM::SetMatrices() {
-  const glm::mat4 kLightView = lightView_.GetViewMatrix();
-
   if (pass_ == kRecordDepth) {
-    const glm::mat4 mvp = projCrop_[cascadeIdx_] * kLightView * model_;
+    const glm::mat4 mvp = vpCrop_[cascadeIdx_] * model_;
     progs_[kRecordDepth].SetUniform("MVP", mvp);
   } else if (pass_ == kShadeWithShadow) {
     const glm::mat4 mv = view_ * model_;
@@ -182,9 +179,9 @@ void SceneCSM::SetMatrices() {
 
     const glm::mat4 mvp = proj_ * mv;
     progs_[kShadeWithShadow].SetUniform("MVP", mvp);
-    
+
     for (int i = 0; i < kCascadedNum; i++) {
-      const glm::mat4 kLightMVP = kShadowBias * projCrop_[i] * kLightView * model_;
+      const glm::mat4 kLightMVP = kShadowBias * vpCrop_[i] * model_;
       const std::string kUniLiMVP = fmt::format("ShadowMatrices[{}]", i);
       progs_[kShadeWithShadow].SetUniform(kUniLiMVP.c_str(), kLightMVP);
     }
@@ -242,7 +239,7 @@ void SceneCSM::Pass2() {
   view_ = camera_.GetViewMatrix();
   progs_[kShadeWithShadow].Use();
   progs_[kShadeWithShadow].SetUniform(
-      "Light.Position", view_ * glm::vec4(lightView_.GetPosition(), 1.0f));
+      "Light.Position", view_ * glm::vec4(kLightDefaultPosition, 1.0f));
 
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glViewport(0, 0, width_, height_);
@@ -270,8 +267,7 @@ void SceneCSM::DrawScene() {
   plane_.Render();
 }
 
-void SceneCSM::DrawStatus() {
-}
+void SceneCSM::DrawStatus() {}
 
 // ********************************************************************************
 // View
@@ -283,9 +279,10 @@ void SceneCSM::SetupCamera() {
       glm::vec3(kCameraRadius * cos(angle_), 1.0f, kCameraRadius * sin(angle_));
   camera_.SetupOrient(kCamPt, glm::vec3(0.0f, 0.0f, 0.0f),
                       glm::vec3(0.0f, 1.0f, 0.0f));
-  camera_.SetupPerspective(
-      glm::radians(kCameraFOVY), static_cast<float>(width_) / static_cast<float>(height_),
-      kCameraNear, kCameraFar);
+  camera_.SetupPerspective(glm::radians(kCameraFOVY),
+                           static_cast<float>(width_) /
+                               static_cast<float>(height_),
+                           kCameraNear, kCameraFar);
 }
 
 void SceneCSM::SetupLight() {
@@ -297,7 +294,8 @@ void SceneCSM::SetupLight() {
 // Calculation
 // ********************************************************************************
 
-std::vector<float> SceneCSM::ComputeSplitPlanes(int cascades, float near, float far) {
+std::vector<float> SceneCSM::ComputeSplitPlanes(int cascades, float near,
+                                                float far) {
   if (cascades < 1) {
     cascades = 1;
   }
@@ -307,7 +305,8 @@ std::vector<float> SceneCSM::ComputeSplitPlanes(int cascades, float near, float 
   splits[cascades] = far;
   for (int i = 1; i < cascades; i++) {
     const float cilog =
-        near * std::powf(far / near, static_cast<float>(i) / static_cast<float>(cascades));
+        near * std::powf(far / near,
+                         static_cast<float>(i) / static_cast<float>(cascades));
     const float ciuni = near + (far - near) * static_cast<float>(i) / cascades;
     splits[i] = kLambda * cilog + ciuni * (1.0f - kLambda);
   }
@@ -338,47 +337,40 @@ void SceneCSM::UpdateFrustums(int cascades, const std::vector<float> splits) {
   for (int i = 0; i < cascades; i++) {
     const float far =
         (i + 1 != cascades) ? splits[i + 1] : splits[i + 1] * 1.005f;
-    cascadedFrustums_[i].SetupPerspective(kCameraFOVY / 57.2957795f + 0.2f, kAspectRatio, splits[i],
-                                          far);
+    cascadedFrustums_[i].SetupPerspective(kCameraFOVY / 57.2957795f + 0.2f,
+                                          kAspectRatio, splits[i], far);
     cascadedFrustums_[i].SetupCorners(camera_.GetPosition(),
                                       camera_.GetTarget(), camera_.GetUpVec());
   }
 }
 
 void SceneCSM::UpdateCropMatrices(int cascades) {
-  
-  const auto kLightView = lightView_.GetViewMatrix();
-
-  projCrop_.clear();
-  projCrop_.resize(cascades);
+  vpCrop_.clear();
+  vpCrop_.resize(cascades);
   for (int i = 0; i < cascades; i++) {
-    // ライトから見た錐台のzの範囲を見つけます。
-    auto [minZ, maxZ] = FindZRange(cascadedFrustums_[i], kLightView);
+    const BSphere bs = cascadedFrustums_[i].GetSphere();
+    const glm::vec3 radius3 = glm::vec3(bs.radius);
+    const glm::vec3 maxi = radius3;
+    const glm::vec3 mini = -radius3;
+    const glm::vec3 extends = maxi - mini;
 
-    // ライトの同次座標系に投影された錐台の延長を見つけます。
-    const auto kLightProj =
+    const auto kLightView =
+        ComputeLightViewMatrix(kLightDefaultDir, bs.center, mini.z);
 #if true
-      glm::ortho(kLightLeft, kLightRight, kLightBottom, kLightTop, -maxZ, -minZ);
+    const auto kLightProj =
+        glm::ortho(mini.x, maxi.x, mini.y, maxi.y, 0.0f, extends.z);
 #else
-      glm::perspective(glm::radians(kLightFOVY), 1.0f, kLightNear, kLightFar);
+    const auto kLightProj =
+        glm::perspective(glm::radians(kLightFOVY), 1.0f, kLightNear, kLightFar);
 #endif
-    const auto kLightVP = kLightProj * kLightView;
-    const auto [minXY, maxXY] = FindExtendsProj(cascadedFrustums_[i], kLightProj);
 
     // Crop Matrix の計算を行います。
-    const auto mini = glm::vec3(minXY, minZ);
-    const auto maxi = glm::vec3(maxXY, maxZ);
-    const auto kCropMatrix = ComputeCropMatrix(mini, maxi);
-    projCrop_[i] = kCropMatrix * kLightProj;
-
-    spdlog::get(CROP_LOG_NAME)->info(glm::to_string(mini));
-    spdlog::get(CROP_LOG_NAME)->info(glm::to_string(maxi));
-    spdlog::get(CROP_LOG_NAME)->info("End Plane.");
+    vpCrop_[i] = ComputeCropMatrix(kLightView, kLightProj);
   }
-  spdlog::get(CROP_LOG_NAME)->info("End Frustum.");
 }
 
-glm::mat4 SceneCSM::ComputeCropMatrix(const glm::vec3& mini, const glm::vec3& maxi) const {
+glm::mat4 SceneCSM::ComputeCropMatrix(const glm::vec3 &mini,
+                                      const glm::vec3 &maxi) const {
   const float sx = 2.0f / (maxi.x - mini.x);
   const float sy = 2.0f / (maxi.y - mini.y);
   const float ox = -0.5f * (maxi.x + mini.x) * sx;
@@ -390,14 +382,14 @@ glm::mat4 SceneCSM::ComputeCropMatrix(const glm::vec3& mini, const glm::vec3& ma
 #else
   const float sz = 1.0f / (maxi.z - mini.z);
   const float oz = -mini.z * sz;
-  return glm::mat4(glm::vec4(sx, 0.0f, 0.0f, 0.0f), glm::vec4(0.0f, sy, 0.0f, 0.0f),
-                   glm::vec4(0.0f, 0.0f, sz, 0.0f),
-                   glm::vec4(ox, oy, oz, 1.0f));
+  return glm::mat4(
+      glm::vec4(sx, 0.0f, 0.0f, 0.0f), glm::vec4(0.0f, sy, 0.0f, 0.0f),
+      glm::vec4(0.0f, 0.0f, sz, 0.0f), glm::vec4(ox, oy, oz, 1.0f));
 #endif
 }
 
-std::pair<float, float>
-SceneCSM::FindZRange(const Frustum& frustum, const glm::mat4& mv) const {
+std::pair<float, float> SceneCSM::FindZRange(const Frustum &frustum,
+                                             const glm::mat4 &mv) const {
   // ライトから見た錐台のzの範囲を見つけます。
   glm::vec4 trans = mv * glm::vec4(frustum.GetCorner(0), 1.0f);
   float minZ = trans.z;
@@ -415,8 +407,8 @@ SceneCSM::FindZRange(const Frustum& frustum, const glm::mat4& mv) const {
   return std::make_pair(minZ, maxZ);
 }
 
-std::pair<glm::vec2, glm::vec2> 
-SceneCSM::FindExtendsProj(const Frustum& frustum, const glm::mat4& mvp) const {
+std::pair<glm::vec2, glm::vec2>
+SceneCSM::FindExtendsProj(const Frustum &frustum, const glm::mat4 &mvp) const {
   float maxX = std::numeric_limits<float>::lowest();
   float maxY = std::numeric_limits<float>::lowest();
   float minX = std::numeric_limits<float>::max();
@@ -448,4 +440,32 @@ SceneCSM::FindExtendsProj(const Frustum& frustum, const glm::mat4& mvp) const {
 #else
   return std::make_pair(glm::vec2(-1.0f, -1.0f), glm::vec2(1.0f, 1.0f));
 #endif
+}
+
+glm::mat4 SceneCSM::ComputeLightViewMatrix(const glm::vec3 &lightDir,
+                                           const glm::vec3 &center,
+                                           float z) const {
+  const glm::vec3 kLightDir = center - glm::normalize(lightDir) * -z;
+  return glm::lookAt(kLightDir, center, glm::vec3(0.0f, 1.0f, 0.0f));
+}
+
+glm::mat4 SceneCSM::ComputeCropMatrix(const glm::mat4 &view,
+                                      const glm::mat4 &proj) const {
+  glm::vec4 shadowPt = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+  shadowPt = proj * view * shadowPt;
+  shadowPt = shadowPt * static_cast<float>(kShadowMapSize) / 2.0f;
+
+  glm::vec4 roundedPt = glm::round(shadowPt);
+  glm::vec4 roundOffset = roundedPt - shadowPt;
+  roundOffset = roundOffset * (2.0f / kShadowMapSize);
+  roundOffset.z = 0.0f;
+  roundOffset.w = 0.0f;
+
+  glm::mat4 shadow = proj;
+  shadow[3][0] += roundOffset.x;
+  shadow[3][1] += roundOffset.y;
+  shadow[3][2] += roundOffset.z;
+  shadow[3][3] += roundOffset.w;
+
+  return shadow * view;
 }

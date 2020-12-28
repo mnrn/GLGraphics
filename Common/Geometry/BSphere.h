@@ -7,6 +7,6 @@
 
 
 struct BSphere {
-  glm::vec3 center_;
-  float radius_;
+  glm::vec3 center;
+  float radius;
 };
