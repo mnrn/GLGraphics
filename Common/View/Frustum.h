@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "Primitive/Drawable.h"
+#include "Geometry/BSphere.h"
 
 enum struct ProjectionType {
   Perspective,
@@ -29,8 +30,11 @@ public:
 
   glm::mat4 GetProjectionMatrix() const;
   glm::vec3 GetCorner(std::size_t idx) const { return corners_.at(idx); }
+  BSphere GetSphere() const { return sphere_; }
 
 private:
+  void SetupSphere();
+
   ProjectionType type_;
 
   float fovy_;
@@ -66,4 +70,5 @@ private:
    *
    */
   std::array<glm::vec3, 8> corners_;
+  BSphere sphere_;
 };

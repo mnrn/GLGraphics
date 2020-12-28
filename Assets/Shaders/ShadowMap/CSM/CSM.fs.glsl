@@ -28,7 +28,7 @@ uniform float CameraHomogeneousSplitPlanes[kCascadesNum];
 //uniform mat4 ShadowMatrices[kCascadesNum];
 
 uniform bool IsShadowOnly = false;
-uniform bool IsVisibleIndicator = true;
+uniform bool IsVisibleIndicator = false;
 uniform bool IsNoShadow = false;
 uniform bool IsShadowTarget = false;
 uniform int Target = 1;

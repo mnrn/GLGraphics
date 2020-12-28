@@ -40,19 +40,20 @@ static constexpr float kCameraFOVY = 50.0f;
 static constexpr float kCameraNear = 0.3f;
 static constexpr float kCameraFar = 10.0f;
 
-static constexpr float kCameraRadius = 2.25f;
+static constexpr float kCameraRadius = 2.0f;
+static constexpr float kCameraDefaultAngle = glm::two_pi<float>() * 0.85f;
 
-static constexpr glm::vec3 kDefaultLightPosition{-2.5f, 2.0f, -2.5f};
+static constexpr glm::vec3 kLightDefaultPosition{-2.0f, 2.0f, -2.0f};
 
 static constexpr float kLightFOVY = 50.0f;
 static constexpr float kLightNear = 0.1f;
-static constexpr float kLightFar = 10.1f;
+static constexpr float kLightFar = 20.1f;
 
-static constexpr float kLightRadius = 10.0f;
-static constexpr float kLightLeft = kDefaultLightPosition.x - kLightRadius;
-static constexpr float kLightRight = kDefaultLightPosition.x + kLightRadius;
-static constexpr float kLightBottom = kDefaultLightPosition.y - kLightRadius;
-static constexpr float kLightTop = kDefaultLightPosition.y + kLightRadius;
+static constexpr float kLightRadius = 20.0f;
+static constexpr float kLightLeft = kLightDefaultPosition.x - kLightRadius;
+static constexpr float kLightRight = kLightDefaultPosition.x + kLightRadius;
+static constexpr float kLightBottom = kLightDefaultPosition.y - kLightRadius;
+static constexpr float kLightTop = kLightDefaultPosition.y + kLightRadius;
 
 static constexpr float kRotSpeed = 0.0f;
 static constexpr int kShadowMapWidth = 1024;
@@ -214,7 +215,7 @@ void SceneCSM::Pass1() {
 
   glCullFace(GL_FRONT);
   glEnable(GL_POLYGON_OFFSET_FILL);
-  glPolygonOffset(1.0f, 100.0f);
+  glPolygonOffset(1.0f, 4096.0f);
 
   glBindFramebuffer(GL_FRAMEBUFFER, csmFBO_.GetShadowFBO());
   progs_[kRecordDepth].Use();
@@ -277,17 +278,18 @@ void SceneCSM::DrawStatus() {
 // ********************************************************************************
 
 void SceneCSM::SetupCamera() {
+  angle_ = kCameraDefaultAngle;
   const glm::vec3 kCamPt =
-      glm::vec3(kCameraRadius * cos(angle_), 0.9f, kCameraRadius * sin(angle_));
-  camera_.SetupOrient(kCamPt, glm::vec3(0.0f, -0.2f, 0.0f),
+      glm::vec3(kCameraRadius * cos(angle_), 1.0f, kCameraRadius * sin(angle_));
+  camera_.SetupOrient(kCamPt, glm::vec3(0.0f, 0.0f, 0.0f),
                       glm::vec3(0.0f, 1.0f, 0.0f));
   camera_.SetupPerspective(
-      kCameraFOVY, static_cast<float>(width_) / static_cast<float>(height_),
+      glm::radians(kCameraFOVY), static_cast<float>(width_) / static_cast<float>(height_),
       kCameraNear, kCameraFar);
 }
 
 void SceneCSM::SetupLight() {
-  lightView_.SetupOrient(kDefaultLightPosition, glm::vec3(0.0f),
+  lightView_.SetupOrient(kLightDefaultPosition, glm::vec3(0.0f),
                          glm::vec3(-1.0f, 0.0f, 0.0f));
 }
 
@@ -334,15 +336,12 @@ void SceneCSM::UpdateFrustums(int cascades, const std::vector<float> splits) {
   cascadedFrustums_.clear();
   cascadedFrustums_.resize(cascades);
   for (int i = 0; i < cascades; i++) {
-    cascadedFrustums_[i].SetupPerspective(kCameraFOVY, kAspectRatio, splits[i],
-                                          splits[i + 1]);
+    const float far =
+        (i + 1 != cascades) ? splits[i + 1] : splits[i + 1] * 1.005f;
+    cascadedFrustums_[i].SetupPerspective(kCameraFOVY / 57.2957795f + 0.2f, kAspectRatio, splits[i],
+                                          far);
     cascadedFrustums_[i].SetupCorners(camera_.GetPosition(),
                                       camera_.GetTarget(), camera_.GetUpVec());
-    
-    for (int j = 0; j < 8; j++) {
-      spdlog::get(SPLIT_LOG_NAME)->info(glm::to_string(cascadedFrustums_[i].GetCorner(j)));
-    }
-    spdlog::get(SPLIT_LOG_NAME)->info("End Plane.");
   }
 }
 
@@ -359,7 +358,7 @@ void SceneCSM::UpdateCropMatrices(int cascades) {
     // ライトの同次座標系に投影された錐台の延長を見つけます。
     const auto kLightProj =
 #if true
-      glm::ortho(kLightLeft, kLightRight, kLightBottom, kLightTop, -10.0f, 10.0f);
+      glm::ortho(kLightLeft, kLightRight, kLightBottom, kLightTop, -maxZ, -minZ);
 #else
       glm::perspective(glm::radians(kLightFOVY), 1.0f, kLightNear, kLightFar);
 #endif

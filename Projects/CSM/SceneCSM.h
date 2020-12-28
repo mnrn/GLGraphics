@@ -1,9 +1,9 @@
 /**
- * @brief シャドウマッピングのテストシーン
+ * @brief カスケードシャドウマッピングのテストシーン
  */
 
-#ifndef SCENE_SHADOW_MAP_H
-#define SCENE_SHADOW_MAP_H
+#ifndef SCENE_CSM_H
+#define SCENE_CSM_H
 
 #include "Scene.h"
 
@@ -21,6 +21,8 @@
 #include "UI/Font.h"
 #include "View/Camera.h"
 #include "View/Frustum.h"
+#include "Geometry/AABB.h"
+#include "Geometry/BSphere.h"
 
 #include "CascadedShadowMapsFBO.h"
 
@@ -48,9 +50,10 @@ private:
   void DrawScene();
   void DrawStatus();
 
+
   std::vector<float> ComputeSplitPlanes(int cascades, float near, float far);
-  void UpdateFrustums(int cascades, const std::vector<float> splits);
   void UpdateSplitPlanesUniform(int cascades, const std::vector<float> splits);
+  void UpdateFrustums(int cascades, const std::vector<float> splits);
   void UpdateCropMatrices(int cascades);
   glm::mat4 ComputeCropMatrix(const glm::vec3& min, const glm::vec3& max) const;
 
@@ -79,7 +82,7 @@ private:
   int cascadeIdx_ = 0;
 
   CascadedShadowMapsFBO csmFBO_{};
-  std::vector<AABB> caster_{};
+  std::vector<BSphere> caster_{};
   std::vector<Frustum> cascadedFrustums_{};
   std::vector<glm::mat4> projCrop_{};
 };

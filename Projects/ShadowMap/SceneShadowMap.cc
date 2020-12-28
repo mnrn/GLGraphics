@@ -279,14 +279,14 @@ void SceneShadowMap::SetupCamera() {
                 kCameraCenter * 11.5f * sin(angle_));
   camera_.SetupOrient(kCamPt, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
   camera_.SetupPerspective(
-      kFOVY, static_cast<float>(width_) / static_cast<float>(height_), 0.1f,
+      glm::radians(kFOVY), static_cast<float>(width_) / static_cast<float>(height_), 0.1f,
       100.0f);
 }
 
 void SceneShadowMap::SetupLight() {
   lightView_.SetupOrient(kDefaultLightPosition, glm::vec3(0.0f),
                          glm::vec3(0.0f, 1.0f, 0.0f));
-  lightView_.SetupPerspective(kFOVY, 1.0f, 1.0f, 25.0f);
+  lightView_.SetupPerspective(glm::radians(kFOVY), 1.0f, 1.0f, 25.0f);
   lightPV_ = kShadowBias * lightView_.GetProjectionMatrix() *
              lightView_.GetViewMatrix();
 }

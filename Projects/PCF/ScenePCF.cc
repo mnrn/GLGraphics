@@ -333,12 +333,12 @@ void ScenePCF::SetupCamera() {
   camera_.SetupOrient(kCamPt, glm::vec3(0.0f, -0.175f, 0.0f),
                       glm::vec3(0.0f, 1.0f, 0.0f));
   camera_.SetupPerspective(
-      kCameraFOVY, static_cast<float>(width_) / static_cast<float>(height_),
+      glm::radians(kCameraFOVY), static_cast<float>(width_) / static_cast<float>(height_),
       kCameraNear, kCameraFar);
 }
 
 void ScenePCF::SetupLight() {
   lightView_.SetupOrient(kDefaultLightPosition, glm::vec3(0.0f),
                          glm::vec3(0.0f, 1.0f, 0.0f));
-  lightView_.SetupPerspective(kLightFOVY, 1.0f, kLightNear, kLightFar);
+  lightView_.SetupPerspective(glm::radians(kLightFOVY), 1.0f, kLightNear, kLightFar);
 }

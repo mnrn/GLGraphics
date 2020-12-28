@@ -34,15 +34,17 @@ void Frustum::SetupOrtho(float left, float right, float bottom, float top,
 
 void Frustum::SetupCorners(const glm::vec3 &eyePt, const glm::vec3 &lookatPt,
                            const glm::vec3 &upVec) {
+#define USE_LOG_1 0
+#if USE_LOG_1
   const glm::vec3 n = glm::normalize(eyePt - lookatPt);
   const glm::vec3 u = glm::normalize(glm::cross(upVec, n));
   const glm::vec3 v = glm::normalize(glm::cross(n, u));
 
-  const float ndy = near_ * tanf(glm::radians(fovy_) / 2.0f);
+  const float ndy = near_ * tanf(fovy_ / 2.0f);
   const float ndx = ar_ * ndy;
   const glm::vec3 nc = eyePt + n * near_;
 
-  const float fdy = far_ * tanf(glm::radians(fovy_) / 2.0f);
+  const float fdy = far_ * tanf(fovy_ / 2.0f);
   const float fdx = ar_ * fdy;
   const glm::vec3 fc = eyePt + n * far_;
 
@@ -57,7 +59,7 @@ void Frustum::SetupCorners(const glm::vec3 &eyePt, const glm::vec3 &lookatPt,
   corners_[5] = fc - u * fdx + v * fdy;
   corners_[6] = fc + u * fdx + v * fdy;
   corners_[7] = fc + u * fdx - v * fdy;
-
+#else
   corners_[0] = glm::vec3(-1.0, 1.0, 1.0);
   corners_[1] = glm::vec3(1.0, 1.0, 1.0);
   corners_[2] = glm::vec3(1.0, -1.0, 1.0);
@@ -75,11 +77,30 @@ void Frustum::SetupCorners(const glm::vec3 &eyePt, const glm::vec3 &lookatPt,
     const auto corner = kInvVP * glm::vec4(corners_[i], 1.0f);
     corners_[i] = glm::vec3(corner) / corner.w;
   }
+#endif
+  SetupSphere();
+}
+
+void Frustum::SetupSphere() {
+  glm::vec3 center = glm::vec3(0.0f);
+  for (int i = 0; i < 8; i++) {
+    center += corners_[i];
+  }
+  center /= 8.0f;
+
+  float radius = 0.0f;
+  for (int i = 0; i < 8; i++) {
+    float len = glm::length(corners_[i] - center);
+    radius = glm::max(radius, len);
+  }
+  radius = std::ceil(radius * 16.0f) / 16.0f;
+
+  sphere_ = {center, radius};
 }
 
 glm::mat4 Frustum::GetProjectionMatrix() const {
   if (type_ == ProjectionType::Perspective) {
-    return glm::perspective(glm::radians(fovy_), ar_, near_, far_);
+    return glm::perspective(fovy_, ar_, near_, far_);
   } else {
     return glm::ortho(left_, right_, bottom_, top_, near_, far_);
   }
