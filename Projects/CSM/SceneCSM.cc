@@ -40,6 +40,7 @@ static constexpr float kCameraFOVY = 50.0f;
 static constexpr float kCameraNear = 0.3f;
 static constexpr float kCameraFar = 8.0f;
 
+static constexpr float kCameraHeight = 1.5f;
 static constexpr float kCameraRadius = 2.25f;
 static constexpr float kCameraDefaultAngle = glm::two_pi<float>() * 0.85f;
 
@@ -47,12 +48,6 @@ static constexpr glm::vec3 kLightDefaultPosition{-2.0f, 2.0f, -2.0f};
 static constexpr glm::vec3 kLightDefaultTarget{0.0f};
 static constexpr glm::vec3 kLightDefaultDir =
     kLightDefaultTarget - kLightDefaultPosition;
-
-static constexpr float kLightRadius = 20.0f;
-static constexpr float kLightLeft = kLightDefaultPosition.x - kLightRadius;
-static constexpr float kLightRight = kLightDefaultPosition.x + kLightRadius;
-static constexpr float kLightBottom = kLightDefaultPosition.y - kLightRadius;
-static constexpr float kLightTop = kLightDefaultPosition.y + kLightRadius;
 
 static constexpr float kRotSpeed = 0.5f;
 static constexpr int kShadowMapSize = 2048;
@@ -64,19 +59,11 @@ static constexpr glm::mat4 kShadowBias{0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 0.5f,
                                        0.0f, 0.0f, 0.0f, 0.0f, 0.5f, 0.0f,
                                        0.5f, 0.5f, 0.5f, 1.0f};
 
-#define CROP_LOG_NAME "CSM_CropLog"
-#define CROP_LOG_PATH "./Logs/CSMCrop.txt"
-#define SPLIT_LOG_NAME "CSM_SplitLog"
-#define SPLIT_LOG_PATH "./Logs/CSMSplit.txt"
-
 // ********************************************************************************
 // Override functions
 // ********************************************************************************
 
 void SceneCSM::OnInit() {
-  spdlog::basic_logger_mt(CROP_LOG_NAME, CROP_LOG_PATH);
-  spdlog::basic_logger_mt(SPLIT_LOG_NAME, SPLIT_LOG_PATH);
-
   SetupCamera();
   SetupLight();
 
@@ -108,8 +95,8 @@ void SceneCSM::OnUpdate(float t) {
     angle_ -= glm::two_pi<float>();
   }
 
-  const glm::vec3 kCamPt =
-      glm::vec3(kCameraRadius * cos(angle_), 0.7f, kCameraRadius * sin(angle_));
+  const glm::vec3 kCamPt = glm::vec3(kCameraRadius * cos(angle_), kCameraHeight,
+                                     kCameraRadius * sin(angle_));
   camera_.SetPosition(kCamPt);
 }
 
@@ -275,8 +262,8 @@ void SceneCSM::DrawStatus() {}
 
 void SceneCSM::SetupCamera() {
   angle_ = kCameraDefaultAngle;
-  const glm::vec3 kCamPt =
-      glm::vec3(kCameraRadius * cos(angle_), 1.0f, kCameraRadius * sin(angle_));
+  const glm::vec3 kCamPt = glm::vec3(kCameraRadius * cos(angle_), kCameraHeight,
+                                     kCameraRadius * sin(angle_));
   camera_.SetupOrient(kCamPt, glm::vec3(0.0f, 0.0f, 0.0f),
                       glm::vec3(0.0f, 1.0f, 0.0f));
   camera_.SetupPerspective(glm::radians(kCameraFOVY),
