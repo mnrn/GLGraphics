@@ -30,7 +30,6 @@ uniform mat4 ShadowMatrices[kCascadesMax];
 uniform bool IsUsePCF = true;
 uniform bool IsShadowOnly = false;
 uniform bool IsVisibleIndicator = false;
-uniform bool IsNoShadow = false;
 
 vec4 GammaCorrection(vec4 color) {
     return pow(color, vec4(1.0 / kGamma));
@@ -69,7 +68,7 @@ float ComputeShadow(int idx) {
         shadow *= 0.125;
         return shadow;
     } else {
-        return texture(ShadowMaps, vec4(shadowCoord.xy, float(idx), shadowCoord.z -bias));
+        return texture(ShadowMaps, vec4(shadowCoord.xy, float(idx), shadowCoord.z - bias));
     }
 }
 
@@ -98,9 +97,6 @@ void ShadeWithShadow() {
     }
     // 影の算出を行います。
     float shadow = ComputeShadow(idx);
-    if (IsNoShadow) {
-        shadow = 1.0;
-    }
 
     // ピクセルが影の中にある場合、Ambient Light (環境光)のみ使用することになります。
     vec4 color = vec4(diffSpec * shadow + amb, 1.0);
