@@ -27,6 +27,7 @@ uniform int CascadesNum;
 uniform float CameraHomogeneousSplitPlanes[kCascadesMax];
 uniform mat4 ShadowMatrices[kCascadesMax];
 
+uniform bool IsUsePCF = true;
 uniform bool IsShadowOnly = false;
 uniform bool IsVisibleIndicator = false;
 uniform bool IsNoShadow = false;
@@ -54,16 +55,24 @@ float ComputeShadow(int idx) {
     vec4 clippedShadowCoord = ShadowMatrices[idx] * vec4(Position, 1.0);
     vec4 shadowCoord = clippedShadowCoord / clippedShadowCoord.w;
 
-    // GLSLにどのレイヤーのテクスチャを参照すればよいのか教えます。
-    float z = shadowCoord.z;
-    shadowCoord.z = float(idx);
+    // シャドウのバイアスを計算します。厳密には傾斜に沿って計算してください。
+    float bias = 0.00001;
 
-    // 深度値をテクスチャから取り出します。
-    float depth = texture(ShadowMaps, shadowCoord.xyz).x;
-    if (depth < z + 0.00001) {
-        return 0.1;
+    if (IsUsePCF) {
+        float shadow = 0.0;
+        vec2 texSize = 1.0 / textureSize(ShadowMaps, 0).xy;
+        for (int y = -1; y <= 1; y++) {
+            for (int x = -1; x <= 1; x++) {
+                float depth = texture(ShadowMaps, vec3(shadowCoord.xy + vec2(x, y) * texSize, float(idx))).x;
+                shadow += (depth < shadowCoord.z - bias) ? 0.0 : 1.0;
+            }
+        }
+        shadow *= 0.125;
+        return shadow;
     } else {
-        return 1.0;
+        // 深度値をテクスチャから取り出します。
+        float depth = texture(ShadowMaps, vec3(shadowCoord.xy, float(idx))).x;
+        return (depth < shadowCoord.z - bias) ? 0.1 : 1.0;
     }
 }
 
