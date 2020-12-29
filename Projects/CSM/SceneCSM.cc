@@ -301,7 +301,7 @@ std::vector<float> SceneCSM::ComputeSplitPlanes(int cascades, float near,
 }
 
 void SceneCSM::UpdateSplitPlanesUniform(int cascades,
-                                        const std::vector<float> splits) {
+                                        const std::vector<float> &splits) {
   progs_[kShadeWithShadow].Use();
   const glm::mat4 proj = camera_.GetProjectionMatrix();
   // カメラから見た Split Planes の同次座標系におけるz位置を計算します。
@@ -315,7 +315,7 @@ void SceneCSM::UpdateSplitPlanesUniform(int cascades,
   }
 }
 
-void SceneCSM::UpdateFrustums(int cascades, const std::vector<float> splits) {
+void SceneCSM::UpdateFrustums(int cascades, const std::vector<float> &splits) {
   const float kAspectRatio =
       static_cast<float>(width_) / static_cast<float>(height_);
 

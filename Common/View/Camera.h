@@ -6,7 +6,6 @@
 
 #include "View/Frustum.h"
 
-
 class Camera {
 public:
   void SetupOrient(const glm::vec3 &eyePt, const glm::vec3 &lookatPt,
@@ -23,6 +22,11 @@ public:
   glm::mat4 GetViewMatrix() const;
   glm::mat4 GetInverseViewMatrix() const;
   glm::mat4 GetProjectionMatrix() const;
+
+  float GetFOVY() const { return frustum_.GetFOVY(); }
+  float GetAspectRatio() const { return frustum_.GetAspectRatio(); }
+  float GetNear() const { return frustum_.GetNear(); }
+  float GetFar() const { return frustum_.GetFar(); }
 
   // void OnPostUpdate() { frustum_.SetupCorners(eyePt_, lookatPt_, upVec_); }
 

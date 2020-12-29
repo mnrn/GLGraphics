@@ -13,6 +13,8 @@
 #include <optional>
 #include <string>
 
+#include "Geometry/AABB.h"
+#include "Geometry/BSphere.h"
 #include "Graphics/Shader.h"
 #include "Mesh/ObjMesh.h"
 #include "Primitive/Plane.h"
@@ -21,8 +23,6 @@
 #include "UI/Font.h"
 #include "View/Camera.h"
 #include "View/Frustum.h"
-#include "Geometry/AABB.h"
-#include "Geometry/BSphere.h"
 
 #include "CascadedShadowMapsFBO.h"
 
@@ -50,20 +50,19 @@ private:
   void DrawScene();
   void DrawStatus();
 
-
   std::vector<float> ComputeSplitPlanes(int cascades, float near, float far);
-  void UpdateSplitPlanesUniform(int cascades, const std::vector<float> splits);
-  void UpdateFrustums(int cascades, const std::vector<float> splits);
+  void UpdateSplitPlanesUniform(int cascades, const std::vector<float> &splits);
+  void UpdateFrustums(int cascades, const std::vector<float> &splits);
   void UpdateCropMatrices(int cascades);
 
-  glm::mat4 ComputeCropMatrix(const glm::vec3& min, const glm::vec3& max) const;
+  glm::mat4 ComputeCropMatrix(const glm::vec3 &min, const glm::vec3 &max) const;
   std::pair<float, float> FindZRange(const Frustum &frustum,
                                      const glm::mat4 &mv) const;
   std::pair<glm::vec2, glm::vec2> FindExtendsProj(const Frustum &frustum,
                                                   const glm::mat4 &mvp) const;
 
-  glm::mat4 ComputeLightViewMatrix(const glm::vec3 &lightDir, const glm::vec3& center,
-                                   float z) const;
+  glm::mat4 ComputeLightViewMatrix(const glm::vec3 &lightDir,
+                                   const glm::vec3 &center, float z) const;
   glm::mat4 ComputeCropMatrix(const glm::mat4 &view,
                               const glm::mat4 &proj) const;
 
@@ -86,7 +85,6 @@ private:
   int cascadeIdx_ = 0;
 
   CascadedShadowMapsFBO csmFBO_{};
-  std::vector<BSphere> caster_{};
   std::vector<Frustum> cascadedFrustums_{};
   std::vector<glm::mat4> vpCrop_{};
 };

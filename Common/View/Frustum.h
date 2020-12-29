@@ -5,8 +5,8 @@
 #include <array>
 #include <vector>
 
-#include "Primitive/Drawable.h"
 #include "Geometry/BSphere.h"
+#include "Primitive/Drawable.h"
 
 enum struct ProjectionType {
   Perspective,
@@ -17,7 +17,8 @@ enum struct ProjectionType {
 class Frustum {
 public:
   void SetupPerspective(float fovy, float aspectRatio, float near, float far);
-  void SetupOrtho(float left, float right, float bottom, float top, float near, float far);
+  void SetupOrtho(float left, float right, float bottom, float top, float near,
+                  float far);
 
   void SetupCorners(const glm::vec3 &eyePt, const glm::vec3 &lookatPt,
                     const glm::vec3 &upVec);
@@ -26,7 +27,8 @@ public:
   float GetNear() const { return near_; }
   void SetFar(float f) { far_ = f; }
   float GetFar() const { return far_; }
-
+  float GetFOVY() const { return fovy_; }
+  float GetAspectRatio() const { return ar_; }
 
   glm::mat4 GetProjectionMatrix() const;
   glm::vec3 GetCorner(std::size_t idx) const { return corners_.at(idx); }
@@ -41,7 +43,7 @@ private:
   float ar_;
   float near_;
   float far_;
-  
+
   float left_;
   float right_;
   float bottom_;
