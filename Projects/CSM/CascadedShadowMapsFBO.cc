@@ -26,18 +26,18 @@ bool CascadedShadowMapsFBO::OnInit(int cascades, int w, int h) {
   }
   glGenTextures(1, &depthTexAry_);
   glBindTexture(GL_TEXTURE_2D_ARRAY, depthTexAry_);
-  glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_DEPTH_COMPONENT24, w, h, cascades, 0,
-               GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
+  glTexStorage3D(GL_TEXTURE_2D_ARRAY, 1, GL_DEPTH_COMPONENT32F, w, h, cascades);
   glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
   glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
   glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_COMPARE_FUNC, GL_EQUAL);
 #ifdef USE_PCF
-  glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
+  glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_COMPARE_MODE,
+                  GL_COMPARE_R_TO_TEXTURE);
 #else
   glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_COMPARE_MODE, GL_NONE);
-#endif  
+#endif
   glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
 
   const GLenum result = glCheckFramebufferStatus(GL_FRAMEBUFFER);
