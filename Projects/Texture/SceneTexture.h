@@ -1,9 +1,9 @@
 #ifndef SCENE_TEXTURE_H
 #define SCENE_TEXTURE_H
 
-#include "Primitive/Cube.h"
-#include "Scene.h"
 #include "Graphics/Shader.h"
+#include "Primitive/Cube.h"
+#include "Scene/Scene.h"
 
 class SceneTexture : public Scene {
 public:

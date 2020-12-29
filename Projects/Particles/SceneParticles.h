@@ -9,7 +9,7 @@
 // Include files
 // ********************************************************************************
 
-#include "Scene.h"
+#include "Scene/Scene.h"
 
 #include <array>
 

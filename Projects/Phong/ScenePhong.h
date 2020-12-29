@@ -12,9 +12,9 @@
 #include <optional>
 #include <string>
 
-#include "Primitive/Torus.h"
-#include "Scene.h"
 #include "Graphics/Shader.h"
+#include "Primitive/Torus.h"
+#include "Scene/Scene.h"
 
 // ********************************************************************************
 // Class

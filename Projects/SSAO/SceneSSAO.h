@@ -5,22 +5,22 @@
 #ifndef SCENE_SSAO_H
 #define SCENE_SSAO_H
 
-#include "Scene.h"
+#include "Scene/Scene.h"
 
 #include <glm/gtc/constants.hpp>
+#include <memory>
 #include <optional>
 #include <string>
-#include <memory>
 
 #include <freetype2/ft2build.h>
 #include FT_FREETYPE_H
 
 #include "GBuffer.h"
+#include "Graphics/Shader.h"
 #include "Mesh/ObjMesh.h"
 #include "Primitive/Plane.h"
 #include "Primitive/Teapot.h"
 #include "Primitive/Torus.h"
-#include "Graphics/Shader.h"
 #include "UI/Font.h"
 
 // ********************************************************************************

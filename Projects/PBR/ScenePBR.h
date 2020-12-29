@@ -5,16 +5,16 @@
 #ifndef SCENE_PBR_H
 #define SCENE_PBR_H
 
-#include "Scene.h"
+#include "Scene/Scene.h"
 
 #include <glm/gtc/constants.hpp>
 #include <optional>
 #include <string>
 
+#include "Graphics/Shader.h"
 #include "Mesh/ObjMesh.h"
 #include "Primitive/Plane.h"
 #include "Primitive/Teapot.h"
-#include "Graphics/Shader.h"
 
 class ScenePBR : public Scene {
 public:

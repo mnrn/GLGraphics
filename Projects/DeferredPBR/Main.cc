@@ -9,8 +9,8 @@
 #include <memory>
 
 #include "App.h"
+#include "Scene/SceneLoop.h"
 #include "SceneDeferredPBR.h"
-#include "SceneLoop.h"
 
 // ********************************************************************************
 // Entry point

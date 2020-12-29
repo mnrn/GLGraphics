@@ -16,7 +16,7 @@
 #include <optional>
 #include <string>
 
-#include "Scene.h"
+#include "Scene/Scene.h"
 
 #include "Graphics/Shader.h"
 #include "UI/Font.h"

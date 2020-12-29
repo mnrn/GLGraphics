@@ -5,7 +5,7 @@
 #ifndef SCENE_SHADOW_MAP_H
 #define SCENE_SHADOW_MAP_H
 
-#include "Scene.h"
+#include "Scene/Scene.h"
 
 #include <array>
 #include <glm/gtc/constants.hpp>

@@ -9,7 +9,7 @@
 #include <memory>
 
 #include "App.h"
-#include "SceneLoop.h"
+#include "Scene/SceneLoop.h"
 #include "ScenePCF.h"
 
 // ********************************************************************************

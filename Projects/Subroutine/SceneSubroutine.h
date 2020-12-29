@@ -12,9 +12,9 @@
 #include <optional>
 #include <string>
 
-#include "Primitive/Teapot.h"
-#include "Scene.h"
 #include "Graphics/Shader.h"
+#include "Primitive/Teapot.h"
+#include "Scene/Scene.h"
 
 // ********************************************************************************
 // Class

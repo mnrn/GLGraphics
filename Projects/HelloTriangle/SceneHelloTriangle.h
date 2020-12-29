@@ -14,8 +14,8 @@
 #include <optional>
 #include <string>
 
-#include "Scene.h"
 #include "Graphics/Shader.h"
+#include "Scene/Scene.h"
 
 // ********************************************************************************
 // Class

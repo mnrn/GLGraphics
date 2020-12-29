@@ -5,7 +5,7 @@
 #ifndef SCENE_CSM_H
 #define SCENE_CSM_H
 
-#include "Scene.h"
+#include "Scene/Scene.h"
 
 #include <array>
 #include <glm/gtc/constants.hpp>

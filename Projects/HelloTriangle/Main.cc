@@ -10,8 +10,8 @@
 #include <memory>
 
 #include "App.h"
+#include "Scene/SceneLoop.h"
 #include "SceneHelloTriangle.h"
-#include "SceneLoop.h"
 
 // ********************************************************************************
 // Entry point

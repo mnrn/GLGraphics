@@ -5,17 +5,17 @@
 #ifndef SCENE_DEFFERED_H
 #define SCENE_DEFFERED_H
 
-#include "Scene.h"
+#include "Scene/Scene.h"
 
 #include <glm/gtc/constants.hpp>
 #include <optional>
 #include <string>
 
 #include "GBuffer.h"
+#include "Graphics/Shader.h"
 #include "Primitive/Plane.h"
 #include "Primitive/Teapot.h"
 #include "Primitive/Torus.h"
-#include "Graphics/Shader.h"
 
 class SceneDeferred : public Scene {
 public:

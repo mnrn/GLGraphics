@@ -149,9 +149,9 @@ void SceneParticles::InitBuffer() {
     for (int32_t yi = 0; yi < particlesYNum_; yi++) {
       for (int32_t zi = 0; zi < particlesZNum_; zi++) {
 
-        p.x = dx * xi;
-        p.y = dy * yi;
-        p.z = dz * zi;
+        p.x = dx * static_cast<float>(xi);
+        p.y = dy * static_cast<float>(yi);
+        p.z = dz * static_cast<float>(zi);
         p.w = 1.0f;
         p = transform * p;
 
