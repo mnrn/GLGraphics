@@ -22,7 +22,7 @@ uniform struct MaterialInfo {
     float Shininess;  // Specular shininess factor (鏡面反射の強さの係数)
 } Material;
 
-uniform sampler2DArray ShadowMaps;
+uniform sampler2DArrayShadow ShadowMaps;
 uniform int CascadesNum;
 uniform float CameraHomogeneousSplitPlanes[kCascadesMax];
 uniform mat4 ShadowMatrices[kCascadesMax];
@@ -56,23 +56,20 @@ float ComputeShadow(int idx) {
     vec4 shadowCoord = clippedShadowCoord / clippedShadowCoord.w;
 
     // シャドウのバイアスを計算します。厳密には傾斜に沿って計算してください。
-    float bias = 0.00001;
+    float bias = 0.00001 / clippedShadowCoord.w;
 
     if (IsUsePCF) {
         float shadow = 0.0;
         vec2 texSize = 1.0 / textureSize(ShadowMaps, 0).xy;
         for (int y = -1; y <= 1; y++) {
             for (int x = -1; x <= 1; x++) {
-                float depth = texture(ShadowMaps, vec3(shadowCoord.xy + vec2(x, y) * texSize, float(idx))).x;
-                shadow += (depth < shadowCoord.z - bias) ? 0.0 : 1.0;
+                shadow += texture(ShadowMaps, vec4(shadowCoord.xy + vec2(x, y) * texSize, float(idx), shadowCoord.z - bias));
             }
         }
         shadow *= 0.125;
         return shadow;
     } else {
-        // 深度値をテクスチャから取り出します。
-        float depth = texture(ShadowMaps, vec3(shadowCoord.xy, float(idx))).x;
-        return (depth < shadowCoord.z - bias) ? 0.1 : 1.0;
+        return texture(ShadowMaps, vec4(shadowCoord.xy, float(idx), shadowCoord.z));
     }
 }
 
