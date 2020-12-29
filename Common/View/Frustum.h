@@ -32,11 +32,9 @@ public:
 
   glm::mat4 GetProjectionMatrix() const;
   glm::vec3 GetCorner(std::size_t idx) const { return corners_.at(idx); }
-  BSphere GetSphere() const { return sphere_; }
+  BSphere ComputeBSphere() const;
 
 private:
-  void SetupSphere();
-
   ProjectionType type_;
 
   float fovy_;
@@ -54,23 +52,22 @@ private:
    * @param corners the corners of the frustum
    *
    * The corners should be specified in this order:
-   * 0. near bottom left
-   * 1. near top left
-   * 2. near top right
-   * 3. near bottom right
-   * 4. far bottom left
-   * 5. far top left
-   * 6. far top right
-   * 7. far bottom right
+   * 0. far top left
+   * 1. far top right
+   * 2. far bottom right
+   * 3. far bottom left
+   * 4. near top left
+   * 5. near top right
+   * 6. near bottom right
+   * 7. near bottom left
    *
-   *     5----6
+   *     0----1
    *    /|   /|
-   *   1----2 |
-   *   | 4--|-7      far
+   *   4----5 |
+   *   | 3--|-2      far
    *   |/   |/       /
-   *   0----3      near
+   *   7----6      near
    *
    */
   std::array<glm::vec3, 8> corners_;
-  BSphere sphere_;
 };

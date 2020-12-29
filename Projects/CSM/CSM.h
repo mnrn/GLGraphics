@@ -34,8 +34,10 @@ public:
                                              const glm::vec3 &lightDir,
                                              float shadowMapSize);
 
+private:
   glm::mat4 ComputeLightViewMatrix(const glm::vec3 &lightDir,
-                                   const glm::vec3 &center, float z) const;
+                                   const glm::vec3 &center,
+                                   float offsetZ) const;
   glm::mat4 ComputeCropMatrix(const glm::mat4 &view, const glm::mat4 &proj,
                               float shadowMapSize) const;
 
@@ -45,7 +47,6 @@ public:
   std::pair<glm::vec2, glm::vec2> FindExtendsProj(const Frustum &frustum,
                                                   const glm::mat4 &mvp) const;
 
-private:
   std::vector<Frustum> frustums_{};
 };
 

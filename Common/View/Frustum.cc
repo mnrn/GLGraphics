@@ -21,7 +21,7 @@ void Frustum::SetupPerspective(float fovy, float aspectRatio, float near,
 }
 
 void Frustum::SetupOrtho(float left, float right, float bottom, float top,
-  float near, float far) {
+                         float near, float far) {
   left_ = left;
   right_ = right;
   bottom_ = bottom;
@@ -34,54 +34,26 @@ void Frustum::SetupOrtho(float left, float right, float bottom, float top,
 
 void Frustum::SetupCorners(const glm::vec3 &eyePt, const glm::vec3 &lookatPt,
                            const glm::vec3 &upVec) {
-#define USE_LOG_1 0
-#if USE_LOG_1
-  const glm::vec3 n = glm::normalize(eyePt - lookatPt);
-  const glm::vec3 u = glm::normalize(glm::cross(upVec, n));
-  const glm::vec3 v = glm::normalize(glm::cross(n, u));
-
-  const float ndy = near_ * tanf(fovy_ / 2.0f);
-  const float ndx = ar_ * ndy;
-  const glm::vec3 nc = eyePt + n * near_;
-
-  const float fdy = far_ * tanf(fovy_ / 2.0f);
-  const float fdx = ar_ * fdy;
-  const glm::vec3 fc = eyePt + n * far_;
-
-  // near plane
-  corners_[0] = nc - u * ndx - v * ndy;
-  corners_[1] = nc - u * ndx + v * ndy;
-  corners_[2] = nc + u * ndx + v * ndy;
-  corners_[3] = nc + u * ndx - v * ndy;
-
-  // far plane
-  corners_[4] = fc - u * fdx - v * fdy;
-  corners_[5] = fc - u * fdx + v * fdy;
-  corners_[6] = fc + u * fdx + v * fdy;
-  corners_[7] = fc + u * fdx - v * fdy;
-#else
   corners_[0] = glm::vec3(-1.0, 1.0, 1.0);
   corners_[1] = glm::vec3(1.0, 1.0, 1.0);
   corners_[2] = glm::vec3(1.0, -1.0, 1.0);
   corners_[3] = glm::vec3(-1.0, -1.0, 1.0);
-       
+
   corners_[4] = glm::vec3(-1.0, 1.0, -1.0);
   corners_[5] = glm::vec3(1.0, 1.0, -1.0);
   corners_[6] = glm::vec3(1.0, -1.0, -1.0);
   corners_[7] = glm::vec3(-1.0, -1.0, -1.0);
 
   const auto kView = glm::lookAt(eyePt, lookatPt, upVec);
-  const auto kProj = GetProjectionMatrix(); 
+  const auto kProj = GetProjectionMatrix();
   const auto kInvVP = glm::inverse(kProj * kView);
   for (int i = 0; i < 8; i++) {
     const auto corner = kInvVP * glm::vec4(corners_[i], 1.0f);
     corners_[i] = glm::vec3(corner) / corner.w;
   }
-#endif
-  SetupSphere();
 }
 
-void Frustum::SetupSphere() {
+BSphere Frustum::ComputeBSphere() const {
   glm::vec3 center = glm::vec3(0.0f);
   for (int i = 0; i < 8; i++) {
     center += corners_[i];
@@ -95,7 +67,7 @@ void Frustum::SetupSphere() {
   }
   radius = std::ceil(radius * 16.0f) / 16.0f;
 
-  sphere_ = {center, radius};
+  return {center, radius};
 }
 
 glm::mat4 Frustum::GetProjectionMatrix() const {

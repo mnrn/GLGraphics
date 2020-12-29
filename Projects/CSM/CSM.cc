@@ -17,6 +17,10 @@
 // Calculation
 // ********************************************************************************
 
+/**
+ * @brief Practical Split Scheme
+ * @ref https://developer.nvidia.com/gpugems/GPUGems3/gpugems3_ch10.html
+ */
 std::vector<float> CSM::ComputeSplitPlanes(int cascades, float near, float far,
                                            float lambda) {
   if (cascades < 1) {
@@ -27,11 +31,9 @@ std::vector<float> CSM::ComputeSplitPlanes(int cascades, float near, float far,
   splits[0] = near;
   splits[cascades] = far;
   for (int i = 1; i < cascades; i++) {
-    const float cilog =
-        near * std::powf(far / near,
-                         static_cast<float>(i) / static_cast<float>(cascades));
-    const float ciuni = near + (far - near) * static_cast<float>(i) /
-                                   static_cast<float>(cascades);
+    const float i_m = static_cast<float>(i) / static_cast<float>(cascades);
+    const float cilog = near * std::powf(far / near, i_m);
+    const float ciuni = near + (far - near) * i_m;
     splits[i] = lambda * cilog + ciuni * (1.0f - lambda);
   }
   return splits;
@@ -56,16 +58,16 @@ void CSM::UpdateSplitPlanesUniform(int cascades,
 void CSM::UpdateFrustums(int cascades, const std::vector<float> &splits,
                          const Camera &camera) {
   const float kAspectRatio = camera.GetAspectRatio();
-  const float kCameraFOVY = glm::degrees(camera.GetFOVY());
+  const float kCameraFOVY = camera.GetFOVY();
 
   frustums_.clear();
   frustums_.resize(cascades);
   for (int i = 0; i < cascades; i++) {
     const float near = splits[i];
     const float far =
-        (i + 1 != cascades) ? splits[i + 1] : splits[i + 1] * 1.005f;
-    frustums_[i].SetupPerspective(kCameraFOVY / 57.2957795f + 0.2f,
-                                  kAspectRatio, near, far);
+        (i + 1 == cascades) ? splits[i + 1] : splits[i + 1] * 1.005f;
+    // アーティファクトを避けるために0.2fを加算しています。
+    frustums_[i].SetupPerspective(kCameraFOVY + 0.2f, kAspectRatio, near, far);
     frustums_[i].SetupCorners(camera.GetPosition(), camera.GetTarget(),
                               camera.GetUpVec());
   }
@@ -76,25 +78,30 @@ std::vector<glm::mat4> CSM::ComputeCropMatrices(int cascades,
                                                 float shadowMapSize) {
   std::vector<glm::mat4> vpCrops(cascades);
   for (int i = 0; i < cascades; i++) {
-    const BSphere bs = frustums_[i].GetSphere();
+    // 視錐台の境界球からAABBを計算します。
+    const BSphere bs = frustums_[i].ComputeBSphere();
     const glm::vec3 radius3 = glm::vec3(bs.radius);
     const glm::vec3 maxi = radius3;
     const glm::vec3 mini = -radius3;
     const glm::vec3 extends = maxi - mini;
 
-    const auto kLightView = ComputeLightViewMatrix(lightDir, bs.center, mini.z);
+    // Crop Matrix の計算を行います。
+    const auto kLightView = ComputeLightViewMatrix(lightDir, bs.center, maxi.z);
     const auto kLightProj =
         glm::ortho(mini.x, maxi.x, mini.y, maxi.y, 0.0f, extends.z);
-    // Crop Matrix の計算を行います。
     vpCrops[i] = ComputeCropMatrix(kLightView, kLightProj, shadowMapSize);
   }
+  // 実際は crop * proj * view
+  // となるような行列のvectorを返していることに注意してください。
   return vpCrops;
 }
 
 glm::mat4 CSM::ComputeLightViewMatrix(const glm::vec3 &lightDir,
-                                      const glm::vec3 &center, float z) const {
-  const glm::vec3 kLightDir = center - glm::normalize(lightDir) * -z;
-  return glm::lookAt(kLightDir, center, glm::vec3(0.0f, 1.0f, 0.0f));
+                                      const glm::vec3 &center,
+                                      float offsetZ) const {
+  // ライトの位置をライトの方向に沿って offsetZ だけ押し戻します。
+  const glm::vec3 kLightPt = center - glm::normalize(lightDir) * offsetZ;
+  return glm::lookAt(kLightPt, center, glm::vec3(0.0f, 1.0f, 0.0f));
 }
 
 glm::mat4 CSM::ComputeCropMatrix(const glm::mat4 &view, const glm::mat4 &proj,
@@ -150,12 +157,8 @@ std::pair<float, float> CSM::FindZRange(const Frustum &frustum,
 
   for (int i = 1; i < 8; i++) {
     trans = mv * glm::vec4(frustum.GetCorner(i), 1.0f);
-    if (trans.z > maxZ) {
-      maxZ = trans.z;
-    }
-    if (trans.z < minZ) {
-      minZ = trans.z;
-    }
+    maxZ = glm::max(trans.z, maxZ);
+    minZ = glm::min(trans.z, minZ);
   }
   return std::make_pair(minZ, maxZ);
 }
@@ -171,22 +174,13 @@ CSM::FindExtendsProj(const Frustum &frustum, const glm::mat4 &mvp) const {
   for (int i = 0; i < 8; i++) {
     const auto corner = glm::vec4(frustum.GetCorner(i), 1.0f);
     const auto trans = mvp * corner;
-
     const auto tX = trans.x / trans.w;
     const auto tY = trans.y / trans.w;
 
-    if (tX > maxX) {
-      maxX = tX;
-    }
-    if (tX < minX) {
-      minX = tX;
-    }
-    if (tY > maxY) {
-      maxY = tY;
-    }
-    if (tY < minY) {
-      minY = tY;
-    }
+    maxX = glm::max(tX, maxX);
+    minX = glm::min(tX, minX);
+    maxY = glm::max(tY, maxY);
+    minY = glm::min(tY, minY);
   }
   return std::make_pair(glm::vec2(minX, minY), glm::vec2(maxX, maxY));
 }
