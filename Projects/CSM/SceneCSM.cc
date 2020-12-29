@@ -174,8 +174,9 @@ void SceneCSM::SetMatrices() {
     const glm::mat4 mvp = proj_ * mv;
     progs_[kShadeWithShadow].SetUniform("MVP", mvp);
 
+    const glm::mat4 kInvView = camera_.GetInverseViewMatrix();
     for (int i = 0; i < kCascadedNum; i++) {
-      const glm::mat4 kLightMVP = kShadowBias * vpCrops_[i] * model_;
+      const glm::mat4 kLightMVP = kShadowBias * vpCrops_[i] * kInvView;
       const std::string kUniLiMVP = fmt::format("ShadowMatrices[{}]", i);
       progs_[kShadeWithShadow].SetUniform(kUniLiMVP.c_str(), kLightMVP);
     }

@@ -5,7 +5,6 @@ const int kCascadesMax = 8;
 
 in vec3 Position;
 in vec3 Normal;
-in vec4 ShadowCoords[kCascadesMax];
 
 layout(location=0) out vec4 FragColor;
 
@@ -26,6 +25,7 @@ uniform struct MaterialInfo {
 uniform sampler2DArray ShadowMaps;
 uniform int CascadesNum;
 uniform float CameraHomogeneousSplitPlanes[kCascadesMax];
+uniform mat4 ShadowMatrices[kCascadesMax];
 
 uniform bool IsShadowOnly = false;
 uniform bool IsVisibleIndicator = false;
@@ -50,11 +50,9 @@ vec3 PhongDSModel(vec3 pos, vec3 n) {
 }
 
 float ComputeShadow(int idx) {
-    if (IsNoShadow) {
-        return 1.0;
-    }
-
-    vec4 shadowCoord = ShadowCoords[idx] / ShadowCoords[idx].w;
+    // ModelView空間からライトから見たクリップ空間へ変換します。
+    vec4 clippedShadowCoord = ShadowMatrices[idx] * vec4(Position, 1.0);
+    vec4 shadowCoord = clippedShadowCoord / clippedShadowCoord.w;
 
     // GLSLにどのレイヤーのテクスチャを参照すればよいのか教えます。
     float z = shadowCoord.z;
@@ -94,6 +92,9 @@ void ShadeWithShadow() {
     }
     // 影の算出を行います。
     float shadow = ComputeShadow(idx);
+    if (IsNoShadow) {
+        shadow = 1.0;
+    }
 
     // ピクセルが影の中にある場合、Ambient Light (環境光)のみ使用することになります。
     vec4 color = vec4(diffSpec * shadow + amb, 1.0);
