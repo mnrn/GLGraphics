@@ -1,11 +1,11 @@
 #version 410
 
 const float kGamma = 2.2;
-const int kCascadesNum = 3;
+const int kCascadesMax = 8;
 
 in vec3 Position;
 in vec3 Normal;
-in vec4 ShadowCoords[kCascadesNum];
+in vec4 ShadowCoords[kCascadesMax];
 
 layout(location=0) out vec4 FragColor;
 
@@ -24,7 +24,8 @@ uniform struct MaterialInfo {
 } Material;
 
 uniform sampler2DArray ShadowMaps;
-uniform float CameraHomogeneousSplitPlanes[kCascadesNum];
+uniform int CascadesNum;
+uniform float CameraHomogeneousSplitPlanes[kCascadesMax];
 
 uniform bool IsShadowOnly = false;
 uniform bool IsVisibleIndicator = false;
@@ -85,7 +86,7 @@ void ShadeWithShadow() {
 
     // 該当するシャドウマップを探します。
     int idx = 0;
-    for (int i = 0; i < kCascadesNum; i++) {
+    for (int i = 0; i < CascadesNum; i++) {
         if (gl_FragCoord.z <= CameraHomogeneousSplitPlanes[i]) {
             idx = i;
             break;

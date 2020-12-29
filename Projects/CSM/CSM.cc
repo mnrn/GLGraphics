@@ -43,6 +43,7 @@ void CSM::UpdateSplitPlanesUniform(int cascades,
                                    const std::vector<float> &splits,
                                    const Camera &camera, ShaderProgram &prog) {
   prog.Use();
+  prog.SetUniform("CascadesNum", cascades);
   const glm::mat4 proj = camera.GetProjectionMatrix();
   // カメラから見た Split Planes の同次座標系におけるz位置を計算します。
   for (int i = 0; i < cascades; i++) {
