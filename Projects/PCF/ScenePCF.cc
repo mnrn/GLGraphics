@@ -7,10 +7,10 @@
 #include <boost/assert.hpp>
 #include <glm/gtc/constants.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include <iostream>
 #include <glm/gtx/string_cast.hpp>
-#include <spdlog/spdlog.h>
+#include <iostream>
 #include <spdlog/sinks/basic_file_sink.h>
+#include <spdlog/spdlog.h>
 
 #include "HID/KeyInput.h"
 #include "UI/Font.h"
@@ -41,15 +41,11 @@ static constexpr float kCameraRadius = 1.8f;
 static constexpr glm::vec3 kLightColor{0.85f};
 static constexpr glm::vec3 kDefaultLightPosition{-2.5f, 2.0f, -2.5f};
 
-#define LOG_NAME "PCFLog"
-
 // ********************************************************************************
 // Override functions
 // ********************************************************************************
 
 void ScenePCF::OnInit() {
-  spdlog::basic_logger_mt(LOG_NAME, "./Logs/PCFMat4.txt");
-
   KeyInput::Create();
   Text::Create();
   Font::Create();
@@ -80,7 +76,6 @@ void ScenePCF::OnInit() {
 void ScenePCF::OnDestroy() {
   glDeleteBuffers(1, &shadowFBO_);
   glDeleteTextures(1, &depthTex_);
-  spdlog::drop_all();
 }
 
 void ScenePCF::OnUpdate(float t) {
@@ -167,7 +162,6 @@ void ScenePCF::SetMatrices() {
     progs_[kShadeWithShadow].SetUniform("MVP", mvp);
     const glm::mat4 kLightMVP = kShadowBias * kLightVP * model_;
     progs_[kShadeWithShadow].SetUniform("ShadowMatrix", kLightMVP);
-  
   }
 }
 
@@ -332,13 +326,15 @@ void ScenePCF::SetupCamera() {
       glm::vec3(kCameraRadius * cos(angle_), 0.7f, kCameraRadius * sin(angle_));
   camera_.SetupOrient(kCamPt, glm::vec3(0.0f, -0.175f, 0.0f),
                       glm::vec3(0.0f, 1.0f, 0.0f));
-  camera_.SetupPerspective(
-      glm::radians(kCameraFOVY), static_cast<float>(width_) / static_cast<float>(height_),
-      kCameraNear, kCameraFar);
+  camera_.SetupPerspective(glm::radians(kCameraFOVY),
+                           static_cast<float>(width_) /
+                               static_cast<float>(height_),
+                           kCameraNear, kCameraFar);
 }
 
 void ScenePCF::SetupLight() {
   lightView_.SetupOrient(kDefaultLightPosition, glm::vec3(0.0f),
                          glm::vec3(0.0f, 1.0f, 0.0f));
-  lightView_.SetupPerspective(glm::radians(kLightFOVY), 1.0f, kLightNear, kLightFar);
+  lightView_.SetupPerspective(glm::radians(kLightFOVY), 1.0f, kLightNear,
+                              kLightFar);
 }

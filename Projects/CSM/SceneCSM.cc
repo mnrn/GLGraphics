@@ -13,8 +13,11 @@
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/spdlog.h>
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-macros"
 #define FMT_HEADER_ONLY
 #include <fmt/format.h>
+#pragma clang diagnostic pop
 
 #include "HID/KeyInput.h"
 #include "UI/Font.h"
@@ -32,7 +35,6 @@
 // ********************************************************************************
 
 static constexpr int kCascadedNum = 3;
-static constexpr int kSplitPlanesNum = kCascadedNum + 1;
 
 static constexpr float kLambda = 0.5f;
 
@@ -40,7 +42,7 @@ static constexpr float kCameraFOVY = 50.0f;
 static constexpr float kCameraNear = 0.3f;
 static constexpr float kCameraFar = 8.0f;
 
-static constexpr float kCameraHeight = 1.5f;
+static constexpr float kCameraHeight = 1.0f;
 static constexpr float kCameraRadius = 2.25f;
 static constexpr float kCameraDefaultAngle = glm::two_pi<float>() * 0.85f;
 
@@ -199,7 +201,7 @@ void SceneCSM::Pass1() {
 
   glCullFace(GL_FRONT);
   glEnable(GL_POLYGON_OFFSET_FILL);
-  glPolygonOffset(1.0f, 4096.0f);
+  glPolygonOffset(2.5f, 10.0f);
 
   glBindFramebuffer(GL_FRAMEBUFFER, csmFBO_.GetShadowFBO());
   progs_[kRecordDepth].Use();
@@ -272,8 +274,7 @@ void SceneCSM::SetupCamera() {
                            kCameraNear, kCameraFar);
 }
 
-void SceneCSM::SetupLight() {
-}
+void SceneCSM::SetupLight() {}
 
 // ********************************************************************************
 // Calculation
@@ -292,7 +293,8 @@ std::vector<float> SceneCSM::ComputeSplitPlanes(int cascades, float near,
     const float cilog =
         near * std::powf(far / near,
                          static_cast<float>(i) / static_cast<float>(cascades));
-    const float ciuni = near + (far - near) * static_cast<float>(i) / cascades;
+    const float ciuni = near + (far - near) * static_cast<float>(i) /
+                                   static_cast<float>(cascades);
     splits[i] = kLambda * cilog + ciuni * (1.0f - kLambda);
   }
   return splits;
@@ -301,9 +303,9 @@ std::vector<float> SceneCSM::ComputeSplitPlanes(int cascades, float near,
 void SceneCSM::UpdateSplitPlanesUniform(int cascades,
                                         const std::vector<float> splits) {
   progs_[kShadeWithShadow].Use();
+  const glm::mat4 proj = camera_.GetProjectionMatrix();
   // カメラから見た Split Planes の同次座標系におけるz位置を計算します。
   for (int i = 0; i < cascades; i++) {
-    const glm::mat4 proj = camera_.GetProjectionMatrix();
     const float clip =
         0.5f * (-splits[i + 1] * proj[2][2] + proj[3][2]) / splits[i + 1] +
         0.5f;
@@ -320,10 +322,11 @@ void SceneCSM::UpdateFrustums(int cascades, const std::vector<float> splits) {
   cascadedFrustums_.clear();
   cascadedFrustums_.resize(cascades);
   for (int i = 0; i < cascades; i++) {
+    const float near = splits[i];
     const float far =
         (i + 1 != cascades) ? splits[i + 1] : splits[i + 1] * 1.005f;
     cascadedFrustums_[i].SetupPerspective(kCameraFOVY / 57.2957795f + 0.2f,
-                                          kAspectRatio, splits[i], far);
+                                          kAspectRatio, near, far);
     cascadedFrustums_[i].SetupCorners(camera_.GetPosition(),
                                       camera_.GetTarget(), camera_.GetUpVec());
   }

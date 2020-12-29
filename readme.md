@@ -44,6 +44,8 @@ Vulkanでの実装がもう少し楽になりそうならそちらに移行す�
 - [freetype]
   - フォントライブラリ。フォントをビットマップデータにして描画しています。
   - LinuxやBSD, iOSやAndroidはこのライブラリを用いているようです。
+- [spdlog]
+  - 便利なロガーライブラリです。主にデバッグで使いました。
 
 リポジトリのルートディレクトリにCMakeLists.txtがあるので詳しくはそちらを参照ください。  
 
@@ -62,3 +64,4 @@ Vulkanでの実装がもう少し楽になりそうならそちらに移行す�
 [stb]:<https://github.com/nothings/stb>
 [tinyobjloader]:<https://github.com/tinyobjloader/tinyobjloader>
 [freetype]:<https://www.freetype.org/>
+[spdlog]:<https://github.com/gabime/spdlog>
