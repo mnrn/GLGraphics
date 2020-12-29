@@ -69,7 +69,7 @@ float ComputeShadow(int idx) {
         shadow *= 0.125;
         return shadow;
     } else {
-        return texture(ShadowMaps, vec4(shadowCoord.xy, float(idx), shadowCoord.z));
+        return texture(ShadowMaps, vec4(shadowCoord.xy, float(idx), shadowCoord.z -bias));
     }
 }
 
