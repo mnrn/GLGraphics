@@ -29,8 +29,6 @@ uniform float CameraHomogeneousSplitPlanes[kCascadesNum];
 uniform bool IsShadowOnly = false;
 uniform bool IsVisibleIndicator = false;
 uniform bool IsNoShadow = false;
-uniform bool IsShadowTarget = false;
-uniform int Target = 1;
 
 vec4 GammaCorrection(vec4 color) {
     return pow(color, vec4(1.0 / kGamma));
@@ -54,22 +52,31 @@ float ComputeShadow(int idx) {
     if (IsNoShadow) {
         return 1.0;
     }
-    if (IsShadowTarget && Target != idx) {
-        return 1.0;
-    }
+
     vec4 shadowCoord = ShadowCoords[idx] / ShadowCoords[idx].w;
 
     // GLSLにどのレイヤーのテクスチャを参照すればよいのか教えます。
-    shadowCoord.w = shadowCoord.z;
+    float z = shadowCoord.z;
     shadowCoord.z = float(idx);
 
     // 深度値をテクスチャから取り出します。
     float depth = texture(ShadowMaps, shadowCoord.xyz).x;
-    if (depth < shadowCoord.w + 0.00001) {
+    if (depth < z + 0.00001) {
         return 0.1;
     } else {
         return 1.0;
     }
+}
+
+vec4 ShadowIndicator(int idx) {
+    if (idx == 0) {
+        return vec4(0.1, 0.0, 0.0, 0.0);
+    } else if (idx == 1) {
+        return vec4(0.0, 0.1, 0.0, 0.0);
+    } else if (idx == 2) {
+        return vec4(0.0, 0.0, 0.1, 0.0);
+    }
+    return vec4(0.0, 0.0, 0.0, 0.0);
 }
 
 void ShadeWithShadow() {
@@ -94,15 +101,7 @@ void ShadeWithShadow() {
         color = vec4(shadow, shadow, shadow, 1.0);
     }
     if (IsVisibleIndicator) {
-        vec4 indicator = vec4(0.0, 0.0, 0.0, 0.0);
-        if (idx == 0) {
-            indicator = vec4(0.1, 0.0, 0.0, 0.0);
-        } else if (idx == 1) {
-            indicator = vec4(0.0, 0.1, 0.0, 0.0);
-        } else if (idx == 2) {
-            indicator = vec4(0.0, 0.0, 0.1, 0.0);
-        }
-        color += indicator;
+        color += ShadowIndicator(idx); 
     }
     FragColor = GammaCorrection(color);
 }
