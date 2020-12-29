@@ -273,8 +273,6 @@ void SceneCSM::SetupCamera() {
 }
 
 void SceneCSM::SetupLight() {
-  lightView_.SetupOrient(kLightDefaultPosition, glm::vec3(0.0f),
-                         glm::vec3(-1.0f, 0.0f, 0.0f));
 }
 
 // ********************************************************************************

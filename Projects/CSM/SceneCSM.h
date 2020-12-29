@@ -68,7 +68,6 @@ private:
                               const glm::mat4 &proj) const;
 
   Camera camera_;
-  Camera lightView_;
 
   Plane plane_{20.0f, 20.0f, 1, 1};
   std::unique_ptr<ObjMesh> building_ =
