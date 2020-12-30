@@ -1,6 +1,7 @@
 #include "GBuffer.h"
 
 #include <iostream>
+#include <boost/assert.hpp>
 
 GBuffer::~GBuffer() { OnDestroy(); }
 
@@ -51,6 +52,10 @@ void GBuffer::OnInit(int w, int h) {
                                              GL_COLOR_ATTACHMENT0};
   glDrawBuffers(static_cast<GLsizei>(aoDrawBuffers.size()),
                 aoDrawBuffers.data());
+
+  BOOST_ASSERT_MSG(glCheckFramebufferStatus(GL_FRAMEBUFFER) ==
+                       GL_FRAMEBUFFER_COMPLETE,
+                   "Framebuffer is not complete.");
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 

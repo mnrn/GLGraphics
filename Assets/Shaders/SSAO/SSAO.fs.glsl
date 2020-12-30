@@ -1,15 +1,12 @@
-#version 430
+#version 410
 
 in vec3 Position;
 in vec3 Normal;
 in vec2 TexCoord;
 
-layout (binding=0) uniform sampler2D PositionTex;
-layout (binding=1) uniform sampler2D NormalTex;
-layout (binding=2) uniform sampler2D ColorTex;
-layout (binding=3) uniform sampler2D AOTex;
-layout (binding=4) uniform sampler2D RandDirTex;
-layout (binding=5) uniform sampler2D DiffTex;
+const int kKernelSize = 64;
+const vec2 kRandScale = vec2(1280.0 / 4.0, 720.0 / 4.0);
+const float kGamma = 2.2;
 
 layout (location=0) out vec4 FragColor;
 layout (location=1) out vec3 PositionData;
@@ -17,9 +14,12 @@ layout (location=2) out vec3 NormalData;
 layout (location=3) out vec3 ColorData;
 layout (location=4) out float AOData;
 
-const int kKernelSize = 64;
-const vec2 kRandScale = vec2(1280.0 / 4.0, 720.0 / 4.0);
-const float kGamma = 2.2;
+uniform sampler2D PositionTex;
+uniform sampler2D NormalTex;
+uniform sampler2D ColorTex;
+uniform sampler2D AOTex;
+uniform sampler2D RandRotTex;
+uniform sampler2D DiffTex;
 
 uniform mat4 ProjectionMatrix;
 uniform int Pass;
@@ -69,7 +69,7 @@ void PackGBuffer() {
 
 void ComputeSSAO() {
     // ランダムに接座標空間->カメラ座標空間変換行列を生成します。
-    vec3 randDir = normalize(texture(RandDirTex, TexCoord.xy * kRandScale).xyz);
+    vec3 randDir = normalize(texture(RandRotTex, TexCoord.xy * kRandScale).xyz);
     vec3 n = normalize(texture(NormalTex, TexCoord.xy).xyz);
     vec3 bitang = cross(n, randDir);
     if (length(bitang) < 0.0001) {  // nとrandDirが平行であれば、nはx-y平面に存在します。

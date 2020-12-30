@@ -41,7 +41,7 @@ private:
   void SetMatrices();
 
   void BuildKernel(std::uint32_t seed);
-  void BuildRandDirTex(std::uint32_t seed);
+  void BuildRandRotTex(std::uint32_t seed);
 
   void Pass1();
   void Pass2();
@@ -78,7 +78,7 @@ private:
   enum Textures {
     WoodTex,
     BrickTex,
-    RandDirTex,
+    RandRotTex,
     TexturesNum,
   };
   std::array<GLuint, VertexBufferSize> vbo_{};

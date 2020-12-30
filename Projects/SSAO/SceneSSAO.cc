@@ -37,6 +37,12 @@ void SceneSSAO::OnInit() {
     BOOST_ASSERT_MSG(false, "failed to compile or link!");
   } else {
     prog_.Use();
+    prog_.SetUniform("PositionTex", 0);
+    prog_.SetUniform("NormalTex", 1);
+    prog_.SetUniform("ColorTex", 2);
+    prog_.SetUniform("AOTex", 3);
+    prog_.SetUniform("RandRotTex", 4);
+    prog_.SetUniform("DiffTex", 5);
     prog_.SetUniform("Light.L", glm::vec3(0.3f));
     prog_.SetUniform("Light.La", glm::vec3(0.5f));
   }
@@ -53,7 +59,7 @@ void SceneSSAO::OnInit() {
 
   std::uint32_t seed = std::random_device()();
   BuildKernel(seed);
-  BuildRandDirTex(seed);
+  BuildRandRotTex(seed);
 
   gbuffer_.OnInit(width_, height_);
 }
@@ -101,14 +107,9 @@ void SceneSSAO::OnResize(int w, int h) {
 
 std::optional<std::string> SceneSSAO::CompileAndLinkShader() {
   // Compile and links
-  if (prog_.Compile("./Assets/Shaders/SSAO/SSAO.vs.glsl", ShaderType::Vertex) &&
-      prog_.Compile("./Assets/Shaders/SSAO/SSAO.fs.glsl",
-                    ShaderType::Fragment) &&
-      prog_.Link()) {
-    return std::nullopt;
-  } else {
-    return prog_.GetLog();
-  }
+  return prog_.CompileAndLink(
+      {{"./Assets/Shaders/SSAO/SSAO.vs.glsl", ShaderType::Vertex},
+       {"./Assets/Shaders/SSAO/SSAO.fs.glsl", ShaderType::Fragment}});
 }
 
 void SceneSSAO::CreateVAO() {
@@ -177,7 +178,7 @@ void SceneSSAO::Pass2() {
 
   // テクスチャユニット4番にRandDirTexを設定します。
   glActiveTexture(GL_TEXTURE4);
-  glBindTexture(GL_TEXTURE_2D, textures_[RandDirTex]);
+  glBindTexture(GL_TEXTURE_2D, textures_[RandRotTex]);
 
   // AOTexに描きこみます。
   const GLuint aoTex = gbuffer_.GetAOTex();
@@ -322,7 +323,7 @@ void SceneSSAO::BuildKernel(std::uint32_t seed) {
   glUniform3fv(loc, kKernelSize, kern.data());
 }
 
-void SceneSSAO::BuildRandDirTex(std::uint32_t seed) {
+void SceneSSAO::BuildRandRotTex(std::uint32_t seed) {
   std::mt19937 engine(seed);
   UniformDistribution dist;
 
@@ -336,8 +337,8 @@ void SceneSSAO::BuildRandDirTex(std::uint32_t seed) {
     randDir[3 * i + 2] = 0.0f;
   }
 
-  glGenTextures(1, &textures_[RandDirTex]);
-  glBindTexture(GL_TEXTURE_2D, textures_[RandDirTex]);
+  glGenTextures(1, &textures_[RandRotTex]);
+  glBindTexture(GL_TEXTURE_2D, textures_[RandRotTex]);
   glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGB16F, kRotTexSize, kRotTexSize);
   glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, kRotTexSize, kRotTexSize, GL_RGB,
                   GL_FLOAT, randDir.data());
