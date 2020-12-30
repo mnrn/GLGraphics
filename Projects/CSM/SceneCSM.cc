@@ -24,11 +24,13 @@
 #include "UI/Font.h"
 #include "UI/Text.h"
 
+#ifdef WIN32
 #ifdef far
 #undef far
 #endif
 #ifdef near
 #undef near
+#endif
 #endif
 
 // ********************************************************************************

@@ -13,6 +13,15 @@
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/spdlog.h>
 
+#ifdef WIN32
+#ifdef far
+#undef far
+#endif
+#ifdef near
+#undef near
+#endif
+#endif
+
 // ********************************************************************************
 // Calculation
 // ********************************************************************************
