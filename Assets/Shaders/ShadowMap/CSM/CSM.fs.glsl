@@ -59,10 +59,10 @@ float ComputeShadow(int idx) {
 
     if (IsUsePCF) {
         float shadow = 0.0;
-        vec2 texSize = 1.0 / textureSize(ShadowMaps, 0).xy;
+        vec2 texelSize = 1.0 / textureSize(ShadowMaps, 0).xy;
         for (int y = -1; y <= 1; y++) {
             for (int x = -1; x <= 1; x++) {
-                shadow += texture(ShadowMaps, vec4(shadowCoord.xy + vec2(x, y) * texSize, float(idx), shadowCoord.z - bias));
+                shadow += texture(ShadowMaps, vec4(shadowCoord.xy + vec2(x, y) * texelSize, float(idx), shadowCoord.z - bias));
             }
         }
         return shadow / 9.0;
