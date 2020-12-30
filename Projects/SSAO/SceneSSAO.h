@@ -7,10 +7,14 @@
 
 #include "Scene/Scene.h"
 
+#include "SSAOCommon.h"
+
+#include <array>
 #include <glm/gtc/constants.hpp>
 #include <memory>
 #include <optional>
 #include <string>
+#include <type_traits>
 
 #include <freetype2/ft2build.h>
 #include FT_FREETYPE_H
@@ -37,6 +41,7 @@ public:
 
 private:
   std::optional<std::string> CompileAndLinkShader();
+  void SetupShaderConfig();
   void CreateVAO();
   void SetMatrices();
 
@@ -67,31 +72,39 @@ private:
   glm::vec4 lightPos_{3.0f, 3.0f, 1.5f, 1.0f};
   glm::mat4 sceneProj_{1.0f};
 
-  ShaderProgram prog_{};
+  enum struct RenderPass {
+    RecordGBuffer,
+    SSAO,
+    Blur,
+    Lighting,
+    Num,
+  };
+  RenderPass pass_ = RenderPass::RecordGBuffer;
+  std::array<ShaderProgram, to_i(RenderPass::Num)> progs_;
   GBuffer gbuffer_{};
 
-  enum VertexBuffer {
+  enum struct VertexBuffer {
     VertexPosition,
     TextureCoordinates,
-    VertexBufferSize,
+    Size,
   };
-  enum Textures {
+  enum struct Textures {
     WoodTex,
     BrickTex,
     RandRotTex,
-    TexturesNum,
+    Num,
   };
-  std::array<GLuint, VertexBufferSize> vbo_{};
-  std::array<GLuint, TexturesNum> textures_{};
+  std::array<GLuint, to_i(VertexBuffer::Size)> vbo_{};
+  std::array<GLuint, to_i(Textures::Num)> textures_{};
   GLuint quad_ = 0;
 
-  enum RenderType {
+  enum struct RenderType : int {
     SSAO,
     SSAOOnly,
     NoSSAO,
-    RenderTypeNum,
+    Num,
   };
-  int type_ = RenderType::SSAO;
+  RenderType type_ = RenderType::SSAO;
 
   std::unique_ptr<FontObj> fontObj_;
 };

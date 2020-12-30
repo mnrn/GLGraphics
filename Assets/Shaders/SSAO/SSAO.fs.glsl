@@ -1,73 +1,21 @@
 #version 410
 
-in vec3 Position;
-in vec3 Normal;
-in vec2 TexCoord;
-
 const int kKernelSize = 64;
 const vec2 kRandScale = vec2(1280.0 / 4.0, 720.0 / 4.0);
-const float kGamma = 2.2;
 
-layout (location=0) out vec4 FragColor;
-layout (location=1) out vec3 PositionData;
-layout (location=2) out vec3 NormalData;
-layout (location=3) out vec3 ColorData;
-layout (location=4) out float AOData;
+in vec2 TexCoord;
+
+layout (location=0) out float FragColor;
 
 uniform sampler2D PositionTex;
 uniform sampler2D NormalTex;
-uniform sampler2D ColorTex;
-uniform sampler2D AOTex;
 uniform sampler2D RandRotTex;
-uniform sampler2D DiffTex;
 
 uniform mat4 ProjectionMatrix;
-uniform int Pass;
 uniform vec3 SampleKernel[kKernelSize];
 uniform float Radius = 0.55;
-uniform int Type = 0;
 
-uniform struct LightInfo {
-    vec4 Position;  // カメラ座標系におけるライトの位置
-    vec3 L;         // Diffuse Light (拡散光)およびSpecular Light (鏡面反射光)の強さ
-    vec3 La;        // Ambient Light (環境光)の強さ
-} Light;
-
-uniform struct MaterialInfo {
-    vec3 Kd;        // Diffsue reflectivity (拡散光の反射係数)
-    bool UseTex;    // テクスチャを使うかどうか
-} Material;
-
-
-vec3 GammaCorrection(vec3 color) {
-    return pow(color, vec3(1.0 / kGamma));
-}
-
-vec3 AmbientDiffuseModel(vec3 pos, vec3 norm, vec3 diff, float ao) {
-    vec3 amb = Light.La * diff * ao;
-    vec3 dirToL = normalize(vec3(Light.Position) - pos);
-    float NoL = max(dot(norm, dirToL), 0.0);
-    if (Type == 1) {
-        return vec3(ao);
-    } else if (Type == 2) {
-        return Light.L * diff * NoL;
-    } else {
-        return amb + Light.L * diff * NoL;
-    }
-}
-
-void PackGBuffer() {
-    // 位置情報、法線情報、色情報をGBufferに詰め込みます。
-    PositionData = Position;
-    NormalData = normalize(Normal);
-    if (Material.UseTex) {
-        ColorData = pow(texture(DiffTex, TexCoord.xy).xyz, vec3(kGamma));
-    } else {
-        ColorData = Material.Kd;
-    }
-}
-
-void ComputeSSAO() {
+void main() {
     // ランダムに接座標空間->カメラ座標空間変換行列を生成します。
     vec3 randDir = normalize(texture(RandRotTex, TexCoord.xy * kRandScale).xyz);
     vec3 n = normalize(texture(NormalTex, TexCoord.xy).xyz);
@@ -99,51 +47,5 @@ void ComputeSSAO() {
     }
     // normalized
     occ = occ / kKernelSize;
-    AOData = 1.0 - occ;
-}
-
-void Blur() {
-    ivec2 pix = ivec2(gl_FragCoord.xy);
-    float acc = 0.0;
-
-    acc += texelFetchOffset(AOTex, pix, 0, ivec2(-1, -1)).r;
-    acc += texelFetchOffset(AOTex, pix, 0, ivec2(-1, -0)).r;
-    acc += texelFetchOffset(AOTex, pix, 0, ivec2(-1, 1)).r;
-    acc += texelFetchOffset(AOTex, pix, 0, ivec2(0, -1)).r;
-    acc += texelFetchOffset(AOTex, pix, 0, ivec2(0, 0)).r;
-    acc += texelFetchOffset(AOTex, pix, 0, ivec2(0, 1)).r;
-    acc += texelFetchOffset(AOTex, pix, 0, ivec2(1, -1)).r;
-    acc += texelFetchOffset(AOTex, pix, 0, ivec2(1, 0)).r;
-    acc += texelFetchOffset(AOTex, pix, 0, ivec2(1, 1)).r;
-    
-    // normalized
-    float ao = acc * (1.0 / 9.0);
-    AOData = ao;
-}
-
-void Visualize() {
-    // テクスチャから情報を取り出します。
-    vec3 pos = texture(PositionTex, TexCoord).xyz;
-    vec3 norm = texture(NormalTex, TexCoord).xyz;
-    vec3 diff = texture(ColorTex, TexCoord).rgb;
-    float ao = texture(AOTex, TexCoord).r;
-
-    // AOのパラメータ化
-    ao = pow(ao, 8.0);
-
-    vec3 color = AmbientDiffuseModel(pos, norm, diff, ao);
-    color = GammaCorrection(color);
-    FragColor = vec4(color, 1.0);
-}
-
-void main() {
-    if (Pass == 1) {
-        PackGBuffer();
-    } else if (Pass == 2) {
-        ComputeSSAO();
-    } else if (Pass == 3) {
-        Blur();
-    } else if (Pass == 4) {
-        Visualize();
-    }
+    FragColor = 1.0 - occ;
 }

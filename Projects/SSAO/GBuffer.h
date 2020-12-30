@@ -3,6 +3,8 @@
 
 #include "GLInclude.h"
 
+#include "SSAOCommon.h"
+
 #include <array>
 #include <vector>
 
@@ -11,43 +13,48 @@ public:
   ~GBuffer();
 
   void OnInit(int w, int h);
-  void OnPreRender();
   void OnDestroy();
 
-  GLuint GetDeferredFBO() const { return fbo_[Deferred]; }
-  GLuint GetSSAOFBO() const { return fbo_[SSAO]; }
+  GLuint GetDeferredFBO() const { return fbo_[to_i(FBO::Deferred)]; }
+  GLuint GetSSAOFBO() const { return fbo_[to_i(FBO::SSAO)]; }
+  GLuint GetSSAOBlurFBO() const { return fbo_[to_i(FBO::SSAOBlur)]; }
 
-  GLuint GetPosTex() const { return textures_[PosTex]; }
-  GLuint GetNormTex() const { return textures_[NormTex]; }
-  GLuint GetColorTex() const { return textures_[ColorTex]; }
-  GLuint GetAOTex() const { return textures_[AOTex]; }
-  GLuint GetBlurAOTex() const { return textures_[BlurAOTex]; }
+  GLuint GetPosTex() const { return textures_[to_i(Textures::Pos)]; }
+  GLuint GetNormTex() const { return textures_[to_i(Textures::Norm)]; }
+  GLuint GetColorTex() const { return textures_[to_i(Textures::Color)]; }
+  GLuint GetAOTex() const { return textures_[to_i(Textures::AO)]; }
+  GLuint GetBlurAOTex() const { return textures_[to_i(Textures::BlurAO)]; }
 
 private:
-  GLuint CreateGBufferTexture(GLenum texUnit, GLenum format);
+  void InitDeferredFBO();
+  void InitSSAOFBO();
+  void InitSSAOBlurFBO();
 
-  enum FramebufferObjects {
+  GLuint CreateGBufferTexture(GLenum format);
+
+  enum struct FBO {
     Deferred,
     SSAO,
-    FramebufferObjectsNum,
+    SSAOBlur,
+    Num,
   };
-  enum Renderbuffers {
+  enum struct Renderbuffers {
     DepthBuffer,
-    RenderbuffersNum,
+    Num,
   };
-  enum Textures {
-    PosTex,
-    NormTex,
-    ColorTex,
-    AOTex,
-    BlurAOTex,
-    TexturesNum,
+  enum struct Textures {
+    Pos,
+    Norm,
+    Color,
+    AO,
+    BlurAO,
+    Num,
   };
 
   int width_, height_;
-  std::array<GLuint, FramebufferObjectsNum> fbo_;
-  std::array<GLuint, RenderbuffersNum> renders_;
-  std::array<GLuint, TexturesNum> textures_; // GBuffer textures
+  std::array<GLuint, to_i(FBO::Num)> fbo_;
+  std::array<GLuint, to_i(Renderbuffers::Num)> renders_;
+  std::array<GLuint, to_i(Textures::Num)> textures_; // GBuffer textures
 };
 
 #endif

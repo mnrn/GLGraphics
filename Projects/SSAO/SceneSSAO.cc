@@ -36,15 +36,7 @@ void SceneSSAO::OnInit() {
     std::cerr << msg.value() << std::endl;
     BOOST_ASSERT_MSG(false, "failed to compile or link!");
   } else {
-    prog_.Use();
-    prog_.SetUniform("PositionTex", 0);
-    prog_.SetUniform("NormalTex", 1);
-    prog_.SetUniform("ColorTex", 2);
-    prog_.SetUniform("AOTex", 3);
-    prog_.SetUniform("RandRotTex", 4);
-    prog_.SetUniform("DiffTex", 5);
-    prog_.SetUniform("Light.L", glm::vec3(0.3f));
-    prog_.SetUniform("Light.La", glm::vec3(0.5f));
+    SetupShaderConfig();
   }
 
   sceneProj_ = glm::perspective(
@@ -53,8 +45,9 @@ void SceneSSAO::OnInit() {
 
   CreateVAO();
 
-  textures_[WoodTex] = Texture::Load("./Assets/Textures/Wood/wood.jpeg");
-  textures_[BrickTex] =
+  textures_[to_i(Textures::WoodTex)] =
+      Texture::Load("./Assets/Textures/Wood/wood.jpeg");
+  textures_[to_i(Textures::BrickTex)] =
       Texture::Load("./Assets/Textures/Brick/ruin_wall_01.png");
 
   std::uint32_t seed = std::random_device()();
@@ -80,18 +73,24 @@ void SceneSSAO::OnUpdate(float t) {
   }
 
   if (KeyInput::Get().IsTrg(Key::Left)) {
-    type_ = glm::mod(type_ - 1, RenderType::RenderTypeNum);
+    type_ = static_cast<RenderType>(
+        glm::mod(to_i(type_) - 1, to_i(RenderType::Num)));
   } else if (KeyInput::Get().IsTrg(Key::Right)) {
-    type_ = glm::mod(type_ + 1, RenderType::RenderTypeNum);
+    type_ = static_cast<RenderType>(
+        glm::mod(to_i(type_) + 1, to_i(RenderType::Num)));
   }
 }
 
 void SceneSSAO::OnRender() {
-  prog_.Use();
-  Pass1();
-  Pass2();
-  Pass3();
-  Pass4();
+  glClearColor(0.9f, 0.9f, 0.9f, 1.0f);
+  glEnable(GL_DEPTH_TEST);
+
+  {
+    Pass1();
+    Pass2();
+    Pass3();
+    Pass4();
+  }
 
   DrawText();
 }
@@ -107,9 +106,46 @@ void SceneSSAO::OnResize(int w, int h) {
 
 std::optional<std::string> SceneSSAO::CompileAndLinkShader() {
   // Compile and links
-  return prog_.CompileAndLink(
-      {{"./Assets/Shaders/SSAO/SSAO.vs.glsl", ShaderType::Vertex},
-       {"./Assets/Shaders/SSAO/SSAO.fs.glsl", ShaderType::Fragment}});
+  if (const auto msg = progs_[to_i(RenderPass::RecordGBuffer)].CompileAndLink(
+          {{"./Assets/Shaders/SSAO/GBuffer.vs.glsl", ShaderType::Vertex},
+           {"./Assets/Shaders/SSAO/GBuffer.fs.glsl", ShaderType::Fragment}})) {
+    return msg;
+  }
+  if (const auto msg = progs_[to_i(RenderPass::SSAO)].CompileAndLink(
+          {{"./Assets/Shaders/SSAO/SSAO.vs.glsl", ShaderType::Vertex},
+           {"./Assets/Shaders/SSAO/SSAO.fs.glsl", ShaderType::Fragment}})) {
+    return msg;
+  }
+  if (const auto msg = progs_[to_i(RenderPass::Blur)].CompileAndLink(
+          {{"./Assets/Shaders/SSAO/SSAO.vs.glsl", ShaderType::Vertex},
+           {"./Assets/Shaders/SSAO/Blur.fs.glsl", ShaderType::Fragment}})) {
+    return msg;
+  }
+  if (const auto msg = progs_[to_i(RenderPass::Lighting)].CompileAndLink(
+          {{"./Assets/Shaders/SSAO/SSAO.vs.glsl", ShaderType::Vertex},
+           {"./Assets/Shaders/SSAO/Lighting.fs.glsl", ShaderType::Fragment}})) {
+    return msg;
+  }
+  return std::nullopt;
+}
+
+void SceneSSAO::SetupShaderConfig() {
+  progs_[to_i(RenderPass::RecordGBuffer)].Use();
+  progs_[to_i(RenderPass::RecordGBuffer)].SetUniform("DiffTex", 0);
+
+  progs_[to_i(RenderPass::SSAO)].Use();
+  progs_[to_i(RenderPass::SSAO)].SetUniform("PositionTex", 0);
+  progs_[to_i(RenderPass::SSAO)].SetUniform("NormalTex", 1);
+  progs_[to_i(RenderPass::SSAO)].SetUniform("RandRotTex", 2);
+
+  progs_[to_i(RenderPass::Blur)].Use();
+  progs_[to_i(RenderPass::Blur)].SetUniform("AOTex", 0);
+
+  progs_[to_i(RenderPass::Lighting)].Use();
+  progs_[to_i(RenderPass::Lighting)].SetUniform("PositionTex", 0);
+  progs_[to_i(RenderPass::Lighting)].SetUniform("NormalTex", 1);
+  progs_[to_i(RenderPass::Lighting)].SetUniform("ColorTex", 2);
+  progs_[to_i(RenderPass::Lighting)].SetUniform("AOTex", 3);
 }
 
 void SceneSSAO::CreateVAO() {
@@ -121,32 +157,34 @@ void SceneSSAO::CreateVAO() {
 
   glGenBuffers(static_cast<GLsizei>(vbo_.size()), vbo_.data());
 
-  glBindBuffer(GL_ARRAY_BUFFER, vbo_[VertexPosition]);
+  glBindBuffer(GL_ARRAY_BUFFER, vbo_[to_i(VertexBuffer::VertexPosition)]);
   glBufferData(GL_ARRAY_BUFFER, 6 * 3 * sizeof(float), verts, GL_STATIC_DRAW);
 
-  glBindBuffer(GL_ARRAY_BUFFER, vbo_[TextureCoordinates]);
+  glBindBuffer(GL_ARRAY_BUFFER, vbo_[to_i(VertexBuffer::TextureCoordinates)]);
   glBufferData(GL_ARRAY_BUFFER, 6 * 2 * sizeof(float), tc, GL_STATIC_DRAW);
 
   // 頂点配列オブジェクトの設定
   glGenVertexArrays(1, &quad_);
   glBindVertexArray(quad_);
 
-  glBindBuffer(GL_ARRAY_BUFFER, vbo_[VertexPosition]);
+  glBindBuffer(GL_ARRAY_BUFFER, vbo_[to_i(VertexBuffer::VertexPosition)]);
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
   glEnableVertexAttribArray(0); // VertexPosition
 
-  glBindBuffer(GL_ARRAY_BUFFER, vbo_[TextureCoordinates]);
-  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, 0);
-  glEnableVertexAttribArray(2); // TexCoord
+  glBindBuffer(GL_ARRAY_BUFFER, vbo_[to_i(VertexBuffer::TextureCoordinates)]);
+  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, 0);
+  glEnableVertexAttribArray(1); // TexCoord
 
   glBindVertexArray(0);
 }
 
 void SceneSSAO::SetMatrices() {
   const glm::mat4 mv = view_ * model_;
-  prog_.SetUniform("ModelViewMatrix", mv);
-  prog_.SetUniform("NormalMatrix", glm::mat3(mv));
-  prog_.SetUniform("MVP", proj_ * mv);
+
+  progs_[to_i(RenderPass::RecordGBuffer)].SetUniform("ModelViewMatrix", mv);
+  progs_[to_i(RenderPass::RecordGBuffer)].SetUniform("NormalMatrix",
+                                                     glm::mat3(mv));
+  progs_[to_i(RenderPass::RecordGBuffer)].SetUniform("MVP", proj_ * mv);
 }
 
 // ********************************************************************************
@@ -154,121 +192,131 @@ void SceneSSAO::SetMatrices() {
 // ********************************************************************************
 
 void SceneSSAO::Pass1() {
-  prog_.SetUniform("Pass", 1);
-
-  const GLuint deferredFBO = gbuffer_.GetDeferredFBO();
-  glBindFramebuffer(GL_FRAMEBUFFER, deferredFBO);
+  glBindFramebuffer(GL_FRAMEBUFFER, gbuffer_.GetDeferredFBO());
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  glEnable(GL_DEPTH_TEST);
 
   view_ = glm::lookAt(glm::vec3(2.1f, 1.5f, 2.1f), glm::vec3(0.0f, 1.0f, 0.0f),
                       glm::vec3(0.0f, 1.0f, 0.0f));
   proj_ = sceneProj_;
-
-  gbuffer_.OnPreRender();
+  progs_[to_i(RenderPass::RecordGBuffer)].Use();
 
   DrawScene();
+
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void SceneSSAO::Pass2() {
-  prog_.SetUniform("Pass", 2);
-
-  const GLuint ssaoFBO = gbuffer_.GetSSAOFBO();
-  glBindFramebuffer(GL_FRAMEBUFFER, ssaoFBO);
-
-  // テクスチャユニット4番にRandDirTexを設定します。
-  glActiveTexture(GL_TEXTURE4);
-  glBindTexture(GL_TEXTURE_2D, textures_[RandRotTex]);
-
-  // AOTexに描きこみます。
-  const GLuint aoTex = gbuffer_.GetAOTex();
-  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
-                         aoTex, 0);
+  glBindFramebuffer(GL_FRAMEBUFFER, gbuffer_.GetSSAOFBO());
   glClear(GL_COLOR_BUFFER_BIT);
-  glDisable(GL_DEPTH_TEST);
-  prog_.SetUniform("ProjectionMatrix", sceneProj_);
+
+  progs_[to_i(RenderPass::SSAO)].Use();
+  progs_[to_i(RenderPass::SSAO)].SetUniform("ProjectionMatrix", sceneProj_);
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, gbuffer_.GetPosTex());
+  glActiveTexture(GL_TEXTURE1);
+  glBindTexture(GL_TEXTURE_2D, gbuffer_.GetNormTex());
+  glActiveTexture(GL_TEXTURE2);
+  glBindTexture(GL_TEXTURE_2D, textures_[to_i(Textures::RandRotTex)]);
+
   DrawQuad();
+
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void SceneSSAO::Pass3() {
-  prog_.SetUniform("Pass", 3);
-
-  // AOTexを読み込み、BlurAOTexに描きこみます。
-  const GLuint aoTex = gbuffer_.GetAOTex();
-  const GLuint blurAOTex = gbuffer_.GetBlurAOTex();
-  glActiveTexture(
-      GL_TEXTURE3); // テクスチャユニット3番を有効にAOTexをバインドします。
-  glBindTexture(GL_TEXTURE_2D, aoTex);
-  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
-                         blurAOTex, 0);
+  glBindFramebuffer(GL_FRAMEBUFFER, gbuffer_.GetSSAOBlurFBO());
   glClear(GL_COLOR_BUFFER_BIT);
-  glDisable(GL_DEPTH_TEST);
+
+  progs_[to_i(RenderPass::Blur)].Use();
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, gbuffer_.GetAOTex());
+
   DrawQuad();
+
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void SceneSSAO::Pass4() {
-  prog_.SetUniform("Pass", 4);
-  prog_.SetUniform("Type", type_);
-
-  // BlurAOTexを読み込みます。
-  const GLuint blurAOTex = gbuffer_.GetBlurAOTex();
-  glActiveTexture(
-      GL_TEXTURE3); // テクスチャユニット3番を有効にしblurAOTexをバインドします。
-  glBindTexture(GL_TEXTURE_2D, blurAOTex);
-
-  // デフォルトのFramebufferに戻して描きこみます。
-  glBindFramebuffer(GL_FRAMEBUFFER, 0);
   glClear(GL_COLOR_BUFFER_BIT);
-  glDisable(GL_DEPTH_TEST);
+
+  progs_[to_i(RenderPass::Lighting)].Use();
+  progs_[to_i(RenderPass::Lighting)].SetUniform("Light.Position",
+                                                view_ * lightPos_);
+  progs_[to_i(RenderPass::Lighting)].SetUniform("Light.L", glm::vec3(0.3f));
+  progs_[to_i(RenderPass::Lighting)].SetUniform("Light.La", glm::vec3(0.5f));
+  progs_[to_i(RenderPass::Lighting)].SetUniform("Type", to_i(type_));
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, gbuffer_.GetPosTex());
+  glActiveTexture(GL_TEXTURE1);
+  glBindTexture(GL_TEXTURE_2D, gbuffer_.GetNormTex());
+  glActiveTexture(GL_TEXTURE2);
+  glBindTexture(GL_TEXTURE_2D, gbuffer_.GetColorTex());
+  glActiveTexture(GL_TEXTURE3);
+  glBindTexture(GL_TEXTURE_2D, gbuffer_.GetBlurAOTex());
+
   DrawQuad();
+
   glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void SceneSSAO::DrawScene() {
-  prog_.SetUniform("Light.Position", view_ * lightPos_);
+  // テクスチャユニット0番を有効にします。
+  glActiveTexture(GL_TEXTURE0);
 
   // 床の描画
-  glActiveTexture(GL_TEXTURE5);
-  glBindTexture(GL_TEXTURE_2D, textures_[WoodTex]);
-  prog_.SetUniform("Material.UseTex", 1);
-  model_ = glm::mat4(1.0f);
-  SetMatrices();
-  plane_.Render();
+  {
+    glBindTexture(GL_TEXTURE_2D, textures_[to_i(Textures::WoodTex)]);
 
-  // 壁の描画
-  glActiveTexture(GL_TEXTURE5);
-  glBindTexture(GL_TEXTURE_2D, textures_[BrickTex]);
-  model_ = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -2.0f));
-  model_ =
-      glm::rotate(model_, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-  SetMatrices();
-  plane_.Render();
+    progs_[to_i(RenderPass::RecordGBuffer)].SetUniform("Material.UseTex", 1);
+    model_ = glm::mat4(1.0f);
+    SetMatrices();
 
-  model_ = glm::translate(glm::mat4(1.0f), glm::vec3(-2.0f, 0.0f, 0.0f));
-  model_ =
-      glm::rotate(model_, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-  model_ =
-      glm::rotate(model_, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-  SetMatrices();
-  plane_.Render();
+    plane_.Render();
+  }
+
+  // 壁の描画1
+  {
+    glBindTexture(GL_TEXTURE_2D, textures_[to_i(Textures::BrickTex)]);
+
+    model_ = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -2.0f));
+    model_ =
+        glm::rotate(model_, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+    SetMatrices();
+
+    plane_.Render();
+  }
+
+  // 壁の描画2
+  {
+    model_ = glm::translate(glm::mat4(1.0f), glm::vec3(-2.0f, 0.0f, 0.0f));
+    model_ =
+        glm::rotate(model_, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    model_ =
+        glm::rotate(model_, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+    SetMatrices();
+
+    plane_.Render();
+  }
 
   // メインメッシュの描画
-  prog_.SetUniform("Material.UseTex", 0);
-  prog_.SetUniform("Material.Kd", glm::vec3(0.9f, 0.5f, 0.2f));
-  model_ = glm::rotate(glm::mat4(1.0f), glm::radians(30.0f),
-                       glm::vec3(0.0f, 1.0f, 0.0f));
-  model_ = glm::scale(model_, glm::vec3(0.3f));
-  model_ = glm::translate(model_, glm::vec3(0.0f, 0.282958f, 0.0f));
-  SetMatrices();
-  mesh_->Render();
+  {
+    progs_[to_i(RenderPass::RecordGBuffer)].SetUniform("Material.UseTex", 0);
+    progs_[to_i(RenderPass::RecordGBuffer)].SetUniform(
+        "Material.Kd", glm::vec3(0.9f, 0.5f, 0.2f));
+
+    model_ = glm::rotate(glm::mat4(1.0f), glm::radians(30.0f),
+                         glm::vec3(0.0f, 1.0f, 0.0f));
+    model_ = glm::scale(model_, glm::vec3(0.3f));
+    model_ = glm::translate(model_, glm::vec3(0.0f, 0.282958f, 0.0f));
+    SetMatrices();
+
+    mesh_->Render();
+  }
+
+  glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void SceneSSAO::DrawQuad() {
-  view_ = glm::mat4(1.0f);
-  proj_ = glm::mat4(1.0f);
-  model_ = glm::mat4(1.0f);
-  SetMatrices();
-
   glBindVertexArray(quad_);
   glDrawArrays(GL_TRIANGLES, 0, 6);
   glBindVertexArray(0);
@@ -281,12 +329,12 @@ void SceneSSAO::DrawText() {
 
   const float kOffsetX = 25.0f;
   const float kOffsetY = static_cast<float>(height_) - 40.0f;
-  const std::map<int, std::string> kTexts = {
+  const std::map<RenderType, std::string> kTexts = {
       {RenderType::SSAO, "RenderType: SSAO"},
       {RenderType::SSAOOnly, "RenderType: SSAO Only"},
       {RenderType::NoSSAO, "RenderType: Diffuse Only"},
   };
-  if (kTexts.count(static_cast<RenderType>(type_)) <= 0) {
+  if (kTexts.count(type_) <= 0) {
     return;
   }
   Text::Get().Begin(width_, height_);
@@ -318,7 +366,8 @@ void SceneSSAO::BuildKernel(std::uint32_t seed) {
     kern[3 * i + 2] = randDir.z;
   }
 
-  GLuint hProg = prog_.GetHandle();
+  progs_[to_i(RenderPass::SSAO)].Use();
+  GLuint hProg = progs_[to_i(RenderPass::SSAO)].GetHandle();
   GLuint loc = glGetUniformLocation(hProg, "SampleKernel");
   glUniform3fv(loc, kKernelSize, kern.data());
 }
@@ -337,8 +386,8 @@ void SceneSSAO::BuildRandRotTex(std::uint32_t seed) {
     randDir[3 * i + 2] = 0.0f;
   }
 
-  glGenTextures(1, &textures_[RandRotTex]);
-  glBindTexture(GL_TEXTURE_2D, textures_[RandRotTex]);
+  glGenTextures(1, &textures_[to_i(Textures::RandRotTex)]);
+  glBindTexture(GL_TEXTURE_2D, textures_[to_i(Textures::RandRotTex)]);
   glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGB16F, kRotTexSize, kRotTexSize);
   glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, kRotTexSize, kRotTexSize, GL_RGB,
                   GL_FLOAT, randDir.data());

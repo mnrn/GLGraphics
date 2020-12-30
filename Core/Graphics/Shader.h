@@ -16,17 +16,17 @@
 
 #include "GLInclude.h"
 
+#include <boost/assert.hpp>
+#include <boost/noncopyable.hpp>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <memory>
+#include <optional>
 #include <sstream>
 #include <string>
 #include <utility>
 #include <vector>
-#include <optional>
-
-#include <boost/noncopyable.hpp>
 
 // ********************************************************************************
 // Class(es)
@@ -56,7 +56,7 @@ public:
   // Compile & Link
   //*--------------------------------------------------------------------------------
 
-  bool Compile(const std::string& filepath, ShaderType type);
+  bool Compile(const std::string &filepath, ShaderType type);
   bool Link();
 
   //*--------------------------------------------------------------------------------
@@ -69,9 +69,8 @@ public:
   // Utility
   //*--------------------------------------------------------------------------------
 
-  std::optional<std::string>
-  CompileAndLink(const std::vector<std::pair<std::string, ShaderType>> &shaders);
-
+  std::optional<std::string> CompileAndLink(
+      const std::vector<std::pair<std::string, ShaderType>> &shaders);
 
   //*--------------------------------------------------------------------------------
   // Bind Location
@@ -130,11 +129,16 @@ private:
   //*--------------------------------------------------------------------------------
 
   template <typename F, typename... Args>
-  void SetUniform(const char *name, F f, Args &&... args) const {
+  void SetUniform(const char *name, F f, Args &&...args) const {
     auto location = GetUniformLocation(name);
     if (location >= 0) {
       f(location, std::forward<Args>(args)...);
     }
+#if (!NDEBUG)
+    else {
+      BOOST_ASSERT_MSG(false, "Failed to get uniform location.");
+    }
+#endif
   }
 
   int GetUniformLocation(const char *name) const {
