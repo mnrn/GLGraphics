@@ -1,5 +1,5 @@
 /**
- * @brief SSAOのレンダリングテストシーン
+ * @brief SSAOのテストシーン
  */
 
 #ifndef SCENE_SSAO_H
@@ -7,17 +7,10 @@
 
 #include "Scene/Scene.h"
 
-#include "SSAOCommon.h"
-
-#include <array>
 #include <glm/gtc/constants.hpp>
 #include <memory>
 #include <optional>
 #include <string>
-#include <type_traits>
-
-#include <freetype2/ft2build.h>
-#include FT_FREETYPE_H
 
 #include "GBuffer.h"
 #include "Graphics/Shader.h"
@@ -25,12 +18,7 @@
 #include "Primitive/Plane.h"
 #include "Primitive/Teapot.h"
 #include "Primitive/Torus.h"
-#include "UI/Font.h"
 #include "View/Camera.h"
-
-// ********************************************************************************
-// Classes
-// ********************************************************************************
 
 class SceneSSAO : public Scene {
 public:
@@ -45,9 +33,7 @@ private:
   void SetupShaderConfig();
   void CreateVAO();
   void SetMatrices();
-
-  void BuildKernel(std::uint32_t seed);
-  void BuildRandRotTex(std::uint32_t seed);
+  void SetupSSAO();
 
   void Pass1();
   void Pass2();
@@ -63,37 +49,29 @@ private:
 
   Camera camera_{};
 
-  enum struct RenderPass {
-    RecordGBuffer,
-    SSAO,
-    Blur,
-    Lighting,
-    Num,
+  enum RenderPass {
+    RecordGBufferPass,
+    SSAOPass,
+    BlurPass,
+    LightingPass,
+    PassMax,
   };
-  std::array<ShaderProgram, to_i(RenderPass::Num)> progs_;
+  std::array<ShaderProgram, PassMax> progs_{};
   GBuffer gbuffer_{};
 
-  enum struct VertexBuffer {
-    VertexPosition,
-    TextureCoordinates,
-    Size,
-  };
-  enum struct Textures {
-    WoodTex,
-    BrickTex,
-    RandRotTex,
-    Num,
-  };
-  std::array<GLuint, to_i(VertexBuffer::Size)> vbo_{};
-  std::array<GLuint, to_i(Textures::Num)> textures_{};
-  GLuint quad_ = 0;
+  enum Textures { WoodTex, BrickTex, RandRotTex, TexturesMax };
+  std::array<GLuint, TexturesMax> textures_{};
 
-  enum struct RenderType : int {
-    SSAO,
-    SSAOOnly,
-    NoSSAO,
-    Num,
+  GLuint quadVAO_ = 0;
+  GLuint quadVBO_ = 0;
+
+  enum RenderType {
+    RenderSSAO,
+    RenderSSAOOnly,
+    RenderNoSSAO,
+    RenderTypeNum,
   };
+  int type_ = RenderSSAO;
 };
 
 #endif

@@ -1,39 +1,41 @@
 /**
- * @brief SSAOのレンダリングテストシーン
+ * @brief SSAOのテストシーン
  */
 
 #include "SceneSSAO.h"
 
 #include <boost/assert.hpp>
-#include <iostream>
-#include <random>
-
 #include <glm/gtc/constants.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/integer.hpp>
+#include <iostream>
+#include <random>
 
 #include "Graphics/Texture.h"
 #include "HID/KeyInput.h"
 #include "Math/UniformDistribution.h"
-#include "UI/Font.h"
-#include "UI/Text.h"
+#include "SSAO.h"
 
 // ********************************************************************************
 // Constexpr variables
 // ********************************************************************************
 
-static constexpr float kCameraFOVY = 50.0f;
+static constexpr float kCameraFOVY = 60.0f;
 
 static constexpr glm::vec4 kLightPos{3.0f, 3.0f, 1.5f, 1.0f};
 
 // NOTE: シェーダーのカーネルサイズと一致させる必要があります。
 static constexpr std::size_t kKernelSize = 64;
 
+static constexpr std::size_t kRotTexSize = 4; // 4x4 texture
+
 // ********************************************************************************
-// Overrides scene
+// Override functions
 // ********************************************************************************
 
 void SceneSSAO::OnInit() {
+  KeyInput::Create();
+
   camera_.SetupOrient(glm::vec3(2.1f, 1.5f, 2.1f), glm::vec3(0.0f, 1.0f, 0.0f),
                       glm::vec3(0.0f, 1.0f, 0.0f));
   camera_.SetupPerspective(
@@ -48,35 +50,34 @@ void SceneSSAO::OnInit() {
   }
 
   CreateVAO();
-
-  textures_[to_i(Textures::WoodTex)] =
-      Texture::Load("./Assets/Textures/Wood/wood.jpeg");
-  textures_[to_i(Textures::BrickTex)] =
-      Texture::Load("./Assets/Textures/Brick/ruin_wall_01.png");
-
-  /*
-  std::uint32_t seed = std::random_device()();
-  BuildKernel(seed);
-  BuildRandRotTex(seed);
-  */
-
   gbuffer_.OnInit(width_, height_);
+
+  SetupSSAO();
+
+  textures_[WoodTex] = Texture::Load("./Assets/Textures/Wood/wood.jpeg");
+  textures_[BrickTex] =
+      Texture::Load("./Assets/Textures/Brick/ruin_wall_01.png");
 }
 
 void SceneSSAO::OnDestroy() {
   glDeleteTextures(static_cast<GLsizei>(textures_.size()), textures_.data());
-  glDeleteVertexArrays(1, &quad_);
-  glDeleteBuffers(static_cast<GLsizei>(vbo_.size()), vbo_.data());
+  glDeleteVertexArrays(1, &quadVAO_);
+  glDeleteBuffers(1, &quadVBO_);
 }
 
-void SceneSSAO::OnUpdate(float t) {}
+void SceneSSAO::OnUpdate(float) {
+  if (KeyInput::Get().IsTrg(Key::Left)) {
+    type_ = glm::mod(type_ - 1, RenderType::RenderTypeNum);
+  } else if (KeyInput::Get().IsTrg(Key::Right)) {
+    type_ = glm::mod(type_ + 1, RenderType::RenderTypeNum);
+  }
+}
 
 void SceneSSAO::OnRender() {
-  glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-  {
-    Pass1();
-    Pass4();
-  }
+  Pass1();
+  Pass2();
+  Pass3();
+  Pass4();
 }
 
 void SceneSSAO::OnResize(int w, int h) {
@@ -85,81 +86,29 @@ void SceneSSAO::OnResize(int w, int h) {
 }
 
 // ********************************************************************************
-// Shader settings
+// Settings
 // ********************************************************************************
 
-std::optional<std::string> SceneSSAO::CompileAndLinkShader() {
-  // Compile and links
-  if (const auto msg = progs_[to_i(RenderPass::RecordGBuffer)].CompileAndLink(
-          {{"./Assets/Shaders/SSAO/GBuffer.vs.glsl", ShaderType::Vertex},
-           {"./Assets/Shaders/SSAO/GBuffer.fs.glsl", ShaderType::Fragment}})) {
-    return msg;
-  }
-  /*
-  if (const auto msg = progs_[to_i(RenderPass::SSAO)].CompileAndLink(
-          {{"./Assets/Shaders/SSAO/SSAO.vs.glsl", ShaderType::Vertex},
-           {"./Assets/Shaders/SSAO/SSAO.fs.glsl", ShaderType::Fragment}})) {
-    return msg;
-  }
-  if (const auto msg = progs_[to_i(RenderPass::Blur)].CompileAndLink(
-          {{"./Assets/Shaders/SSAO/SSAO.vs.glsl", ShaderType::Vertex},
-           {"./Assets/Shaders/SSAO/Blur.fs.glsl", ShaderType::Fragment}})) {
-    return msg;
-  }
-  */
-  if (const auto msg = progs_[to_i(RenderPass::Lighting)].CompileAndLink(
-          {{"./Assets/Shaders/SSAO/SSAO.vs.glsl", ShaderType::Vertex},
-           {"./Assets/Shaders/SSAO/Lighting.fs.glsl", ShaderType::Fragment}})) {
-    return msg;
-  }
-  return std::nullopt;
-}
-
-void SceneSSAO::SetupShaderConfig() {
-  progs_[to_i(RenderPass::RecordGBuffer)].Use();
-  progs_[to_i(RenderPass::RecordGBuffer)].SetUniform("DiffTex", 0);
-
-  /*
-  progs_[to_i(RenderPass::SSAO)].Use();
-  progs_[to_i(RenderPass::SSAO)].SetUniform("PositionTex", 0);
-  progs_[to_i(RenderPass::SSAO)].SetUniform("NormalTex", 1);
-  progs_[to_i(RenderPass::SSAO)].SetUniform("RandRotTex", 2);
-
-  progs_[to_i(RenderPass::Blur)].Use();
-  progs_[to_i(RenderPass::Blur)].SetUniform("AOTex", 0);
-  */
-  progs_[to_i(RenderPass::Lighting)].Use();
-  progs_[to_i(RenderPass::Lighting)].SetUniform("PositionTex", 0);
-  progs_[to_i(RenderPass::Lighting)].SetUniform("NormalTex", 1);
-  progs_[to_i(RenderPass::Lighting)].SetUniform("ColorTex", 2);
-}
-
 void SceneSSAO::CreateVAO() {
-  // 四角形ポリゴン用配列
-  GLfloat verts[] = {-1.0f, -1.0f, 0.0f, 1.0f, -1.0f, 0.0f, 1.0f,  1.0f, 0.0f,
-                     -1.0f, -1.0f, 0.0f, 1.0f, 1.0f,  0.0f, -1.0f, 1.0f, 0.0f};
-  GLfloat tc[] = {0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f,
-                  0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f};
-
-  glGenBuffers(static_cast<GLsizei>(vbo_.size()), vbo_.data());
-
-  glBindBuffer(GL_ARRAY_BUFFER, vbo_[to_i(VertexBuffer::VertexPosition)]);
-  glBufferData(GL_ARRAY_BUFFER, 6 * 3 * sizeof(float), verts, GL_STATIC_DRAW);
-
-  glBindBuffer(GL_ARRAY_BUFFER, vbo_[to_i(VertexBuffer::TextureCoordinates)]);
-  glBufferData(GL_ARRAY_BUFFER, 6 * 2 * sizeof(float), tc, GL_STATIC_DRAW);
+  const float quadVertices[] = {
+      // positions        // texture Coords
+      -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
+      1.0f,  1.0f, 0.0f, 1.0f, 1.0f, 1.0f,  -1.0f, 0.0f, 1.0f, 0.0f,
+  };
 
   // 頂点配列オブジェクトの設定
-  glGenVertexArrays(1, &quad_);
-  glBindVertexArray(quad_);
+  glGenVertexArrays(1, &quadVAO_);
+  glGenBuffers(1, &quadVBO_);
+  glBindVertexArray(quadVAO_);
 
-  glBindBuffer(GL_ARRAY_BUFFER, vbo_[to_i(VertexBuffer::VertexPosition)]);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+  glBindBuffer(GL_ARRAY_BUFFER, quadVBO_);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices,
+               GL_STATIC_DRAW);
   glEnableVertexAttribArray(0); // VertexPosition
-
-  glBindBuffer(GL_ARRAY_BUFFER, vbo_[to_i(VertexBuffer::TextureCoordinates)]);
-  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, 0);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), nullptr);
   glEnableVertexAttribArray(1); // TexCoord
+  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
+                        reinterpret_cast<void *>(3 * sizeof(float)));
 
   glBindVertexArray(0);
 }
@@ -169,14 +118,79 @@ void SceneSSAO::SetMatrices() {
   const glm::mat4 proj = camera_.GetProjectionMatrix();
   const glm::mat4 mv = view * model_;
 
-  progs_[to_i(RenderPass::RecordGBuffer)].SetUniform("ModelViewMatrix", mv);
-  progs_[to_i(RenderPass::RecordGBuffer)].SetUniform("NormalMatrix",
-                                                     glm::mat3(mv));
-  progs_[to_i(RenderPass::RecordGBuffer)].SetUniform("MVP", proj * mv);
+  progs_[RecordGBufferPass].SetUniform("ModelViewMatrix", mv);
+  progs_[RecordGBufferPass].SetUniform("NormalMatrix", glm::mat3(mv));
+  progs_[RecordGBufferPass].SetUniform("MVP", proj * mv);
+}
+
+std::optional<std::string> SceneSSAO::CompileAndLinkShader() {
+  // Compile and links
+  if (const auto msg = progs_[RecordGBufferPass].CompileAndLink(
+          {{"./Assets/Shaders/SSAO/GBuffer.vs.glsl", ShaderType::Vertex},
+           {"./Assets/Shaders/SSAO/GBuffer.fs.glsl", ShaderType::Fragment}})) {
+    return msg;
+  }
+  if (const auto msg = progs_[SSAOPass].CompileAndLink(
+          {{"./Assets/Shaders/SSAO/SSAO.vs.glsl", ShaderType::Vertex},
+           {"./Assets/Shaders/SSAO/SSAO.fs.glsl", ShaderType::Fragment}})) {
+    return msg;
+  }
+  if (const auto msg = progs_[BlurPass].CompileAndLink(
+          {{"./Assets/Shaders/SSAO/SSAO.vs.glsl", ShaderType::Vertex},
+           {"./Assets/Shaders/SSAO/Blur.fs.glsl", ShaderType::Fragment}})) {
+    return msg;
+  }
+  if (const auto msg = progs_[LightingPass].CompileAndLink(
+          {{"./Assets/Shaders/SSAO/SSAO.vs.glsl", ShaderType::Vertex},
+           {"./Assets/Shaders/SSAO/Lighting.fs.glsl", ShaderType::Fragment}})) {
+    return msg;
+  }
+  return std::nullopt;
+}
+
+void SceneSSAO::SetupShaderConfig() {
+  progs_[RecordGBufferPass].Use();
+  progs_[RecordGBufferPass].SetUniform("DiffTex", 0);
+
+  progs_[SSAOPass].Use();
+  progs_[SSAOPass].SetUniform("PositionTex", 0);
+  progs_[SSAOPass].SetUniform("NormalTex", 1);
+  progs_[SSAOPass].SetUniform("RandRotTex", 2);
+
+  progs_[BlurPass].Use();
+  progs_[BlurPass].SetUniform("AOTex", 0);
+
+  progs_[LightingPass].Use();
+  progs_[LightingPass].SetUniform("PositionTex", 0);
+  progs_[LightingPass].SetUniform("NormalTex", 1);
+  progs_[LightingPass].SetUniform("ColorTex", 2);
+  progs_[LightingPass].SetUniform("AOTex", 3);
+}
+
+void SceneSSAO::SetupSSAO() {
+  SSAO ssao;
+
+  const auto kernel = ssao.BuildKernel(kKernelSize);
+  progs_[SSAOPass].Use();
+  GLuint hProg = progs_[SSAOPass].GetHandle();
+  GLuint loc = glGetUniformLocation(hProg, "SampleKernel");
+  glUniform3fv(loc, kKernelSize, kernel.data());
+
+  const auto randDir = ssao.BuildRandRot(kRotTexSize);
+  glGenTextures(1, &textures_[RandRotTex]);
+  glBindTexture(GL_TEXTURE_2D, textures_[RandRotTex]);
+  glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGB16F, kRotTexSize, kRotTexSize);
+  glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, kRotTexSize, kRotTexSize, GL_RGB,
+                  GL_FLOAT, randDir.data());
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
+
+  glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 // ********************************************************************************
-// Drawing
+// Render
 // ********************************************************************************
 
 void SceneSSAO::Pass1() {
@@ -184,8 +198,7 @@ void SceneSSAO::Pass1() {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glEnable(GL_DEPTH_TEST);
 
-  progs_[to_i(RenderPass::RecordGBuffer)].Use();
-
+  progs_[RecordGBufferPass].Use();
   DrawScene();
 
   glDisable(GL_DEPTH_TEST);
@@ -195,26 +208,24 @@ void SceneSSAO::Pass2() {
   glBindFramebuffer(GL_FRAMEBUFFER, gbuffer_.GetSSAOFBO());
   glClear(GL_COLOR_BUFFER_BIT);
 
-  progs_[to_i(RenderPass::SSAO)].Use();
-  progs_[to_i(RenderPass::SSAO)].SetUniform("ProjectionMatrix",
-                                            camera_.GetProjectionMatrix());
+  progs_[SSAOPass].Use();
+  progs_[SSAOPass].SetUniform("ProjectionMatrix",
+                              camera_.GetProjectionMatrix());
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, gbuffer_.GetPosTex());
   glActiveTexture(GL_TEXTURE1);
   glBindTexture(GL_TEXTURE_2D, gbuffer_.GetNormTex());
   glActiveTexture(GL_TEXTURE2);
-  glBindTexture(GL_TEXTURE_2D, textures_[to_i(Textures::RandRotTex)]);
+  glBindTexture(GL_TEXTURE_2D, textures_[RandRotTex]);
 
   DrawQuad();
-
-  glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void SceneSSAO::Pass3() {
   glBindFramebuffer(GL_FRAMEBUFFER, gbuffer_.GetSSAOBlurFBO());
   glClear(GL_COLOR_BUFFER_BIT);
 
-  progs_[to_i(RenderPass::Blur)].Use();
+  progs_[BlurPass].Use();
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, gbuffer_.GetAOTex());
 
@@ -222,31 +233,40 @@ void SceneSSAO::Pass3() {
 }
 
 void SceneSSAO::Pass4() {
+  // デフォルトのフレームバッファに戻します
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
   glClear(GL_COLOR_BUFFER_BIT);
 
-  progs_[to_i(RenderPass::Lighting)].Use();
-  progs_[to_i(RenderPass::Lighting)].SetUniform(
-      "Light.Position", camera_.GetViewMatrix() * kLightPos);
-  progs_[to_i(RenderPass::Lighting)].SetUniform("Light.L", glm::vec3(0.3f));
-  progs_[to_i(RenderPass::Lighting)].SetUniform("Light.La", glm::vec3(0.5f));
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, gbuffer_.GetPosTex());
   glActiveTexture(GL_TEXTURE1);
   glBindTexture(GL_TEXTURE_2D, gbuffer_.GetNormTex());
   glActiveTexture(GL_TEXTURE2);
   glBindTexture(GL_TEXTURE_2D, gbuffer_.GetColorTex());
+  glActiveTexture(GL_TEXTURE3);
+  glBindTexture(GL_TEXTURE_2D, gbuffer_.GetBlurAOTex());
+
+  progs_[LightingPass].Use();
+  progs_[LightingPass].SetUniform("Light.Position",
+                                  camera_.GetViewMatrix() * kLightPos);
+  progs_[LightingPass].SetUniform("Light.L", glm::vec3(0.3f));
+  progs_[LightingPass].SetUniform("Light.La", glm::vec3(0.5f));
+  progs_[LightingPass].SetUniform("Type", type_);
 
   DrawQuad();
 }
+
+// ********************************************************************************
+// Render subroutine
+// ********************************************************************************
 
 void SceneSSAO::DrawScene() {
   // 床の描画
   auto DrawFloor = [this]() {
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, textures_[to_i(Textures::WoodTex)]);
+    glBindTexture(GL_TEXTURE_2D, textures_[WoodTex]);
 
-    progs_[to_i(RenderPass::RecordGBuffer)].SetUniform("Material.UseTex", 1);
+    progs_[RecordGBufferPass].SetUniform("Material.UseTex", 1);
     model_ = glm::mat4(1.0f);
     SetMatrices();
 
@@ -256,9 +276,9 @@ void SceneSSAO::DrawScene() {
   // 壁の描画1
   auto DrawWallL = [this]() {
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, textures_[to_i(Textures::BrickTex)]);
+    glBindTexture(GL_TEXTURE_2D, textures_[BrickTex]);
 
-    model_ = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+    model_ = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -2.0f));
     model_ =
         glm::rotate(model_, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
     SetMatrices();
@@ -269,9 +289,9 @@ void SceneSSAO::DrawScene() {
   // 壁の描画2
   auto DrawWallR = [this]() {
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, textures_[to_i(Textures::BrickTex)]);
+    glBindTexture(GL_TEXTURE_2D, textures_[BrickTex]);
 
-    model_ = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+    model_ = glm::translate(glm::mat4(1.0f), glm::vec3(-2.0f, 0.0f, 0.0f));
     model_ =
         glm::rotate(model_, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
     model_ =
@@ -283,10 +303,9 @@ void SceneSSAO::DrawScene() {
 
   // メインメッシュの描画
   auto DrawMesh = [this]() {
-    progs_[to_i(RenderPass::RecordGBuffer)].SetUniform("Material.UseTex", 0);
-    progs_[to_i(RenderPass::RecordGBuffer)].SetUniform(
-        "Material.Kd", glm::vec3(0.9f, 0.5f, 0.2f));
-
+    progs_[RecordGBufferPass].SetUniform("Material.UseTex", 0);
+    progs_[RecordGBufferPass].SetUniform("Material.Kd",
+                                         glm::vec3(0.9f, 0.5f, 0.2f));
     model_ = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.282958f, 0.0f));
     model_ =
         glm::rotate(model_, glm::radians(30.0f), glm::vec3(0.0f, 1.0f, 0.0f));
@@ -303,59 +322,7 @@ void SceneSSAO::DrawScene() {
 }
 
 void SceneSSAO::DrawQuad() {
-  glBindVertexArray(quad_);
-  glDrawArrays(GL_TRIANGLES, 0, 6);
+  glBindVertexArray(quadVAO_);
+  glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
   glBindVertexArray(0);
-}
-
-// ********************************************************************************
-// Sampling for SSAO
-// ********************************************************************************
-
-void SceneSSAO::BuildKernel(std::uint32_t seed) {
-  std::mt19937 engine(seed);
-  UniformDistribution dist;
-
-  std::vector<float> kern(3 * kKernelSize);
-  for (size_t i = 0; i < kKernelSize; i++) {
-    glm::vec3 randDir = dist.OnHemisphere(engine);
-    const float kScale =
-        static_cast<float>(i * i) / (kKernelSize * kKernelSize);
-    randDir *= glm::mix(0.1f, 1.0f, kScale);
-
-    kern[3 * i + 0] = randDir.x;
-    kern[3 * i + 1] = randDir.y;
-    kern[3 * i + 2] = randDir.z;
-  }
-
-  progs_[to_i(RenderPass::SSAO)].Use();
-  GLuint hProg = progs_[to_i(RenderPass::SSAO)].GetHandle();
-  GLuint loc = glGetUniformLocation(hProg, "SampleKernel");
-  glUniform3fv(loc, kKernelSize, kern.data());
-}
-
-void SceneSSAO::BuildRandRotTex(std::uint32_t seed) {
-  std::mt19937 engine(seed);
-  UniformDistribution dist;
-
-  const size_t kRotTexSize = 4; // 4x4 texture
-  std::vector<GLfloat> randDir(3 * kRotTexSize * kRotTexSize);
-
-  for (size_t i = 0; i < kRotTexSize * kRotTexSize; i++) {
-    glm::vec2 v = dist.OnCircle(engine);
-    randDir[3 * i + 0] = v.x;
-    randDir[3 * i + 1] = v.y;
-    randDir[3 * i + 2] = 0.0f;
-  }
-
-  glGenTextures(1, &textures_[to_i(Textures::RandRotTex)]);
-  glBindTexture(GL_TEXTURE_2D, textures_[to_i(Textures::RandRotTex)]);
-  glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGB16F, kRotTexSize, kRotTexSize);
-  glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, kRotTexSize, kRotTexSize, GL_RGB,
-                  GL_FLOAT, randDir.data());
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
-
-  glBindTexture(GL_TEXTURE_2D, 0);
 }

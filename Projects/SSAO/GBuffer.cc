@@ -1,6 +1,5 @@
 #include "GBuffer.h"
 
-#include <boost/assert.hpp>
 #include <iostream>
 
 GBuffer::~GBuffer() { OnDestroy(); }
@@ -10,48 +9,46 @@ void GBuffer::OnInit(int w, int h) {
   height_ = h;
 
   InitDeferredFBO();
+  InitSSAOFBO();
+  InitSSAOBlurFBO();
 }
 
 void GBuffer::OnDestroy() {
   glDeleteTextures(static_cast<GLsizei>(textures_.size()), textures_.data());
-  glDeleteRenderbuffers(static_cast<GLsizei>(renders_.size()), renders_.data());
-  glDeleteFramebuffers(static_cast<GLsizei>(fbo_.size()), fbo_.data());
+  glDeleteRenderbuffers(static_cast<GLsizei>(rbuffers_.size()),
+                        rbuffers_.data());
+  glDeleteFramebuffers(static_cast<GLsizei>(fbuffers_.size()),
+                       fbuffers_.data());
 }
 
 void GBuffer::InitDeferredFBO() {
-  // 遅延シェーディング用のFBOの生成とバインド
-  glGenFramebuffers(1, &fbo_[to_i(FBO::Deferred)]);
-  glBindFramebuffer(GL_FRAMEBUFFER, fbo_[to_i(FBO::Deferred)]);
+  // FBOの生成とバインド
+  glGenFramebuffers(1, &fbuffers_[DeferredFBO]);
+  glBindFramebuffer(GL_FRAMEBUFFER, fbuffers_[DeferredFBO]);
 
-  // 深度バッファを生成してアタッチします。
-  glGenRenderbuffers(1, &renders_[to_i(Renderbuffers::DepthBuffer)]);
-  glBindRenderbuffer(GL_RENDERBUFFER,
-                     renders_[to_i(Renderbuffers::DepthBuffer)]);
+  // 深度バッファの生成とバインド
+  glGenRenderbuffers(1, &rbuffers_[Depth]);
+  glBindRenderbuffer(GL_RENDERBUFFER, rbuffers_[Depth]);
   glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width_, height_);
 
-  // 位置情報、法線情報、色情報、AO情報を格納するためのテクスチャを生成
-  textures_[to_i(Textures::Pos)] = CreateGBufferTexture(GL_RGB32F);
-  textures_[to_i(Textures::Norm)] = CreateGBufferTexture(GL_RGB32F);
-  textures_[to_i(Textures::Color)] = CreateGBufferTexture(GL_RGB8);
+  // 位置情報、法線情報、色情報を格納するためのテクスチャを生成
+  textures_[PosTex] = CreateGBufferTexture(GL_RGB32F);
+  textures_[NormTex] = CreateGBufferTexture(GL_RGB32F);
+  textures_[ColorTex] = CreateGBufferTexture(GL_RGB8);
 
+  // テクスチャをFramebufferにアタッチします。
   glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
-                            GL_RENDERBUFFER,
-                            renders_[to_i(Renderbuffers::DepthBuffer)]);
+                            GL_RENDERBUFFER, rbuffers_[Depth]);
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
-                         textures_[to_i(Textures::Pos)], 0);
-
+                         textures_[PosTex], 0);
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D,
-                         textures_[to_i(Textures::Norm)], 0);
+                         textures_[NormTex], 0);
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D,
-                         textures_[to_i(Textures::Color)], 0);
+                         textures_[ColorTex], 0);
 
-  // 描画に使用するカラーアタッチメントをGLに通知します。
-  const std::vector<GLenum> drawBuffers = {
-      GL_COLOR_ATTACHMENT0,
-      GL_COLOR_ATTACHMENT1,
-      GL_COLOR_ATTACHMENT2,
-  };
-  glDrawBuffers(static_cast<GLsizei>(drawBuffers.size()), drawBuffers.data());
+  const GLenum drawBuffers[] = {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1,
+                                GL_COLOR_ATTACHMENT2};
+  glDrawBuffers(3, drawBuffers);
 
   if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
     std::cerr << "Framebuffer not complete." << std::endl;
@@ -62,33 +59,33 @@ void GBuffer::InitDeferredFBO() {
 
 void GBuffer::InitSSAOFBO() {
   // AO用のFBOの生成とバインド
-  glGenFramebuffers(1, &fbo_[to_i(FBO::SSAO)]);
-  glBindFramebuffer(GL_FRAMEBUFFER, fbo_[to_i(FBO::SSAO)]);
+  glGenFramebuffers(1, &fbuffers_[SSAOFBO]);
+  glBindFramebuffer(GL_FRAMEBUFFER, fbuffers_[SSAOFBO]);
 
   // AO用のテクスチャの生成とアタッチ
-  textures_[to_i(Textures::AO)] = CreateGBufferTexture(GL_R16F);
+  textures_[AOTex] = CreateGBufferTexture(GL_R16F);
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
-                         textures_[to_i(Textures::AO)], 0);
+                         textures_[AOTex], 0);
 
-  BOOST_ASSERT_MSG(glCheckFramebufferStatus(GL_FRAMEBUFFER) ==
-                       GL_FRAMEBUFFER_COMPLETE,
-                   "SSAO Framebuffer not complete.");
+  if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+    std::cerr << "SSAO Framebuffer not complete." << std::endl;
+  }
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void GBuffer::InitSSAOBlurFBO() {
   // BlurAO用のFBOの生成とバインド
-  glGenFramebuffers(1, &fbo_[to_i(FBO::SSAOBlur)]);
-  glBindFramebuffer(GL_FRAMEBUFFER, fbo_[to_i(FBO::SSAOBlur)]);
+  glGenFramebuffers(1, &fbuffers_[SSAOBlurFBO]);
+  glBindFramebuffer(GL_FRAMEBUFFER, fbuffers_[SSAOBlurFBO]);
 
   // BlurAO用のテクスチャの生成とアタッチ
-  textures_[to_i(Textures::BlurAO)] = CreateGBufferTexture(GL_R16F);
+  textures_[BlurAOTex] = CreateGBufferTexture(GL_R16F);
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
-                         textures_[to_i(Textures::BlurAO)], 0);
+                         textures_[BlurAOTex], 0);
 
-  BOOST_ASSERT_MSG(glCheckFramebufferStatus(GL_FRAMEBUFFER) ==
-                       GL_FRAMEBUFFER_COMPLETE,
-                   "SSAO Blur Framebuffer is not complete.");
+  if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+    std::cerr << "SSAO blur Framebuffer not complete." << std::endl;
+  }
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
