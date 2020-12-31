@@ -2,7 +2,7 @@
  * @brief SSAOのテストシーン
  */
 
-#include "SceneSSAOTest.h"
+#include "SceneSSAOProto.h"
 
 #include <boost/assert.hpp>
 #include <glm/gtc/constants.hpp>
@@ -12,15 +12,27 @@
 #include "Graphics/Texture.h"
 
 // ********************************************************************************
+// Constexpr variables
+// ********************************************************************************
+
+static constexpr float kCameraFOVY = 50.0f;
+
+static constexpr glm::vec4 kLightPos{3.0f, 3.0f, 1.5f, 1.0f};
+
+// NOTE: シェーダーのカーネルサイズと一致させる必要があります。
+static constexpr std::size_t kKernelSize = 64;
+
+// ********************************************************************************
 // Override functions
 // ********************************************************************************
 
-void SceneSSAOTest::OnInit() {
+void SceneSSAOProto::OnInit() {
   camera_.SetupOrient(glm::vec3(2.1f, 1.5f, 2.1f), glm::vec3(0.0f, 1.0f, 0.0f),
                       glm::vec3(0.0f, 1.0f, 0.0f));
   camera_.SetupPerspective(
-      glm::radians(50.0f),
+      glm::radians(kCameraFOVY),
       static_cast<float>(width_) / static_cast<float>(height_), 0.3f, 100.0f);
+
   if (const auto msg = CompileAndLinkShader()) {
     std::cerr << msg.value() << std::endl;
     BOOST_ASSERT_MSG(false, "failed to compile or link!");
@@ -36,27 +48,21 @@ void SceneSSAOTest::OnInit() {
       Texture::Load("./Assets/Textures/Brick/ruin_wall_01.png");
 }
 
-void SceneSSAOTest::OnDestroy() {
+void SceneSSAOProto::OnDestroy() {
   glDeleteVertexArrays(1, &quadVAO_);
   glDeleteBuffers(1, &quadVBO_);
 }
 
-void SceneSSAOTest::OnUpdate(float t) {
-  const float deltaT = tPrev_ == 0.0f ? 0.0f : t - tPrev_;
-  tPrev_ = t;
+void SceneSSAOProto::OnUpdate(float) {}
 
-  angle_ += rotSpeed_ * deltaT;
-  if (angle_ > glm::two_pi<float>()) {
-    angle_ -= glm::two_pi<float>();
-  }
-}
-
-void SceneSSAOTest::OnRender() {
+void SceneSSAOProto::OnRender() {
   Pass1();
   Pass2();
+  Pass3();
+  Pass4();
 }
 
-void SceneSSAOTest::OnResize(int w, int h) {
+void SceneSSAOProto::OnResize(int w, int h) {
   SetDimensions(w, h);
   glViewport(0, 0, w, h);
 }
@@ -65,7 +71,7 @@ void SceneSSAOTest::OnResize(int w, int h) {
 // Member functions
 // ********************************************************************************
 
-void SceneSSAOTest::CreateVAO() {
+void SceneSSAOProto::CreateVAO() {
   const float quadVertices[] = {
       // positions        // texture Coords
       -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
@@ -89,24 +95,34 @@ void SceneSSAOTest::CreateVAO() {
   glBindVertexArray(0);
 }
 
-void SceneSSAOTest::SetMatrices() {
+void SceneSSAOProto::SetMatrices() {
   const glm::mat4 view = camera_.GetViewMatrix();
   const glm::mat4 proj = camera_.GetProjectionMatrix();
   const glm::mat4 mv = view * model_;
 
-  progs_[RecordGBuffer].SetUniform("ModelViewMatrix", mv);
-  progs_[RecordGBuffer].SetUniform("NormalMatrix", glm::mat3(mv));
-  progs_[RecordGBuffer].SetUniform("MVP", proj * mv);
+  progs_[RecordGBufferPass].SetUniform("ModelViewMatrix", mv);
+  progs_[RecordGBufferPass].SetUniform("NormalMatrix", glm::mat3(mv));
+  progs_[RecordGBufferPass].SetUniform("MVP", proj * mv);
 }
 
-std::optional<std::string> SceneSSAOTest::CompileAndLinkShader() {
+std::optional<std::string> SceneSSAOProto::CompileAndLinkShader() {
   // Compile and links
-  if (const auto msg = progs_[RecordGBuffer].CompileAndLink(
+  if (const auto msg = progs_[RecordGBufferPass].CompileAndLink(
           {{"./Assets/Shaders/SSAO/GBuffer.vs.glsl", ShaderType::Vertex},
            {"./Assets/Shaders/SSAO/GBuffer.fs.glsl", ShaderType::Fragment}})) {
     return msg;
   }
-  if (const auto msg = progs_[Lighting].CompileAndLink(
+  if (const auto msg = progs_[SSAOPass].CompileAndLink(
+          {{"./Assets/Shaders/SSAO/SSAO.vs.glsl", ShaderType::Vertex},
+           {"./Assets/Shaders/SSAO/SSAO.fs.glsl", ShaderType::Fragment}})) {
+    return msg;
+  }
+  if (const auto msg = progs_[BlurPass].CompileAndLink(
+          {{"./Assets/Shaders/SSAO/SSAO.vs.glsl", ShaderType::Vertex},
+           {"./Assets/Shaders/SSAO/Blur.fs.glsl", ShaderType::Fragment}})) {
+    return msg;
+  }
+  if (const auto msg = progs_[LightingPass].CompileAndLink(
           {{"./Assets/Shaders/SSAO/SSAO.vs.glsl", ShaderType::Vertex},
            {"./Assets/Shaders/SSAO/Lighting.fs.glsl", ShaderType::Fragment}})) {
     return msg;
@@ -114,32 +130,44 @@ std::optional<std::string> SceneSSAOTest::CompileAndLinkShader() {
   return std::nullopt;
 }
 
-void SceneSSAOTest::SetupShaderConfig() {
-  progs_[RecordGBuffer].Use();
-  progs_[RecordGBuffer].SetUniform("DiffTex", 0);
+void SceneSSAOProto::SetupShaderConfig() {
+  progs_[RecordGBufferPass].Use();
+  progs_[RecordGBufferPass].SetUniform("DiffTex", 0);
 
-  progs_[Lighting].Use();
-  progs_[Lighting].SetUniform("PositionTex", 0);
-  progs_[Lighting].SetUniform("NormalTex", 1);
-  progs_[Lighting].SetUniform("ColorTex", 2);
+  progs_[SSAOPass].Use();
+  progs_[SSAOPass].SetUniform("PositionTex", 0);
+  progs_[SSAOPass].SetUniform("NormalTex", 1);
+  progs_[SSAOPass].SetUniform("RandRotTex", 2);
+
+  progs_[BlurPass].Use();
+  progs_[BlurPass].SetUniform("AOTex", 0);
+
+  progs_[LightingPass].Use();
+  progs_[LightingPass].SetUniform("PositionTex", 0);
+  progs_[LightingPass].SetUniform("NormalTex", 1);
+  progs_[LightingPass].SetUniform("ColorTex", 2);
 }
 
 // ********************************************************************************
 // Render
 // ********************************************************************************
 
-void SceneSSAOTest::Pass1() {
+void SceneSSAOProto::Pass1() {
   glBindFramebuffer(GL_FRAMEBUFFER, gbuffer_.GetDeferredFBO());
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glEnable(GL_DEPTH_TEST);
 
-  progs_[RecordGBuffer].Use();
+  progs_[RecordGBufferPass].Use();
   DrawScene();
 
   glDisable(GL_DEPTH_TEST);
 }
 
-void SceneSSAOTest::Pass2() {
+void SceneSSAOProto::Pass2() {}
+
+void SceneSSAOProto::Pass3() {}
+
+void SceneSSAOProto::Pass4() {
   // デフォルトのフレームバッファに戻します
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
   glClear(GL_COLOR_BUFFER_BIT);
@@ -151,11 +179,11 @@ void SceneSSAOTest::Pass2() {
   glActiveTexture(GL_TEXTURE2);
   glBindTexture(GL_TEXTURE_2D, gbuffer_.GetColorTex());
 
-  progs_[Lighting].Use();
-  progs_[Lighting].SetUniform("Light.Position",
-                              glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
-  progs_[Lighting].SetUniform("Light.L", glm::vec3(0.3f));
-  progs_[Lighting].SetUniform("Light.La", glm::vec3(0.5f));
+  progs_[LightingPass].Use();
+  progs_[LightingPass].SetUniform("Light.Position",
+                                  camera_.GetViewMatrix() * kLightPos);
+  progs_[LightingPass].SetUniform("Light.L", glm::vec3(0.3f));
+  progs_[LightingPass].SetUniform("Light.La", glm::vec3(0.5f));
 
   DrawQuad();
 }
@@ -164,13 +192,13 @@ void SceneSSAOTest::Pass2() {
 // Render subroutine
 // ********************************************************************************
 
-void SceneSSAOTest::DrawScene() {
+void SceneSSAOProto::DrawScene() {
   // 床の描画
   auto DrawFloor = [this]() {
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, textures_[WoodTex]);
 
-    progs_[RecordGBuffer].SetUniform("Material.UseTex", 1);
+    progs_[RecordGBufferPass].SetUniform("Material.UseTex", 1);
     model_ = glm::mat4(1.0f);
     SetMatrices();
 
@@ -207,9 +235,9 @@ void SceneSSAOTest::DrawScene() {
 
   // メインメッシュの描画
   auto DrawMesh = [this]() {
-    progs_[RecordGBuffer].SetUniform("Material.UseTex", 0);
-    progs_[RecordGBuffer].SetUniform("Material.Kd",
-                                     glm::vec3(0.9f, 0.5f, 0.2f));
+    progs_[RecordGBufferPass].SetUniform("Material.UseTex", 0);
+    progs_[RecordGBufferPass].SetUniform("Material.Kd",
+                                         glm::vec3(0.9f, 0.5f, 0.2f));
     model_ = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.282958f, 0.0f));
     model_ =
         glm::rotate(model_, glm::radians(30.0f), glm::vec3(0.0f, 1.0f, 0.0f));
@@ -225,7 +253,7 @@ void SceneSSAOTest::DrawScene() {
   DrawMesh();
 }
 
-void SceneSSAOTest::DrawQuad() {
+void SceneSSAOProto::DrawQuad() {
   glBindVertexArray(quadVAO_);
   glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
   glBindVertexArray(0);

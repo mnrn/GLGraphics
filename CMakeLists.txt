@@ -130,7 +130,7 @@ set(TARGETS
     Deferred
     DeferredPBR
     MSAA
-    SSAOTest
+    SSAOProto
     SSAO
     ShadowMap
     PCF

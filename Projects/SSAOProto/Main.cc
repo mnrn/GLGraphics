@@ -10,7 +10,7 @@
 
 #include "App.h"
 #include "Scene/SceneLoop.h"
-#include "SceneSSAOTest.h"
+#include "SceneSSAOProto.h"
 
 // ********************************************************************************
 // Entry point
@@ -26,7 +26,7 @@ int main(
   App app("Screen Space Ambient Occlusion");
 
   // Create scene
-  std::unique_ptr<Scene> scene = std::make_unique<SceneSSAOTest>();
+  std::unique_ptr<Scene> scene = std::make_unique<SceneSSAOProto>();
 
   // Enter the main loop
   return SceneLoop::Run(app, std::move(scene));

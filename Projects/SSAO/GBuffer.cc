@@ -35,7 +35,8 @@ void GBuffer::InitDeferredFBO() {
   textures_[to_i(Textures::Color)] = CreateGBufferTexture(GL_RGB8);
 
   glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
-                            GL_RENDERBUFFER, to_i(Renderbuffers::DepthBuffer));
+                            GL_RENDERBUFFER,
+                            renders_[to_i(Renderbuffers::DepthBuffer)]);
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
                          textures_[to_i(Textures::Pos)], 0);
 

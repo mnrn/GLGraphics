@@ -2,8 +2,8 @@
  * @brief 遅延レンダリングのテストシーン
  */
 
-#ifndef SCENE_SSAO_TEST_H
-#define SCENE_SSAO_TEST_H
+#ifndef SCENE_SSAO_PROTO_H
+#define SCENE_SSAO_PROTO_H
 
 #include "Scene/Scene.h"
 
@@ -20,7 +20,7 @@
 #include "Primitive/Torus.h"
 #include "View/Camera.h"
 
-class SceneSSAOTest : public Scene {
+class SceneSSAOProto : public Scene {
 public:
   void OnInit() override;
   void OnDestroy() override;
@@ -36,34 +36,30 @@ private:
 
   void Pass1();
   void Pass2();
+  void Pass3();
+  void Pass4();
 
   void DrawScene();
   void DrawQuad();
-
-  static inline constexpr float rotSpeed_ = 0.2f;
 
   Plane plane_{10.0f, 10.0f, 1, 1, 10, 7};
   std::unique_ptr<ObjMesh> mesh_ =
       std::make_unique<ObjMesh>("./Assets/Models/Tests/Teapot/teapot.obj");
 
-  float angle_ = glm::pi<float>() / 2.0f;
-  float tPrev_ = 0.0f;
-
   Camera camera_{};
 
   enum RenderPass {
-    RecordGBuffer,
-    Lighting,
+    RecordGBufferPass,
+    SSAOPass,
+    BlurPass,
+    LightingPass,
+    PassMax,
   };
-  std::array<ShaderProgram, 2> progs_{};
+  std::array<ShaderProgram, PassMax> progs_{};
   GBuffer gbuffer_{};
 
-  enum Textures {
-    WoodTex,
-    BrickTex,
-    RandRotTex,
-  };
-  std::array<GLuint, 3> textures_{};
+  enum Textures { WoodTex, BrickTex, RandRotTex, TexturesMax };
+  std::array<GLuint, TexturesMax> textures_{};
 
   GLuint quadVAO_ = 0;
   GLuint quadVBO_ = 0;
