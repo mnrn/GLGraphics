@@ -8,14 +8,16 @@
 #include <glm/gtc/constants.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <iostream>
+#include <random>
 
 #include "Graphics/Texture.h"
+#include "Math/UniformDistribution.h"
 
 // ********************************************************************************
 // Constexpr variables
 // ********************************************************************************
 
-static constexpr float kCameraFOVY = 50.0f;
+static constexpr float kCameraFOVY = 60.0f;
 
 static constexpr glm::vec4 kLightPos{3.0f, 3.0f, 1.5f, 1.0f};
 
@@ -42,6 +44,10 @@ void SceneSSAOProto::OnInit() {
 
   CreateVAO();
   gbuffer_.OnInit(width_, height_);
+
+  std::uint32_t seed = std::random_device()();
+  BuildKernel(seed);
+  BuildRandRotTex(seed);
 
   textures_[WoodTex] = Texture::Load("./Assets/Textures/Wood/wood.jpeg");
   textures_[BrickTex] =
@@ -146,6 +152,7 @@ void SceneSSAOProto::SetupShaderConfig() {
   progs_[LightingPass].SetUniform("PositionTex", 0);
   progs_[LightingPass].SetUniform("NormalTex", 1);
   progs_[LightingPass].SetUniform("ColorTex", 2);
+  progs_[LightingPass].SetUniform("AOTex", 3);
 }
 
 // ********************************************************************************
@@ -163,9 +170,33 @@ void SceneSSAOProto::Pass1() {
   glDisable(GL_DEPTH_TEST);
 }
 
-void SceneSSAOProto::Pass2() {}
+void SceneSSAOProto::Pass2() {
+  glBindFramebuffer(GL_FRAMEBUFFER, gbuffer_.GetSSAOFBO());
+  glClear(GL_COLOR_BUFFER_BIT);
 
-void SceneSSAOProto::Pass3() {}
+  progs_[SSAOPass].Use();
+  progs_[SSAOPass].SetUniform("ProjectionMatrix",
+                              camera_.GetProjectionMatrix());
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, gbuffer_.GetPosTex());
+  glActiveTexture(GL_TEXTURE1);
+  glBindTexture(GL_TEXTURE_2D, gbuffer_.GetNormTex());
+  glActiveTexture(GL_TEXTURE2);
+  glBindTexture(GL_TEXTURE_2D, textures_[RandRotTex]);
+
+  DrawQuad();
+}
+
+void SceneSSAOProto::Pass3() {
+  glBindFramebuffer(GL_FRAMEBUFFER, gbuffer_.GetSSAOBlurFBO());
+  glClear(GL_COLOR_BUFFER_BIT);
+
+  progs_[BlurPass].Use();
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, gbuffer_.GetAOTex());
+
+  DrawQuad();
+}
 
 void SceneSSAOProto::Pass4() {
   // デフォルトのフレームバッファに戻します
@@ -178,6 +209,8 @@ void SceneSSAOProto::Pass4() {
   glBindTexture(GL_TEXTURE_2D, gbuffer_.GetNormTex());
   glActiveTexture(GL_TEXTURE2);
   glBindTexture(GL_TEXTURE_2D, gbuffer_.GetColorTex());
+  glActiveTexture(GL_TEXTURE3);
+  glBindTexture(GL_TEXTURE_2D, gbuffer_.GetBlurAOTex());
 
   progs_[LightingPass].Use();
   progs_[LightingPass].SetUniform("Light.Position",
@@ -257,4 +290,56 @@ void SceneSSAOProto::DrawQuad() {
   glBindVertexArray(quadVAO_);
   glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
   glBindVertexArray(0);
+}
+
+// ********************************************************************************
+// Sampling for SSAO
+// ********************************************************************************
+
+void SceneSSAOProto::BuildKernel(std::uint32_t seed) {
+  std::mt19937 engine(seed);
+  UniformDistribution dist;
+
+  std::vector<float> kern(3 * kKernelSize);
+  for (size_t i = 0; i < kKernelSize; i++) {
+    glm::vec3 randDir = dist.OnHemisphere(engine);
+    const float kScale =
+        static_cast<float>(i * i) / (kKernelSize * kKernelSize);
+    randDir *= glm::mix(0.1f, 1.0f, kScale);
+
+    kern[3 * i + 0] = randDir.x;
+    kern[3 * i + 1] = randDir.y;
+    kern[3 * i + 2] = randDir.z;
+  }
+
+  progs_[SSAOPass].Use();
+  GLuint hProg = progs_[SSAOPass].GetHandle();
+  GLuint loc = glGetUniformLocation(hProg, "SampleKernel");
+  glUniform3fv(loc, kKernelSize, kern.data());
+}
+
+void SceneSSAOProto::BuildRandRotTex(std::uint32_t seed) {
+  std::mt19937 engine(seed);
+  UniformDistribution dist;
+
+  const size_t kRotTexSize = 4; // 4x4 texture
+  std::vector<GLfloat> randDir(3 * kRotTexSize * kRotTexSize);
+
+  for (size_t i = 0; i < kRotTexSize * kRotTexSize; i++) {
+    glm::vec2 v = dist.OnCircle(engine);
+    randDir[3 * i + 0] = v.x;
+    randDir[3 * i + 1] = v.y;
+    randDir[3 * i + 2] = 0.0f;
+  }
+
+  glGenTextures(1, &textures_[RandRotTex]);
+  glBindTexture(GL_TEXTURE_2D, textures_[RandRotTex]);
+  glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGB16F, kRotTexSize, kRotTexSize);
+  glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, kRotTexSize, kRotTexSize, GL_RGB,
+                  GL_FLOAT, randDir.data());
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
+
+  glBindTexture(GL_TEXTURE_2D, 0);
 }

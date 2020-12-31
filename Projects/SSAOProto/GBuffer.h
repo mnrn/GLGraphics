@@ -21,7 +21,7 @@ public:
   GLuint GetNormTex() const { return textures_[NormTex]; }
   GLuint GetColorTex() const { return textures_[ColorTex]; }
   GLuint GetAOTex() const { return textures_[AOTex]; }
-  GLuint GetAOBlurTex() const { return textures_[BlurAOTex]; }
+  GLuint GetBlurAOTex() const { return textures_[BlurAOTex]; }
 
 private:
   void InitDeferredFBO();

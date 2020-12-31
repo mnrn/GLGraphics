@@ -29,10 +29,13 @@ public:
   void OnResize(int, int) override;
 
 private:
-  void SetMatrices();
-  void CreateVAO();
   std::optional<std::string> CompileAndLinkShader();
   void SetupShaderConfig();
+  void CreateVAO();
+  void SetMatrices();
+
+  void BuildKernel(std::uint32_t seed);
+  void BuildRandRotTex(std::uint32_t seed);
 
   void Pass1();
   void Pass2();
