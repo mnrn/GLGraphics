@@ -1,5 +1,5 @@
 /**
- * @brief 遅延レンダリングのテストシーン
+ * @brief SSAOのテストシーン
  */
 
 #ifndef SCENE_SSAO_PROTO_H
@@ -33,9 +33,7 @@ private:
   void SetupShaderConfig();
   void CreateVAO();
   void SetMatrices();
-
-  void BuildKernel(std::uint32_t seed);
-  void BuildRandRotTex(std::uint32_t seed);
+  void SetupSSAO();
 
   void Pass1();
   void Pass2();
