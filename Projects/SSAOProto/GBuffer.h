@@ -52,7 +52,6 @@ private:
   int width_, height_;
   std::array<GLuint, FramebuffersNum> fbuffers_{};
   std::array<GLuint, RenderbuffersNum> rbuffers_{};
-
   std::array<GLuint, TexturesNum> textures_{};
 };
 

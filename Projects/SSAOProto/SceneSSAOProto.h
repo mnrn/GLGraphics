@@ -66,6 +66,14 @@ private:
 
   GLuint quadVAO_ = 0;
   GLuint quadVBO_ = 0;
+
+  enum RenderType {
+    RenderSSAO,
+    RenderSSAOOnly,
+    RenderNoSSAO,
+    RenderTypeNum,
+  };
+  int type_ = RenderSSAO;
 };
 
 #endif

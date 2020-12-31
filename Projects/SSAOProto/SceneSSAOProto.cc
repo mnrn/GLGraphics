@@ -7,10 +7,12 @@
 #include <boost/assert.hpp>
 #include <glm/gtc/constants.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/integer.hpp>
 #include <iostream>
 #include <random>
 
 #include "Graphics/Texture.h"
+#include "HID/KeyInput.h"
 #include "Math/UniformDistribution.h"
 
 // ********************************************************************************
@@ -29,6 +31,8 @@ static constexpr std::size_t kKernelSize = 64;
 // ********************************************************************************
 
 void SceneSSAOProto::OnInit() {
+  KeyInput::Create();
+
   camera_.SetupOrient(glm::vec3(2.1f, 1.5f, 2.1f), glm::vec3(0.0f, 1.0f, 0.0f),
                       glm::vec3(0.0f, 1.0f, 0.0f));
   camera_.SetupPerspective(
@@ -59,7 +63,13 @@ void SceneSSAOProto::OnDestroy() {
   glDeleteBuffers(1, &quadVBO_);
 }
 
-void SceneSSAOProto::OnUpdate(float) {}
+void SceneSSAOProto::OnUpdate(float) {
+  if (KeyInput::Get().IsTrg(Key::Left)) {
+    type_ = glm::mod(type_ - 1, RenderType::RenderTypeNum);
+  } else if (KeyInput::Get().IsTrg(Key::Right)) {
+    type_ = glm::mod(type_ + 1, RenderType::RenderTypeNum);
+  }
+}
 
 void SceneSSAOProto::OnRender() {
   Pass1();
@@ -217,6 +227,7 @@ void SceneSSAOProto::Pass4() {
                                   camera_.GetViewMatrix() * kLightPos);
   progs_[LightingPass].SetUniform("Light.L", glm::vec3(0.3f));
   progs_[LightingPass].SetUniform("Light.La", glm::vec3(0.5f));
+  progs_[LightingPass].SetUniform("Type", type_);
 
   DrawQuad();
 }

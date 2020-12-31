@@ -11,6 +11,8 @@ uniform sampler2D NormalTex;
 uniform sampler2D ColorTex;
 uniform sampler2D AOTex;
 
+uniform int Type = 0;
+
 uniform struct LightInfo {
     vec4 Position;  // カメラ座標系におけるライトの位置
     vec3 L;         // Diffuse Light (拡散光)およびSpecular Light (鏡面反射光)の強さ
@@ -25,7 +27,13 @@ vec3 AmbientDiffuseModel(vec3 pos, vec3 norm, vec3 diff, float ao) {
     vec3 amb = Light.La * diff * ao;
     vec3 dirToL = normalize(vec3(Light.Position) - pos);
     float NoL = max(dot(norm, dirToL), 0.0);
-    return amb + Light.L * diff * NoL;
+    if (Type == 1) {
+        return vec3(ao);
+    } else if (Type == 2) {
+        return Light.L * diff * NoL;
+    } else {
+        return amb + Light.L * diff * NoL;
+    }
 }
 
 void main() {
