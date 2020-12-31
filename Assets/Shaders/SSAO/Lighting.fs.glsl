@@ -9,7 +9,6 @@ layout (location=0) out vec4 FragColor;
 uniform sampler2D PositionTex;
 uniform sampler2D NormalTex;
 uniform sampler2D ColorTex;
-uniform sampler2D AOTex;
 
 uniform int Type = 0;
 
@@ -23,17 +22,11 @@ vec3 GammaCorrection(vec3 color) {
     return pow(color, vec3(1.0 / kGamma));
 }
 
-vec3 AmbientDiffuseModel(vec3 pos, vec3 norm, vec3 diff, float ao) {
-    vec3 amb = Light.La * diff * ao;
+vec3 AmbientDiffuseModel(vec3 pos, vec3 norm, vec3 diff) {
+    vec3 amb = Light.La * diff;
     vec3 dirToL = normalize(vec3(Light.Position) - pos);
     float NoL = max(dot(norm, dirToL), 0.0);
-    if (Type == 1) {
-        return vec3(ao);
-    } else if (Type == 2) {
-        return Light.L * diff * NoL;
-    } else {
-        return amb + Light.L * diff * NoL;
-    }
+    return amb + Light.L * diff * NoL;
 }
 
 void main() {
@@ -41,12 +34,8 @@ void main() {
     vec3 pos = texture(PositionTex, TexCoord).xyz;
     vec3 norm = texture(NormalTex, TexCoord).xyz;
     vec3 diff = texture(ColorTex, TexCoord).rgb;
-    float ao = texture(AOTex, TexCoord).r;
 
-    // AOのパラメータ化
-    ao = pow(ao, 8.0);
-
-    vec3 color = AmbientDiffuseModel(pos, norm, diff, ao);
+    vec3 color = AmbientDiffuseModel(pos, norm, diff);
     color = GammaCorrection(color);
     FragColor = vec4(color, 1.0);
 }

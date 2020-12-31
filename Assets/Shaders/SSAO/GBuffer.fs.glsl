@@ -1,10 +1,10 @@
 #version 410
 
+const float kGamma = 2.2;
+
 in vec3 Position;
 in vec3 Normal;
 in vec2 TexCoord;
-
-const float kGamma = 2.2;
 
 layout (location=0) out vec3 PositionData;
 layout (location=1) out vec3 NormalData;

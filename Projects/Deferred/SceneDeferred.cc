@@ -26,8 +26,6 @@ void SceneDeferred::OnInit() {
     prog_.SetUniform("ColorTex", 2);
   }
 
-  glEnable(GL_DEPTH_TEST);
-
   // 四角形ポリゴン用配列
   GLfloat verts[] = {-1.0f, -1.0f, 0.0f, 1.0f, -1.0f, 0.0f, 1.0f,  1.0f, 0.0f,
                      -1.0f, -1.0f, 0.0f, 1.0f, 1.0f,  0.0f, -1.0f, 1.0f, 0.0f};
@@ -75,7 +73,6 @@ void SceneDeferred::OnUpdate(float t) {
 }
 
 void SceneDeferred::OnRender() {
-  gbuffer_.OnPreRender();
   Pass1();
   Pass2();
 }
@@ -119,7 +116,7 @@ void SceneDeferred::Pass1() {
 
   // ティーポットの描画
   prog_.SetUniform("Light.Position", glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
-  prog_.SetUniform("Matrial.Kd", 0.9f, 0.9f, 0.9f);
+  prog_.SetUniform("Material.Kd", 0.9f, 0.9f, 0.9f);
   model_ = glm::mat4(1.0f);
   model_ = glm::translate(model_, glm::vec3(0.0f, 0.0f, 0.0f));
   model_ =
@@ -144,7 +141,6 @@ void SceneDeferred::Pass1() {
   SetMatrices();
   torus_.Render();
 
-  glFinish();
   glDisable(GL_DEPTH_TEST);
 }
 
@@ -153,12 +149,13 @@ void SceneDeferred::Pass2() {
 
   // デフォルトのフレームバッファに戻します
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  glClear(GL_COLOR_BUFFER_BIT);
 
   view_ = glm::mat4(1.0f);
   proj_ = glm::mat4(1.0f);
   model_ = glm::mat4(1.0f);
   SetMatrices();
+  gbuffer_.OnPreRender();
 
   // 四角形ポリゴンとして描画していく
   glBindVertexArray(quad_);

@@ -26,6 +26,7 @@
 #include "Primitive/Teapot.h"
 #include "Primitive/Torus.h"
 #include "UI/Font.h"
+#include "View/Camera.h"
 
 // ********************************************************************************
 // Classes
@@ -53,24 +54,14 @@ private:
   void Pass3();
   void Pass4();
 
-  void DrawText();
   void DrawScene();
   void DrawQuad();
 
-  static constexpr inline size_t kKernelSize =
-      64; // NOTE: シェーダーのカーネルサイズと一致させる必要があります。
-  static constexpr inline float kRotSpeed = 1.0f;
-  static constexpr inline float kFOVY = 50.0f;
-
-  Plane plane_{10.0f, 10.0f, 1, 1, 7, 10};
+  Plane plane_{10.0f, 10.0f, 1, 1, 10, 7};
   std::unique_ptr<ObjMesh> mesh_ =
       std::make_unique<ObjMesh>("./Assets/Models/Tests/Teapot/teapot.obj");
 
-  float angle_ = glm::pi<float>() / 2.0f;
-  float tPrev_ = 0.0f;
-
-  glm::vec4 lightPos_{3.0f, 3.0f, 1.5f, 1.0f};
-  glm::mat4 sceneProj_{1.0f};
+  Camera camera_{};
 
   enum struct RenderPass {
     RecordGBuffer,
@@ -79,7 +70,6 @@ private:
     Lighting,
     Num,
   };
-  RenderPass pass_ = RenderPass::RecordGBuffer;
   std::array<ShaderProgram, to_i(RenderPass::Num)> progs_;
   GBuffer gbuffer_{};
 
@@ -104,9 +94,6 @@ private:
     NoSSAO,
     Num,
   };
-  RenderType type_ = RenderType::SSAO;
-
-  std::unique_ptr<FontObj> fontObj_;
 };
 
 #endif

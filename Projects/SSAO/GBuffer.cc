@@ -10,8 +10,6 @@ void GBuffer::OnInit(int w, int h) {
   height_ = h;
 
   InitDeferredFBO();
-  InitSSAOFBO();
-  InitSSAOBlurFBO();
 }
 
 void GBuffer::OnDestroy() {
@@ -25,14 +23,24 @@ void GBuffer::InitDeferredFBO() {
   glGenFramebuffers(1, &fbo_[to_i(FBO::Deferred)]);
   glBindFramebuffer(GL_FRAMEBUFFER, fbo_[to_i(FBO::Deferred)]);
 
+  // 深度バッファを生成してアタッチします。
+  glGenRenderbuffers(1, &renders_[to_i(Renderbuffers::DepthBuffer)]);
+  glBindRenderbuffer(GL_RENDERBUFFER,
+                     renders_[to_i(Renderbuffers::DepthBuffer)]);
+  glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width_, height_);
+
   // 位置情報、法線情報、色情報、AO情報を格納するためのテクスチャを生成
   textures_[to_i(Textures::Pos)] = CreateGBufferTexture(GL_RGB32F);
+  textures_[to_i(Textures::Norm)] = CreateGBufferTexture(GL_RGB32F);
+  textures_[to_i(Textures::Color)] = CreateGBufferTexture(GL_RGB8);
+
+  glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
+                            GL_RENDERBUFFER, to_i(Renderbuffers::DepthBuffer));
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
                          textures_[to_i(Textures::Pos)], 0);
-  textures_[to_i(Textures::Norm)] = CreateGBufferTexture(GL_RGB32F);
+
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D,
                          textures_[to_i(Textures::Norm)], 0);
-  textures_[to_i(Textures::Color)] = CreateGBufferTexture(GL_RGB8);
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D,
                          textures_[to_i(Textures::Color)], 0);
 
@@ -44,19 +52,13 @@ void GBuffer::InitDeferredFBO() {
   };
   glDrawBuffers(static_cast<GLsizei>(drawBuffers.size()), drawBuffers.data());
 
-  // 深度バッファを生成してアタッチします。
-  glGenRenderbuffers(1, &renders_[to_i(Renderbuffers::DepthBuffer)]);
-  glBindRenderbuffer(GL_RENDERBUFFER,
-                     renders_[to_i(Renderbuffers::DepthBuffer)]);
-  glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width_, height_);
-  glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
-                            GL_RENDERBUFFER, to_i(Renderbuffers::DepthBuffer));
+  if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+    std::cerr << "Framebuffer not complete." << std::endl;
+  }
 
-  BOOST_ASSERT_MSG(glCheckFramebufferStatus(GL_FRAMEBUFFER) ==
-                       GL_FRAMEBUFFER_COMPLETE,
-                   "Framebuffer not complete.");
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
+
 void GBuffer::InitSSAOFBO() {
   // AO用のFBOの生成とバインド
   glGenFramebuffers(1, &fbo_[to_i(FBO::SSAO)]);
