@@ -292,7 +292,6 @@ void SceneCSM::DrawGUI() {
     }
   }
   ImGui::SliderFloat("Camera Rotate Speed", &param_.rotSpeed, 0.0f, 1.0f);
-
   ImGui::End();
 
   GUI::Render();
