@@ -78,8 +78,17 @@ vec4 ShadowIndicator(int idx) {
         return vec4(0.0, 0.1, 0.0, 0.0);
     } else if (idx == 2) {
         return vec4(0.0, 0.0, 0.1, 0.0);
+    } else if (idx == 3) {
+        return vec4(0.1, 0.1, 0.0, 0.0);
+    } else if (idx == 4) {
+        return vec4(0.0, 0.1, 0.1, 0.0);
+    } else if (idx == 5) {
+        return vec4(0.1, 0.0, 0.1, 0.0);
+    } else if (idx == 6) {
+        return vec4(0.1, 0.1, 0.1, 0.0);
+    } else {
+        return vec4(0.0, 0.0, 0.0, 0.0);
     }
-    return vec4(0.0, 0.0, 0.0, 0.0);
 }
 
 void ShadeWithShadow() {
