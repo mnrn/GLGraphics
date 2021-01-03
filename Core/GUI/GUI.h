@@ -29,6 +29,11 @@ namespace GUI {
   ImGui::NewFrame();
 }
 
+[[maybe_unused]] static void Render() {
+  ImGui::Render();
+  ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+}
+
 [[maybe_unused]] static void Destroy() {
   // Cleanup
   ImGui_ImplOpenGL3_Shutdown();

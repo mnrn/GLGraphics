@@ -48,7 +48,7 @@ private:
   void Pass2();
 
   void DrawScene();
-  void DrawStatus();
+  void DrawGUI();
 
   Camera camera_;
 
@@ -75,6 +75,7 @@ private:
     bool isPCF = true;
     bool isShadowOnly = false;
     bool isVisibleIndicator = false;
+    float rotSpeed = 0.0f;
   } param_;
 };
 

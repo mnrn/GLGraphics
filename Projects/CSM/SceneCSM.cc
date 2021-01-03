@@ -20,6 +20,7 @@
 #pragma clang diagnostic pop
 
 #include "CSM.h"
+#include "GUI/GUI.h"
 #include "HID/KeyInput.h"
 #include "UI/Font.h"
 #include "UI/Text.h"
@@ -54,7 +55,6 @@ static constexpr glm::vec3 kLightDefaultTarget{0.0f};
 static constexpr glm::vec3 kLightDefaultDir =
     kLightDefaultTarget - kLightDefaultPosition;
 
-static constexpr float kRotSpeed = 0.0f;
 static constexpr int kShadowMapSize = 2048;
 static constexpr int kShadowMapWidth = kShadowMapSize;
 static constexpr int kShadowMapHeight = kShadowMapSize;
@@ -95,7 +95,7 @@ void SceneCSM::OnUpdate(float t) {
   const float deltaT = tPrev_ == 0.0f ? 0.0f : t - tPrev_;
   tPrev_ = t;
 
-  angle_ += kRotSpeed * deltaT;
+  angle_ += param_.rotSpeed * deltaT;
   if (angle_ > glm::two_pi<float>()) {
     angle_ -= glm::two_pi<float>();
   }
@@ -123,7 +123,7 @@ void SceneCSM::OnRender() {
   glDisable(GL_CULL_FACE);
   glDisable(GL_DEPTH_TEST);
 
-  DrawStatus();
+  DrawGUI();
 }
 
 void SceneCSM::OnResize(int w, int h) {
@@ -277,7 +277,18 @@ void SceneCSM::DrawScene() {
   plane_.Render();
 }
 
-void SceneCSM::DrawStatus() {}
+void SceneCSM::DrawGUI() {
+  GUI::NewFrame();
+
+  ImGui::Begin("Cascaded Shadow Maps Config");
+  ImGui::Checkbox("PCF ON", &param_.isPCF);
+  ImGui::Checkbox("Visible Indicator", &param_.isVisibleIndicator);
+  ImGui::Checkbox("Shadow Only", &param_.isShadowOnly);
+  ImGui::SliderFloat("Camera Rotate Speed", &param_.rotSpeed, 0.0f, 0.5f);
+  ImGui::End();
+
+  GUI::Render();
+}
 
 // ********************************************************************************
 // View

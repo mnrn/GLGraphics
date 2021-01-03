@@ -334,6 +334,5 @@ void SceneSSAO::DrawGUI() {
                      RenderType::RenderNoSSAO);
   ImGui::End();
 
-  ImGui::Render();
-  ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+  GUI::Render();
 }
