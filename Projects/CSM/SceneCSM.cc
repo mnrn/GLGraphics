@@ -38,7 +38,7 @@
 // constexpr variables
 // ********************************************************************************
 
-static constexpr int kCascadedNum = 3;
+static constexpr int kCascadesMax = 8;
 
 static constexpr float kCameraFOVY = 50.0f;
 static constexpr float kCameraNear = 0.3f;
@@ -82,7 +82,7 @@ void SceneCSM::OnInit() {
   }
 
   // CSM用のFBOの初期化を行います。
-  if (!csmFBO_.OnInit(kCascadedNum, kShadowMapWidth, kShadowMapHeight)) {
+  if (!csmFBO_.OnInit(kCascadesMax, kShadowMapWidth, kShadowMapHeight)) {
     BOOST_ASSERT_MSG(false, "Framebuffer is not complete.");
   }
 }
@@ -132,20 +132,20 @@ void SceneCSM::OnResize(int w, int h) {
 void SceneCSM::OnPreRender() {
   CSM csm;
 
-  const auto splits = csm.ComputeSplitPlanes(kCascadedNum, kCameraNear,
+  const auto splits = csm.ComputeSplitPlanes(param_.cascades, kCameraNear,
                                              kCameraFar, param_.schemeLambda);
 
   progs_[kShadeWithShadow].Use();
-  progs_[kShadeWithShadow].SetUniform("CascadesNum", kCascadedNum);
+  progs_[kShadeWithShadow].SetUniform("CascadesNum", param_.cascades);
   csm.UpdateSplitPlanesUniform(
-      kCascadedNum, splits, camera_, [&](int i, float clip) {
+      param_.cascades, splits, camera_, [&](int i, float clip) {
         const std::string plane =
             fmt::format("CameraHomogeneousSplitPlanes[{}]", i);
         progs_[kShadeWithShadow].SetUniform(plane.c_str(), clip);
       });
 
-  csm.UpdateFrustums(kCascadedNum, splits, camera_);
-  vpCrops_ = csm.ComputeCropMatrices(kCascadedNum, kLightDefaultDir,
+  csm.UpdateFrustums(param_.cascades, splits, camera_);
+  vpCrops_ = csm.ComputeCropMatrices(param_.cascades, kLightDefaultDir,
                                      static_cast<float>(kShadowMapSize));
 }
 
@@ -184,7 +184,7 @@ void SceneCSM::SetMatrices() {
     progs_[kShadeWithShadow].SetUniform("MVP", mvp);
 
     const glm::mat4 kInvView = camera_.GetInverseViewMatrix();
-    for (int i = 0; i < kCascadedNum; i++) {
+    for (int i = 0; i < param_.cascades; i++) {
       const glm::mat4 kLightMVP = kShadowBias * vpCrops_[i] * kInvView;
       const std::string kUniLiMVP = fmt::format("ShadowMatrices[{}]", i);
       progs_[kShadeWithShadow].SetUniform(kUniLiMVP.c_str(), kLightMVP);
@@ -220,7 +220,7 @@ void SceneCSM::Pass1() {
 
   glBindFramebuffer(GL_FRAMEBUFFER, csmFBO_.GetShadowFBO());
   progs_[kRecordDepth].Use();
-  for (int i = 0; i < kCascadedNum; i++) {
+  for (int i = 0; i < param_.cascades; i++) {
     cascadeIdx_ = i;
     glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
                               csmFBO_.GetDepthTextureArray(), 0, i);
@@ -282,8 +282,15 @@ void SceneCSM::DrawGUI() {
   ImGui::Checkbox("PCF ON", &param_.isPCF);
   ImGui::Checkbox("Visible Indicator", &param_.isVisibleIndicator);
   ImGui::Checkbox("Shadow Only", &param_.isShadowOnly);
-  ImGui::SliderFloat("Camera Rotate Speed", &param_.rotSpeed, 0.0f, 0.5f);
-  ImGui::SliderFloat("Split Scheme Lambda", &param_.schemeLambda, 0.1f, 0.9f);
+  ImGui::SliderFloat("Camera Rotate Speed", &param_.rotSpeed, 0.0f, 1.0f);
+  ImGui::SliderFloat("Split Scheme Lambda", &param_.schemeLambda, 0.01f, 0.99f);
+  ImGui::Text("Cascades Num = %d", param_.cascades);
+  ImGui::SameLine();
+  for (int i = 2; i <= kCascadesMax; i++) {
+    ImGui::RadioButton(std::to_string(i).c_str(), &param_.cascades, i);
+    ImGui::SameLine();
+  }
+
   ImGui::End();
 
   GUI::Render();
