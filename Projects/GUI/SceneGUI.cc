@@ -15,9 +15,6 @@
 #include <imgui_impl_opengl3.h>
 #include <iostream>
 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdouble-promotion"
-
 // ********************************************************************************
 // Override functions
 // ********************************************************************************
@@ -78,5 +75,3 @@ void SceneGUI::OnResize(int w, int h) {
   SetDimensions(w, h);
   glViewport(0, 0, w, h);
 }
-
-#pragma clang diagnostic pop
