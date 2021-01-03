@@ -134,7 +134,7 @@ void ScenePBR::DrawMesh(const glm::vec3 &pos, float rough, int metal,
                         const glm::vec3 &color) {
   model_ = glm::mat4(1.0f);
   prog_.SetUniform("Material.Roughness", rough);
-  prog_.SetUniform("Material.metallic", metal);
+  prog_.SetUniform("Material.Metallic", metal);
   prog_.SetUniform("Material.Color", color);
   model_ = glm::translate(model_, pos);
   model_ =
