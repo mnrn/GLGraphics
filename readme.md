@@ -46,6 +46,8 @@ Vulkanでの実装がもう少し楽になりそうならそちらに移行す�
   - LinuxやBSD, iOSやAndroidはこのライブラリを用いているようです。
 - [spdlog]
   - 便利なロガーライブラリです。主にデバッグで使いました。
+- [imgui]
+  - パラメータの調整やデバッグを容易にしてくれるGUIライブラリです。
 
 リポジトリのルートディレクトリにCMakeLists.txtがあるので詳しくはそちらを参照ください。  
 
@@ -65,3 +67,4 @@ Vulkanでの実装がもう少し楽になりそうならそちらに移行す�
 [tinyobjloader]:<https://github.com/tinyobjloader/tinyobjloader>
 [freetype]:<https://www.freetype.org/>
 [spdlog]:<https://github.com/gabime/spdlog>
+[imgui]:<https://github.com/ocornut/imgui>
