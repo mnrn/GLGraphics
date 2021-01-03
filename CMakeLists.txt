@@ -60,6 +60,7 @@ find_library(FREETYPE_LIBRARIES
 )
 message("@@ FREETYPE_LIBRARIES: ${FREETYPE_LIBRARIES}")
 include_directories(SYSTEM third-party/freetype2)
+include_directories(SYSTEM third-party/imgui)
 
 
 # Set preprocessor defines
@@ -92,6 +93,7 @@ function(build TARGET_NAME)
         Common/Mesh/*cc 
         Common/View/*.cc 
         Common/UI/*.cc
+        third-party/imgui/*.cc
         ${PROJECTS_DIR_NAME}/${TARGET_NAME}/*.cc
     )
     set(MAIN_CC ${TARGET_NAME}/${TARGET_NAME}/Main.cc)

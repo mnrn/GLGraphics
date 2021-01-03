@@ -34,8 +34,6 @@ static constexpr std::size_t kRotTexSize = 4; // 4x4 texture
 // ********************************************************************************
 
 void SceneSSAO::OnInit() {
-  KeyInput::Create();
-
   camera_.SetupOrient(glm::vec3(2.1f, 1.5f, 2.1f), glm::vec3(0.0f, 1.0f, 0.0f),
                       glm::vec3(0.0f, 1.0f, 0.0f));
   camera_.SetupPerspective(
@@ -65,13 +63,7 @@ void SceneSSAO::OnDestroy() {
   glDeleteBuffers(1, &quadVBO_);
 }
 
-void SceneSSAO::OnUpdate(float) {
-  if (KeyInput::Get().IsTrg(Key::Left)) {
-    param_.type = glm::mod(param_.type - 1, RenderType::RenderTypeNum);
-  } else if (KeyInput::Get().IsTrg(Key::Right)) {
-    param_.type = glm::mod(param_.type + 1, RenderType::RenderTypeNum);
-  }
-}
+void SceneSSAO::OnUpdate(float) {}
 
 void SceneSSAO::OnRender() {
   Pass1();
@@ -251,7 +243,6 @@ void SceneSSAO::Pass4() {
                                   camera_.GetViewMatrix() * kLightPos);
   progs_[LightingPass].SetUniform("Light.L", glm::vec3(0.3f));
   progs_[LightingPass].SetUniform("Light.La", glm::vec3(0.5f));
-  progs_[LightingPass].SetUniform("Type", param_.type);
 
   DrawQuad();
 }
