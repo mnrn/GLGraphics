@@ -7,8 +7,6 @@
 #include <glm/gtc/constants.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#define USE_PCF
-
 CascadedShadowMapsFBO::~CascadedShadowMapsFBO() { OnDestroy(); }
 
 bool CascadedShadowMapsFBO::OnInit(int cascades, int w, int h) {
@@ -34,13 +32,9 @@ bool CascadedShadowMapsFBO::OnInit(int cascades, int w, int h) {
   glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
   glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
   glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
-
-#ifdef USE_PCF
   glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_COMPARE_MODE,
                   GL_COMPARE_REF_TO_TEXTURE);
-#else
-  glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_COMPARE_MODE, GL_NONE);
-#endif
+
   glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
 
   const GLenum result = glCheckFramebufferStatus(GL_FRAMEBUFFER);

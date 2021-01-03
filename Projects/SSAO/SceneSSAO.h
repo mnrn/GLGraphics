@@ -71,7 +71,10 @@ private:
     RenderNoSSAO,
     RenderTypeNum,
   };
-  int type_ = RenderSSAO;
+
+  struct Param {
+    int type = RenderSSAO;
+  } param_{};
 };
 
 #endif

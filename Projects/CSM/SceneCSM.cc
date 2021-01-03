@@ -54,7 +54,7 @@ static constexpr glm::vec3 kLightDefaultTarget{0.0f};
 static constexpr glm::vec3 kLightDefaultDir =
     kLightDefaultTarget - kLightDefaultPosition;
 
-static constexpr float kRotSpeed = 0.5f;
+static constexpr float kRotSpeed = 0.0f;
 static constexpr int kShadowMapSize = 2048;
 static constexpr int kShadowMapWidth = kShadowMapSize;
 static constexpr int kShadowMapHeight = kShadowMapSize;
@@ -237,6 +237,10 @@ void SceneCSM::Pass2() {
   progs_[kShadeWithShadow].Use();
   progs_[kShadeWithShadow].SetUniform(
       "Light.Position", view_ * glm::vec4(kLightDefaultPosition, 1.0f));
+  progs_[kShadeWithShadow].SetUniform("IsPCF", param_.isPCF);
+  progs_[kShadeWithShadow].SetUniform("IsShadowOnly", param_.isShadowOnly);
+  progs_[kShadeWithShadow].SetUniform("IsVisibleIndicator",
+                                      param_.isVisibleIndicator);
 
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glViewport(0, 0, width_, height_);

@@ -70,6 +70,12 @@ private:
 
   CascadedShadowMapsFBO csmFBO_{};
   std::vector<glm::mat4> vpCrops_{};
+
+  struct Param {
+    bool isPCF = true;
+    bool isShadowOnly = false;
+    bool isVisibleIndicator = false;
+  } param_;
 };
 
 #endif

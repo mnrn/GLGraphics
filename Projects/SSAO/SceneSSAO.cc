@@ -67,9 +67,9 @@ void SceneSSAO::OnDestroy() {
 
 void SceneSSAO::OnUpdate(float) {
   if (KeyInput::Get().IsTrg(Key::Left)) {
-    type_ = glm::mod(type_ - 1, RenderType::RenderTypeNum);
+    param_.type = glm::mod(param_.type - 1, RenderType::RenderTypeNum);
   } else if (KeyInput::Get().IsTrg(Key::Right)) {
-    type_ = glm::mod(type_ + 1, RenderType::RenderTypeNum);
+    param_.type = glm::mod(param_.type + 1, RenderType::RenderTypeNum);
   }
 }
 
@@ -251,7 +251,7 @@ void SceneSSAO::Pass4() {
                                   camera_.GetViewMatrix() * kLightPos);
   progs_[LightingPass].SetUniform("Light.L", glm::vec3(0.3f));
   progs_[LightingPass].SetUniform("Light.La", glm::vec3(0.5f));
-  progs_[LightingPass].SetUniform("Type", type_);
+  progs_[LightingPass].SetUniform("Type", param_.type);
 
   DrawQuad();
 }

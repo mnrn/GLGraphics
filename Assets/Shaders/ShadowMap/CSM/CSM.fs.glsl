@@ -27,7 +27,7 @@ uniform int CascadesNum;
 uniform float CameraHomogeneousSplitPlanes[kCascadesMax];
 uniform mat4 ShadowMatrices[kCascadesMax];
 
-uniform bool IsUsePCF = true;
+uniform bool IsPCF = true;
 uniform bool IsShadowOnly = false;
 uniform bool IsVisibleIndicator = false;
 
@@ -57,7 +57,7 @@ float ComputeShadow(int idx) {
     // シャドウのバイアスを計算します。厳密には傾斜に沿って計算してください。
     float bias = 0.00001 / clippedShadowCoord.w;
 
-    if (IsUsePCF) {
+    if (IsPCF) {
         float shadow = 0.0;
         vec2 texelSize = 1.0 / textureSize(ShadowMaps, 0).xy;
         for (int y = -1; y <= 1; y++) {

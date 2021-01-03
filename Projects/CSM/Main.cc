@@ -23,7 +23,7 @@ int main(
     int argc, char **argv
 #endif
 ) {
-  App app("Cascaded shadow mapping");
+  App app("Cascaded Shadow Mapping");
 
   // Create scene
   std::unique_ptr<Scene> scene = std::make_unique<SceneCSM>();
