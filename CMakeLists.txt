@@ -124,22 +124,22 @@ endfunction(buildAll)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/Bin/")
 set(TARGETS
-    #HelloTriangle
-    #Text
+    HelloTriangle
+    Text
     GUI
-    #Diffuse
-    #Phong
-    #Subroutine
-    #PBR
-    #Texture
-    #Deferred
-    #DeferredPBR
-    #MSAA
-    #SSAO
-    #ShadowMap
-    #PCF
-    #CSM
-    #Bezier
-    #Particles
+    Diffuse
+    Phong
+    Subroutine
+    PBR
+    Texture
+    Deferred
+    DeferredPBR
+    MSAA
+    SSAO
+    ShadowMap
+    PCF
+    CSM
+    Bezier
+    Particles
 )
 buildAll()
