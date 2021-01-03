@@ -41,8 +41,8 @@
 static constexpr int kCascadesMax = 8;
 
 static constexpr float kCameraFOVY = 50.0f;
-static constexpr float kCameraNear = 0.3f;
-static constexpr float kCameraFar = 8.0f;
+static constexpr float kCameraNear = 0.1f;
+static constexpr float kCameraFar = 10.0f;
 
 static constexpr float kCameraHeight = 1.0f;
 static constexpr float kCameraRadius = 2.25f;
@@ -282,14 +282,16 @@ void SceneCSM::DrawGUI() {
   ImGui::Checkbox("PCF ON", &param_.isPCF);
   ImGui::Checkbox("Visible Indicator", &param_.isVisibleIndicator);
   ImGui::Checkbox("Shadow Only", &param_.isShadowOnly);
-  ImGui::SliderFloat("Camera Rotate Speed", &param_.rotSpeed, 0.0f, 1.0f);
   ImGui::SliderFloat("Split Scheme Lambda", &param_.schemeLambda, 0.01f, 0.99f);
   ImGui::Text("Cascades Num = %d", param_.cascades);
   ImGui::SameLine();
   for (int i = 2; i <= kCascadesMax; i++) {
     ImGui::RadioButton(std::to_string(i).c_str(), &param_.cascades, i);
-    ImGui::SameLine();
+    if (i != kCascadesMax) {
+      ImGui::SameLine();
+    }
   }
+  ImGui::SliderFloat("Camera Rotate Speed", &param_.rotSpeed, 0.0f, 1.0f);
 
   ImGui::End();
 
