@@ -12,6 +12,7 @@ uniform sampler2D ColorTex;
 uniform sampler2D AOTex;
 
 uniform int Type = 0;
+uniform float AO = 8.0;
 
 uniform struct LightInfo {
     vec4 Position;  // カメラ座標系におけるライトの位置
@@ -44,7 +45,7 @@ void main() {
     float ao = texture(AOTex, TexCoord).r;
 
     // AOのパラメータ化
-    ao = pow(ao, 8.0);
+    ao = pow(ao, AO);
 
     vec3 color = AmbientDiffuseModel(pos, norm, diff, ao);
     color = GammaCorrection(color);

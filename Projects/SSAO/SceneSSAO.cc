@@ -207,6 +207,7 @@ void SceneSSAO::Pass2() {
   progs_[SSAOPass].Use();
   progs_[SSAOPass].SetUniform("ProjectionMatrix",
                               camera_.GetProjectionMatrix());
+  progs_[SSAOPass].SetUniform("Radius", param_.radius);
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, gbuffer_.GetPosTex());
   glActiveTexture(GL_TEXTURE1);
@@ -248,6 +249,7 @@ void SceneSSAO::Pass4() {
   progs_[LightingPass].SetUniform("Light.L", glm::vec3(0.3f));
   progs_[LightingPass].SetUniform("Light.La", glm::vec3(0.5f));
   progs_[LightingPass].SetUniform("Type", param_.type);
+  progs_[LightingPass].SetUniform("AO", param_.ao);
 
   DrawQuad();
 }
@@ -326,12 +328,14 @@ void SceneSSAO::DrawQuad() {
 void SceneSSAO::DrawGUI() {
   GUI::NewFrame();
 
-  ImGui::Begin("SSAO Render Config");
+  ImGui::Begin("SSAO Config");
   ImGui::RadioButton("RenderType: SSAO", &param_.type, RenderType::RenderSSAO);
   ImGui::RadioButton("RenderType: Only SSAO", &param_.type,
                      RenderType::RenderSSAOOnly);
   ImGui::RadioButton("RenderType: No SSAO", &param_.type,
                      RenderType::RenderNoSSAO);
+  ImGui::SliderFloat("SSAO Sampling Radius", &param_.radius, 0.1f, 1.0f);
+  ImGui::SliderFloat("AO Parameterization", &param_.ao, 1.0f, 10.0f);
   ImGui::End();
 
   GUI::Render();

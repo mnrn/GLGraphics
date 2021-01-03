@@ -75,6 +75,8 @@ private:
 
   struct Param {
     int type = RenderSSAO;
+    float radius = 0.55f;
+    float ao = 8.0f;
   } param_{};
 };
 
