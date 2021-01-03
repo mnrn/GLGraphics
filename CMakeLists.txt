@@ -78,6 +78,7 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-missing-prototypes -Wno-global-constructors -Wno-exit-time-destructors -Wno-padded")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-weak-vtables -Wno-covered-switch-default")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-poison-system-directories -Wno-ctad-maybe-unsupported")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-old-style-cast")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-documentation")
 endif()
 
@@ -93,7 +94,7 @@ function(build TARGET_NAME)
         Common/Mesh/*cc 
         Common/View/*.cc 
         Common/UI/*.cc
-        third-party/imgui/*.cc
+        third-party/imgui/*.cpp
         ${PROJECTS_DIR_NAME}/${TARGET_NAME}/*.cc
     )
     set(MAIN_CC ${TARGET_NAME}/${TARGET_NAME}/Main.cc)
@@ -123,21 +124,22 @@ endfunction(buildAll)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/Bin/")
 set(TARGETS
-    HelloTriangle
-    Diffuse
-    Phong
-    Subroutine
-    PBR
-    Texture
-    Deferred
-    DeferredPBR
-    MSAA
-    SSAO
-    ShadowMap
-    PCF
-    CSM
-    Bezier
-    Particles
-    Text
+    #HelloTriangle
+    #Text
+    GUI
+    #Diffuse
+    #Phong
+    #Subroutine
+    #PBR
+    #Texture
+    #Deferred
+    #DeferredPBR
+    #MSAA
+    #SSAO
+    #ShadowMap
+    #PCF
+    #CSM
+    #Bezier
+    #Particles
 )
 buildAll()

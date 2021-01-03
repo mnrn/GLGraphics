@@ -17,6 +17,7 @@
 #include "GLInclude.h"
 
 #include "Debug.h"
+#include "GUI/GUI.h"
 #include "HID/KeyInput.h"
 #include "Window.h"
 
@@ -39,6 +40,7 @@ public:
 #if (!NDEBUG)
     Debug::SetupInfo();
 #endif
+    GUI::Init(window_);
   }
 
   ~App() {
@@ -48,13 +50,13 @@ public:
 
   template <typename Initialize, typename Update, typename Render,
             typename Destroy>
-  int Run(Initialize onInit, Update onUpdate, Render onRender,
-          Destroy onDestroy) {
+  int Run(Initialize OnInit, Update OnUpdate, Render OnRender,
+          Destroy OnDestroy) {
     if (window_ == nullptr) {
       return EXIT_FAILURE;
     }
 
-    onInit(width_, height_);
+    OnInit(width_, height_);
 
     while (!glfwWindowShouldClose(window_) &&
            !glfwGetKey(window_, GLFW_KEY_ESCAPE)) {
@@ -63,14 +65,15 @@ public:
       Debug::CheckForOpenGLError(__FILE__, __LINE__);
 #endif
       OnPreUpdate(window_);
-      onUpdate(static_cast<float>(glfwGetTime()));
-      onRender();
+      OnUpdate(static_cast<float>(glfwGetTime()));
+      OnRender();
 
       glfwSwapBuffers(window_);
       glfwPollEvents();
     }
 
-    onDestroy();
+    OnDestroy();
+    GUI::Destroy();
 #if (!NDEBUG)
     Debug::CleanupInfo();
 #endif
