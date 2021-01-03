@@ -6,6 +6,7 @@
 #define CSM_H
 
 #include <array>
+#include <functional>
 #include <glm/gtc/constants.hpp>
 #include <memory>
 #include <optional>
@@ -26,8 +27,10 @@ class CSM {
 public:
   std::vector<float> ComputeSplitPlanes(int cascades, float near, float far,
                                         float lambda);
-  void UpdateSplitPlanesUniform(int cascades, const std::vector<float> &splits,
-                                const Camera &camera, ShaderProgram &prog);
+  void
+  UpdateSplitPlanesUniform(int cascades, const std::vector<float> &splits,
+                           const Camera &camera,
+                           std::function<void(int, float)> loopEndCallback);
   void UpdateFrustums(int cascades, const std::vector<float> &splits,
                       const Camera &camera);
   std::vector<glm::mat4> ComputeCropMatrices(int cascades,

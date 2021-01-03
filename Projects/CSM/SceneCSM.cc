@@ -133,10 +133,19 @@ void SceneCSM::OnResize(int w, int h) {
 
 void SceneCSM::OnPreRender() {
   CSM csm;
+
   const auto splits =
       csm.ComputeSplitPlanes(kCascadedNum, kCameraNear, kCameraFar, kLambda);
-  csm.UpdateSplitPlanesUniform(kCascadedNum, splits, camera_,
-                               progs_[kShadeWithShadow]);
+
+  progs_[kShadeWithShadow].Use();
+  progs_[kShadeWithShadow].SetUniform("CascadesNum", kCascadedNum);
+  csm.UpdateSplitPlanesUniform(
+      kCascadedNum, splits, camera_, [&](int i, float clip) {
+        const std::string plane =
+            fmt::format("CameraHomogeneousSplitPlanes[{}]", i);
+        progs_[kShadeWithShadow].SetUniform(plane.c_str(), clip);
+      });
+
   csm.UpdateFrustums(kCascadedNum, splits, camera_);
   vpCrops_ = csm.ComputeCropMatrices(kCascadedNum, kLightDefaultDir,
                                      static_cast<float>(kShadowMapSize));

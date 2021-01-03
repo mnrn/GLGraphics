@@ -32,10 +32,6 @@
  */
 std::vector<float> CSM::ComputeSplitPlanes(int cascades, float near, float far,
                                            float lambda) {
-  if (cascades < 1) {
-    cascades = 1;
-  }
-
   std::vector<float> splits(cascades + 1);
   splits[0] = near;
   splits[cascades] = far;
@@ -48,20 +44,18 @@ std::vector<float> CSM::ComputeSplitPlanes(int cascades, float near, float far,
   return splits;
 }
 
-void CSM::UpdateSplitPlanesUniform(int cascades,
-                                   const std::vector<float> &splits,
-                                   const Camera &camera, ShaderProgram &prog) {
-  prog.Use();
-  prog.SetUniform("CascadesNum", cascades);
+void CSM::UpdateSplitPlanesUniform(
+    int cascades, const std::vector<float> &splits, const Camera &camera,
+    std::function<void(int, float)> loopEndCallback) {
   const glm::mat4 proj = camera.GetProjectionMatrix();
+
   // カメラから見た Split Planes の同次座標系におけるz位置を計算します。
+  std::vector<float> clips(cascades);
   for (int i = 0; i < cascades; i++) {
     const float clip =
         0.5f * (-splits[i + 1] * proj[2][2] + proj[3][2]) / splits[i + 1] +
         0.5f;
-    const std::string plane =
-        fmt::format("CameraHomogeneousSplitPlanes[{}]", i);
-    prog.SetUniform(plane.c_str(), clip);
+    loopEndCallback(i, clip);
   }
 }
 
