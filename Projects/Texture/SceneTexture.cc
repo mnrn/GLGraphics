@@ -3,15 +3,15 @@
  */
 
 // ********************************************************************************
-// Include files
+// Including files
 // ********************************************************************************
 
 #include <boost/assert.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <iostream>
 
-#include "SceneTexture.h"
 #include "Graphics/Texture.h"
+#include "SceneTexture.h"
 
 // ********************************************************************************
 // Override functions
@@ -27,7 +27,6 @@ void SceneTexture::OnInit() {
                       glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
   proj_ = glm::mat4(1.0f);
   angle_ = 0.0f;
-
 
   // テクスチャのロード
   tex_ = Texture::Load("./Assets/Textures/Wood/hp_wood.png");
@@ -45,7 +44,7 @@ void SceneTexture::OnRender() {
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, tex_);
 
-  prog_.Use();  
+  prog_.Use();
 #ifdef __APPLE__
   prog_.SetUniform("Tex1", 0);
 #endif
@@ -63,7 +62,7 @@ void SceneTexture::OnRender() {
                                              glm::vec3(mv[2])));
   prog_.SetUniform("MVP", proj_ * mv);
   cube_.Render();
-  
+
   glBindTexture(GL_TEXTURE_2D, 0);
   glDisable(GL_DEPTH_TEST);
 }

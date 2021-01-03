@@ -4,7 +4,7 @@
  */
 
 // ********************************************************************************
-// Include files
+// Including files
 // ********************************************************************************
 
 #include <memory>
@@ -24,7 +24,7 @@ int main(
     int argc, char **argv
 #endif
 ) {
-  App app("Hello Triangle!!!");
+  App app("Hello Triangle!");
 
   // Create scene
   std::unique_ptr<Scene> scene = std::make_unique<SceneHelloTriangle>();

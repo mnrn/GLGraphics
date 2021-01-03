@@ -3,7 +3,7 @@
  */
 
 // ********************************************************************************
-// Include files
+// Including files
 // ********************************************************************************
 
 #include <memory>
@@ -23,7 +23,7 @@ int main(
     int argc, char **argv
 #endif
 ) {
-  App app("Text Rendering.");
+  App app("Text Rendering");
 
   // Create scene
   std::unique_ptr<Scene> scene = std::make_unique<SceneText>();

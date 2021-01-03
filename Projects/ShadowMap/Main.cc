@@ -3,7 +3,7 @@
  */
 
 // ********************************************************************************
-// Include files
+// Including files
 // ********************************************************************************
 
 #include <memory>
@@ -23,7 +23,7 @@ int main(
     int argc, char **argv
 #endif
 ) {
-  App app("Shadow mapping");
+  App app("Shadow Mapping");
 
   // Create scene
   std::unique_ptr<Scene> scene = std::make_unique<SceneShadowMap>();
