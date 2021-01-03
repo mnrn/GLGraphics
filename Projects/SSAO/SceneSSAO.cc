@@ -11,6 +11,7 @@
 #include <iostream>
 #include <random>
 
+#include "GUI/GUI.h"
 #include "Graphics/Texture.h"
 #include "HID/KeyInput.h"
 #include "Math/UniformDistribution.h"
@@ -66,10 +67,13 @@ void SceneSSAO::OnDestroy() {
 void SceneSSAO::OnUpdate(float) {}
 
 void SceneSSAO::OnRender() {
-  Pass1();
-  Pass2();
-  Pass3();
-  Pass4();
+  {
+    Pass1();
+    Pass2();
+    Pass3();
+    Pass4();
+  }
+  DrawGUI();
 }
 
 void SceneSSAO::OnResize(int w, int h) {
@@ -243,6 +247,7 @@ void SceneSSAO::Pass4() {
                                   camera_.GetViewMatrix() * kLightPos);
   progs_[LightingPass].SetUniform("Light.L", glm::vec3(0.3f));
   progs_[LightingPass].SetUniform("Light.La", glm::vec3(0.5f));
+  progs_[LightingPass].SetUniform("Type", param_.type);
 
   DrawQuad();
 }
@@ -316,4 +321,19 @@ void SceneSSAO::DrawQuad() {
   glBindVertexArray(quadVAO_);
   glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
   glBindVertexArray(0);
+}
+
+void SceneSSAO::DrawGUI() {
+  GUI::NewFrame();
+
+  ImGui::Begin("SSAO Render Config");
+  ImGui::RadioButton("RenderType: SSAO", &param_.type, RenderType::RenderSSAO);
+  ImGui::RadioButton("RenderType: Only SSAO", &param_.type,
+                     RenderType::RenderSSAOOnly);
+  ImGui::RadioButton("RenderType: No SSAO", &param_.type,
+                     RenderType::RenderNoSSAO);
+  ImGui::End();
+
+  ImGui::Render();
+  ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }

@@ -10,7 +10,7 @@
 
 namespace GUI {
 
-void Init(GLFWwindow *window) {
+[[maybe_unused]] static void Init(GLFWwindow *window) {
   // Dear ImGui contextの設定を行います。
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
@@ -23,7 +23,13 @@ void Init(GLFWwindow *window) {
   ImGui_ImplOpenGL3_Init();
 }
 
-void Destroy() {
+[[maybe_unused]] static void NewFrame() {
+  ImGui_ImplOpenGL3_NewFrame();
+  ImGui_ImplGlfw_NewFrame();
+  ImGui::NewFrame();
+}
+
+[[maybe_unused]] static void Destroy() {
   // Cleanup
   ImGui_ImplOpenGL3_Shutdown();
   ImGui_ImplGlfw_Shutdown();
