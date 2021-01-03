@@ -40,8 +40,6 @@
 
 static constexpr int kCascadedNum = 3;
 
-static constexpr float kLambda = 0.5f;
-
 static constexpr float kCameraFOVY = 50.0f;
 static constexpr float kCameraNear = 0.3f;
 static constexpr float kCameraFar = 8.0f;
@@ -134,8 +132,8 @@ void SceneCSM::OnResize(int w, int h) {
 void SceneCSM::OnPreRender() {
   CSM csm;
 
-  const auto splits =
-      csm.ComputeSplitPlanes(kCascadedNum, kCameraNear, kCameraFar, kLambda);
+  const auto splits = csm.ComputeSplitPlanes(kCascadedNum, kCameraNear,
+                                             kCameraFar, param_.schemeLambda);
 
   progs_[kShadeWithShadow].Use();
   progs_[kShadeWithShadow].SetUniform("CascadesNum", kCascadedNum);
@@ -285,6 +283,7 @@ void SceneCSM::DrawGUI() {
   ImGui::Checkbox("Visible Indicator", &param_.isVisibleIndicator);
   ImGui::Checkbox("Shadow Only", &param_.isShadowOnly);
   ImGui::SliderFloat("Camera Rotate Speed", &param_.rotSpeed, 0.0f, 0.5f);
+  ImGui::SliderFloat("Split Scheme Lambda", &param_.schemeLambda, 0.1f, 0.9f);
   ImGui::End();
 
   GUI::Render();

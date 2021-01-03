@@ -72,6 +72,7 @@ private:
   std::vector<glm::mat4> vpCrops_{};
 
   struct Param {
+    float schemeLambda = 0.5f;
     bool isPCF = true;
     bool isShadowOnly = false;
     bool isVisibleIndicator = false;
