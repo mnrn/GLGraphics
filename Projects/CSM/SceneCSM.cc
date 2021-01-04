@@ -85,6 +85,8 @@ void SceneCSM::OnInit() {
   if (!csmFBO_.OnInit(kCascadesMax, kShadowMapWidth, kShadowMapHeight)) {
     BOOST_ASSERT_MSG(false, "Framebuffer is not complete.");
   }
+
+  glClearColor(0.9f, 0.9f, 0.9f, 1.0f);
 }
 
 void SceneCSM::OnDestroy() { spdlog::drop_all(); }
@@ -106,19 +108,11 @@ void SceneCSM::OnUpdate(float t) {
 void SceneCSM::OnRender() {
   OnPreRender();
 
-  glClearColor(0.9f, 0.9f, 0.9f, 1.0f);
   glEnable(GL_DEPTH_TEST);
-  glEnable(GL_CULL_FACE);
-
-  glActiveTexture(GL_TEXTURE0);
-  glBindTexture(GL_TEXTURE_2D_ARRAY, csmFBO_.GetDepthTextureArray());
   {
     Pass1();
     Pass2();
   }
-  glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
-
-  glDisable(GL_CULL_FACE);
   glDisable(GL_DEPTH_TEST);
 
   DrawGUI();
@@ -212,13 +206,13 @@ void SceneCSM::SetMatrialUniforms(const glm::vec3 &diff, const glm::vec3 &amb,
 void SceneCSM::Pass1() {
   pass_ = RenderPass::kRecordDepth;
 
+  glBindFramebuffer(GL_FRAMEBUFFER, csmFBO_.GetShadowFBO());
   glViewport(0, 0, kShadowMapWidth, kShadowMapHeight);
 
-  glCullFace(GL_FRONT);
   glEnable(GL_POLYGON_OFFSET_FILL);
   glPolygonOffset(2.5f, 10.0f);
+  glDisable(GL_CULL_FACE);
 
-  glBindFramebuffer(GL_FRAMEBUFFER, csmFBO_.GetShadowFBO());
   progs_[kRecordDepth].Use();
   for (int i = 0; i < param_.cascades; i++) {
     cascadeIdx_ = i;
@@ -230,14 +224,20 @@ void SceneCSM::Pass1() {
     DrawScene();
   }
 
-  glBindFramebuffer(GL_FRAMEBUFFER, 0);
+  glEnable(GL_CULL_FACE);
   glDisable(GL_POLYGON_OFFSET_FILL);
-  glCullFace(GL_BACK);
 }
 
 // render
 void SceneCSM::Pass2() {
   pass_ = RenderPass::kShadeWithShadow;
+
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
+  glViewport(0, 0, width_, height_);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D_ARRAY, csmFBO_.GetDepthTextureArray());
 
   proj_ = camera_.GetProjectionMatrix();
   view_ = camera_.GetViewMatrix();
@@ -249,10 +249,9 @@ void SceneCSM::Pass2() {
   progs_[kShadeWithShadow].SetUniform("IsVisibleIndicator",
                                       param_.isVisibleIndicator);
 
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  glViewport(0, 0, width_, height_);
-
   DrawScene();
+
+  glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
 }
 
 void SceneCSM::DrawScene() {

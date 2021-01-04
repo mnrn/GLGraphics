@@ -69,7 +69,7 @@ bool FontObj::SetupWithSize(std::size_t size) {
     return false;
   }
 
-  FT_Set_Pixel_Sizes(face_, 0, size);
+  FT_Set_Pixel_Sizes(face_, 0, static_cast<FT_UInt>(size));
 
   glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 

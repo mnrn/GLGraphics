@@ -21,6 +21,10 @@ namespace GUI {
   // Platform/Renderer backends による設定を行います。
   ImGui_ImplGlfw_InitForOpenGL(window, true);
   ImGui_ImplOpenGL3_Init();
+
+  // iniファイルを作成しないようにします。
+  ImGuiIO &io = ImGui::GetIO();
+  io.IniFilename = nullptr;
 }
 
 [[maybe_unused]] static void NewFrame() {
