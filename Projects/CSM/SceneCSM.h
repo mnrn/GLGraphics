@@ -78,7 +78,7 @@ private:
     bool isShadowOnly = false;
     bool isVisibleIndicator = false;
     float rotSpeed = 0.0f;
-  } param_;
+  } param_{};
 };
 
 #endif

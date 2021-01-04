@@ -10,10 +10,14 @@
 // Including files
 // ********************************************************************************
 
+#include "GLInclude.h"
+
 #include <iostream>
 
 #define FMT_HEADER_ONLY
 #include <fmt/printf.h>
+
+#include "Common.h"
 
 // ********************************************************************************
 // Namespace
