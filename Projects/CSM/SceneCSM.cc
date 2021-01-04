@@ -226,12 +226,18 @@ void SceneCSM::Pass1() {
 
   glEnable(GL_CULL_FACE);
   glDisable(GL_POLYGON_OFFSET_FILL);
-  glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 // render
 void SceneCSM::Pass2() {
   pass_ = RenderPass::kShadeWithShadow;
+
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
+  glViewport(0, 0, width_, height_);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D_ARRAY, csmFBO_.GetDepthTextureArray());
 
   proj_ = camera_.GetProjectionMatrix();
   view_ = camera_.GetViewMatrix();
@@ -242,12 +248,6 @@ void SceneCSM::Pass2() {
   progs_[kShadeWithShadow].SetUniform("IsShadowOnly", param_.isShadowOnly);
   progs_[kShadeWithShadow].SetUniform("IsVisibleIndicator",
                                       param_.isVisibleIndicator);
-
-  glViewport(0, 0, width_, height_);
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-  glActiveTexture(GL_TEXTURE0);
-  glBindTexture(GL_TEXTURE_2D_ARRAY, csmFBO_.GetDepthTextureArray());
 
   DrawScene();
 
