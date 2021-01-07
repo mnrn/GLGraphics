@@ -19,7 +19,6 @@
 #include "Scene/Scene.h"
 
 #include "Graphics/Shader.h"
-#include "UI/Font.h"
 
 // ********************************************************************************
 // Class
@@ -41,15 +40,16 @@ private:
   void CreateVAO();
 
   void DrawQuad();
-  void DrawText();
-
-  static constexpr inline float kRotSpeed = glm::pi<float>() / 8.0f;
+  void DrawGUI();
 
   float angle_ = glm::pi<float>() / 2.0f;
   float tPrev_ = 0.0f;
 
-  bool isEnabledMSAA_ = true;
-  bool isEnabledCentroid_ = true;
+  struct Param {
+    bool isEnabledMSAA = true;
+    bool isEnabledCentroid = true;
+    float rotSpeed = glm::pi<float>() / 8.0;
+  } param_;
 
   enum VertexBuffer {
     Position,
@@ -61,8 +61,6 @@ private:
   GLuint quad_ = 0;
   ShaderProgram centroid_;
   ShaderProgram noCentroid_;
-
-  std::unique_ptr<FontObj> fontObj_;
 };
 
 #endif // SCENE_MSAA_H
