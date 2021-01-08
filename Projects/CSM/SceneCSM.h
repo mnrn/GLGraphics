@@ -42,13 +42,12 @@ private:
   void SetMatrialUniforms(const glm::vec3 &diff, const glm::vec3 &amb,
                           const glm::vec3 &spec, float shininess);
   void SetupCamera();
-  void SetupLight();
 
   void Pass1();
   void Pass2();
 
+  void UpdateGUI();
   void DrawScene();
-  void DrawGUI();
 
   Camera camera_;
 

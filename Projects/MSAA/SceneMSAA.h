@@ -39,8 +39,8 @@ private:
   std::optional<std::string> CompileAndLinkShader();
   void CreateVAO();
 
+  void UpdateGUI();
   void DrawQuad();
-  void DrawGUI();
 
   float angle_ = glm::pi<float>() / 2.0f;
   float tPrev_ = 0.0f;

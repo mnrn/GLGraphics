@@ -68,7 +68,6 @@ static constexpr glm::mat4 kShadowBias{0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 0.5f,
 
 void SceneCSM::OnInit() {
   SetupCamera();
-  SetupLight();
 
   if (const auto msg = CompileAndLinkShader()) {
     std::cerr << msg.value() << std::endl;
@@ -92,6 +91,8 @@ void SceneCSM::OnInit() {
 void SceneCSM::OnDestroy() { spdlog::drop_all(); }
 
 void SceneCSM::OnUpdate(float t) {
+  UpdateGUI();
+
   const float deltaT = tPrev_ == 0.0f ? 0.0f : t - tPrev_;
   tPrev_ = t;
 
@@ -115,7 +116,7 @@ void SceneCSM::OnRender() {
   }
   glDisable(GL_DEPTH_TEST);
 
-  DrawGUI();
+  GUI::Render();
 }
 
 void SceneCSM::OnResize(int w, int h) {
@@ -198,6 +199,26 @@ void SceneCSM::SetMatrialUniforms(const glm::vec3 &diff, const glm::vec3 &amb,
   progs_[kShadeWithShadow].SetUniform("Material.Shininess", shininess);
 }
 
+void SceneCSM::UpdateGUI() {
+  GUI::NewFrame();
+
+  ImGui::Begin("Cascaded Shadow Maps Config");
+  ImGui::Checkbox("PCF ON", &param_.isPCF);
+  ImGui::Checkbox("Visible Indicator", &param_.isVisibleIndicator);
+  ImGui::Checkbox("Shadow Only", &param_.isShadowOnly);
+  ImGui::SliderFloat("Split Scheme Lambda", &param_.schemeLambda, 0.01f, 0.99f);
+  ImGui::Text("Cascades Num = %d", param_.cascades);
+  ImGui::SameLine();
+  for (int i = 2; i <= kCascadesMax; i++) {
+    ImGui::RadioButton(std::to_string(i).c_str(), &param_.cascades, i);
+    if (i != kCascadesMax) {
+      ImGui::SameLine();
+    }
+  }
+  ImGui::SliderFloat("Camera Rotate Speed", &param_.rotSpeed, 0.0f, 1.0f);
+  ImGui::End();
+}
+
 // ********************************************************************************
 // Drawing
 // ********************************************************************************
@@ -274,28 +295,6 @@ void SceneCSM::DrawScene() {
   plane_.Render();
 }
 
-void SceneCSM::DrawGUI() {
-  GUI::NewFrame();
-
-  ImGui::Begin("Cascaded Shadow Maps Config");
-  ImGui::Checkbox("PCF ON", &param_.isPCF);
-  ImGui::Checkbox("Visible Indicator", &param_.isVisibleIndicator);
-  ImGui::Checkbox("Shadow Only", &param_.isShadowOnly);
-  ImGui::SliderFloat("Split Scheme Lambda", &param_.schemeLambda, 0.01f, 0.99f);
-  ImGui::Text("Cascades Num = %d", param_.cascades);
-  ImGui::SameLine();
-  for (int i = 2; i <= kCascadesMax; i++) {
-    ImGui::RadioButton(std::to_string(i).c_str(), &param_.cascades, i);
-    if (i != kCascadesMax) {
-      ImGui::SameLine();
-    }
-  }
-  ImGui::SliderFloat("Camera Rotate Speed", &param_.rotSpeed, 0.0f, 1.0f);
-  ImGui::End();
-
-  GUI::Render();
-}
-
 // ********************************************************************************
 // View
 // ********************************************************************************
@@ -311,5 +310,3 @@ void SceneCSM::SetupCamera() {
                                static_cast<float>(height_),
                            kCameraNear, kCameraFar);
 }
-
-void SceneCSM::SetupLight() {}

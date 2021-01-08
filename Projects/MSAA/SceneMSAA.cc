@@ -42,6 +42,8 @@ void SceneMSAA::OnDestroy() {
 }
 
 void SceneMSAA::OnUpdate(float t) {
+  UpdateGUI();
+
   const float deltaT = tPrev_ == 0.0f ? 0.0f : t - tPrev_;
   tPrev_ = t;
 
@@ -53,7 +55,7 @@ void SceneMSAA::OnUpdate(float t) {
 
 void SceneMSAA::OnRender() {
   DrawQuad();
-  DrawGUI();
+  GUI::Render();
 }
 
 void SceneMSAA::OnResize(int w, int h) {
@@ -111,6 +113,16 @@ void SceneMSAA::CreateVAO() {
   glBindVertexArray(0);
 }
 
+void SceneMSAA::UpdateGUI() {
+  GUI::NewFrame();
+
+  ImGui::Begin("MSAA Config");
+  ImGui::Checkbox("MSAA ON", &param_.isEnabledMSAA);
+  ImGui::Checkbox("Centroid ON", &param_.isEnabledCentroid);
+  ImGui::SliderFloat("Rotate Speed", &param_.rotSpeed, 0.0f, 1.0f);
+  ImGui::End();
+}
+
 // ********************************************************************************
 // Drawing
 // ********************************************************************************
@@ -146,16 +158,4 @@ void SceneMSAA::DrawQuad() {
 
   glDisable(GL_MULTISAMPLE);
   glDisable(GL_DEPTH_TEST);
-}
-
-void SceneMSAA::DrawGUI() {
-  GUI::NewFrame();
-
-  ImGui::Begin("MSAA Config");
-  ImGui::Checkbox("MSAA ON", &param_.isEnabledMSAA);
-  ImGui::Checkbox("Centroid ON", &param_.isEnabledCentroid);
-  ImGui::SliderFloat("Quad Rotate Speed", &param_.rotSpeed, 0.0f, 1.0f);
-  ImGui::End();
-
-  GUI::Render();
 }

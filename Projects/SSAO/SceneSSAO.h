@@ -42,7 +42,6 @@ private:
 
   void DrawScene();
   void DrawQuad();
-  void DrawGUI();
 
   Plane plane_{10.0f, 10.0f, 1, 1, 10, 7};
   std::unique_ptr<ObjMesh> mesh_ =
