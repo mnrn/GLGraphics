@@ -1,17 +1,18 @@
 #version 410
 
+const float kPI = 3.14159265358979323846264;
+const float kGamma = 2.2;
+const int kLightMax = 4;
+
 in vec3 Position;
 in vec3 Normal;
 
 layout (location=0) out vec4 FragColor;
 
-const float PI = 3.14159265358979323846264;
-const float GAMMA = 2.2;
-
 uniform struct LightInfo {
     vec4 Position;  // カメラ座標系におけるライトの位置
     vec3 L;         // ライトの強さ
-} Light[3];
+} Light[kLightMax];
 
 uniform struct MaterialInfo {
     float Roughness; // 粗さ
@@ -19,13 +20,16 @@ uniform struct MaterialInfo {
     vec3 Color;      // 誘電体(Dielectric)のDiffuse色(Albedo)もしくは金属(Metal)のSpecular色
 } Material;
 
+// ライトの数
+uniform int LightNum = 3;
+
 /**
  * @brief The GGX distribution (GGX分布関数)
  */
 float D_GGX(float NoH, float roughness) {
     float a2 = roughness * roughness;
     float f = (NoH * a2 - NoH) * NoH + 1.0;
-    return a2 / (PI * f * f);
+    return a2 / (kPI * f * f);
 }
 
 /**
@@ -45,7 +49,7 @@ vec3 F_Schlick(float u, vec3 f0) {
 }
 
 vec3 GammaCorrection(vec3 color) {
-    return pow(color, vec3(1.0 / GAMMA));
+    return pow(color, vec3(1.0 / kGamma));
 }
 
 vec3 MicroFacetModel(int lightIdx, vec3 pos, vec3 n) {
@@ -88,14 +92,14 @@ vec3 MicroFacetModel(int lightIdx, vec3 pos, vec3 n) {
     float V = V_Smith(NoV, NoL, roughness);
     vec3 spec = D * V * F;
 
-    return (diff + PI * spec) * lightIntensity * NoL;
+    return (diff + kPI * spec) * lightIntensity * NoL;
 }
 
 void main() {
     vec3 color = vec3(0.0);
     vec3 n = normalize(Normal);
 
-    for (int i =0; i < 3; i++) {
+    for (int i =0; i < LightNum; i++) {
         color += MicroFacetModel(i, Position, n);
     }
 
