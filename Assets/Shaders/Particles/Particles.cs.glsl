@@ -39,7 +39,7 @@ void main (void) {
     const vec3 force2 = (Gravity2 / dist2) * normalize (delta2);
 
     // Reset particles that get too far from the hole.
-    if (dist1 > MaxDist) {
+    if (dist1 > MaxDist || dist2 > MaxDist) {
         Position[idx] = vec4 (0.0, 0.0, 0.0, 1.0);
     }
     // Apply euler intergrator.

@@ -6,11 +6,13 @@
 // Including files
 // ********************************************************************************
 
+#include "SceneParticles.h"
+
 #include <glm/gtc/matrix_transform.hpp>
 #include <iostream>
 #include <vector>
 
-#include "SceneParticles.h"
+#include "GUI/GUI.h"
 
 // ********************************************************************************
 // Constant expressions
@@ -45,21 +47,25 @@ void SceneParticles::OnDestroy() {
   glDeleteVertexArrays(1, &hBlackHoleVAO_);
   glDeleteBuffers(1, &hBlackHoleBuffer_);
   glDeleteVertexArrays(1, &hParticlesVAO_);
-  glDeleteBuffers(computeBuffer_.size(), computeBuffer_.data());
+  glDeleteBuffers(static_cast<GLsizei>(computeBuffer_.size()), computeBuffer_.data());
 }
 
-void SceneParticles::OnUpdate(float deltaSec) { static_cast<void>(deltaSec); }
+void SceneParticles::OnUpdate(float t) {
+  UpdateGUI();
+}
 
 void SceneParticles::OnRender() {
   ComputeParticles();
 
-  glClearColor(0.9f, 0.9f, 0.9f, 1.0f);
+  glClearColor(param_.clearColor.r, param_.clearColor.g, param_.clearColor.b, 1.0f);
   glEnable(GL_BLEND);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  glBlendFunc(GL_ONE, GL_ONE);
   {
     DrawParticles();
   }
   glDisable(GL_BLEND);
+
+  GUI::Render();
 }
 
 void SceneParticles::OnResize(int w, int h) {
@@ -161,9 +167,26 @@ void SceneParticles::InitBuffer() {
 // Update
 // ********************************************************************************
 
+void SceneParticles::UpdateGUI() { 
+  GUI::NewFrame();
+
+  ImGui::Begin("Particles Config");
+  ImGui::ColorEdit4("Particle Color",
+                      reinterpret_cast<float *>(&param_.particleColor));
+  ImGui::SliderFloat("Particle Size", &param_.particleSize, 0.1f, 2.0f);
+  ImGui::SliderFloat("Particle Mass", &param_.particleMass, 0.01f, 0.5f);
+  ImGui::SliderFloat("Gravity", &param_.gravity, 100.0f, 10000.0f);
+  ImGui::SliderFloat("Gravity Rotate", &param_.gravityAngle, 0.0f, 360.0f);
+  ImGui::SliderFloat("Delta Time", &param_.deltaTime, 0.1f, 1.0f);
+  ImGui::SliderFloat("Limit Range", &param_.limitRange, 0.0f, 100.0f);
+  ImGui::ColorEdit3(
+      "Clear Color", reinterpret_cast<float *>(&param_.clearColor));
+  ImGui::End();
+}
+
 void SceneParticles::ComputeParticles() {
   // 重力場の回転
-  const glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), glm::radians(angle_),
+  const glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), glm::radians(param_.gravityAngle),
                                          glm::vec3(0.0f, 0.0f, 1.0f));
   const glm::vec3 blackHole1Pos = glm::vec3(rotation * kBlackHole1BasePos);
   const glm::vec3 blackHole2Pos = glm::vec3(rotation * kBlackHole2BasePos);
@@ -172,10 +195,14 @@ void SceneParticles::ComputeParticles() {
   compute_.Use();
   compute_.SetUniform("BlackHole1Pos", blackHole1Pos);
   compute_.SetUniform("BlackHole2Pos", blackHole2Pos);
+  compute_.SetUniform("DeltaTime", param_.deltaTime * 0.001f);
+  compute_.SetUniform("ParticleInvMass", 1.0f / param_.particleMass);
+  compute_.SetUniform("Gravity1", param_.gravity);
+  compute_.SetUniform("Gravity2", param_.gravity);
+  compute_.SetUniform("MaxDist", param_.limitRange);
   glDispatchCompute(kTotalParticles / kLocalSizeX, 1, 1);
   glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 }
-
 
 // ********************************************************************************
 // Render
@@ -197,8 +224,8 @@ void SceneParticles::DrawParticles() {
   render_.SetUniform("MVP", proj * view * model);
 
   // パーティクルの描画
-  glPointSize(1.0f);
-  render_.SetUniform("Color", glm::vec4(0.015f, 0.05f, 0.3f, 0.1f));
+  glPointSize(param_.particleSize);
+  render_.SetUniform("Color", param_.particleColor);
   glBindVertexArray(hParticlesVAO_);
   glDrawArrays(GL_POINTS, 0, kTotalParticles);
   glBindVertexArray(0);
