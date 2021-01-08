@@ -129,11 +129,9 @@ set(TARGETS
     GUI
     Diffuse
     Phong
-    Subroutine
     PBR
     Texture
     Deferred
-    DeferredPBR
     MSAA
     SSAO
     ShadowMap

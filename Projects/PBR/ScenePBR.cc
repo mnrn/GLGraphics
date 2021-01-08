@@ -11,6 +11,13 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 // ********************************************************************************
+// Constant expressions
+// ********************************************************************************
+
+static constexpr float kFOVY = 60.0f;
+static constexpr int kNumCows = 9;
+
+// ********************************************************************************
 // Special member functions
 // ********************************************************************************
 
@@ -24,24 +31,26 @@ ScenePBR::ScenePBR()
 // ********************************************************************************
 
 void ScenePBR::OnInit() {
-  if (const auto msg = CompileAndLinkShader()) {
-    std::cerr << msg.value() << std::endl;
-    BOOST_ASSERT_MSG(false, "Failed to compile or link.");
-  }
-
-  glEnable(GL_DEPTH_TEST);
   view_ = glm::lookAt(glm::vec3(0.0f, 4.0f, 7.0f), glm::vec3(0.0f, 0.0f, 0.0f),
                       glm::vec3(0.0f, 1.0f, 0.0f));
   proj_ = glm::perspective(
       glm::radians(kFOVY),
       static_cast<float>(width_) / static_cast<float>(height_), 0.3f, 100.0f);
 
-  prog_.SetUniform("Light[0].L", glm::vec3(45.0f));
-  prog_.SetUniform("Light[0].Position", view_ * lightPositions_[0]);
-  prog_.SetUniform("Light[1].L", glm::vec3(0.3f));
-  prog_.SetUniform("Light[1].Position", lightPositions_[1]);
-  prog_.SetUniform("Light[2].L", glm::vec3(45.0f));
-  prog_.SetUniform("Light[2].Position", view_ * lightPositions_[2]);
+  if (const auto msg = CompileAndLinkShader()) {
+    std::cerr << msg.value() << std::endl;
+    BOOST_ASSERT_MSG(false, "Failed to compile or link.");
+  } else {
+    prog_.Use();
+    prog_.SetUniform("Light[0].L", glm::vec3(45.0f));
+    prog_.SetUniform("Light[0].Position", view_ * lightPositions_[0]);
+    prog_.SetUniform("Light[1].L", glm::vec3(0.3f));
+    prog_.SetUniform("Light[1].Position", lightPositions_[1]);
+    prog_.SetUniform("Light[2].L", glm::vec3(45.0f));
+    prog_.SetUniform("Light[2].Position", view_ * lightPositions_[2]);
+  }
+
+  glEnable(GL_DEPTH_TEST);
 }
 
 void ScenePBR::OnUpdate(float t) {
@@ -66,9 +75,6 @@ void ScenePBR::OnRender() {
 void ScenePBR::OnResize(int w, int h) {
   glViewport(0, 0, w, h);
   SetDimensions(w, h);
-  proj_ = glm::perspective(glm::radians(kFOVY),
-                           static_cast<float>(w) / static_cast<float>(h), 0.3f,
-                           100.0f);
 }
 
 // ********************************************************************************
@@ -83,14 +89,10 @@ void ScenePBR::SetMatrices() {
 }
 
 std::optional<std::string> ScenePBR::CompileAndLinkShader() {
-  if (prog_.Compile("./Assets/Shaders/PBR/PBR.vs.glsl", ShaderType::Vertex) &&
-      prog_.Compile("./Assets/Shaders/PBR/PBR.fs.glsl", ShaderType::Fragment) &&
-      prog_.Link()) {
-    prog_.Use();
-    return std::nullopt;
-  } else {
-    return prog_.GetLog();
-  }
+  // Compile and links
+  return prog_.CompileAndLink(
+      {{"./Assets/Shaders/PBR/PBR.vs.glsl", ShaderType::Vertex},
+       {"./Assets/Shaders/PBR/PBR.fs.glsl", ShaderType::Fragment}});
 }
 
 bool ScenePBR::IsAnimate() const { return true; }
@@ -101,7 +103,7 @@ void ScenePBR::DrawScene() {
   for (int i = 0; i < kNumCows; i++) {
     const float cowX = static_cast<float>(i) * (10.0f / (kNumCows - 1)) - 5.0f;
     const float rough = static_cast<float>(i + 1) * (1.0f / kNumCows);
-    DrawMesh(glm::vec3(cowX, 0.0f, 0.0f), rough, 0, kBaseCowColor);
+    DrawMesh(glm::vec3(cowX, 0.0f, 0.0f), rough, 0, param_.dielectricBaseColor);
   }
 
   const std::vector<glm::vec3> kMetalColors = {
@@ -114,7 +116,8 @@ void ScenePBR::DrawScene() {
   const float kOffsetX = 1.5f;
   float cowX = -3.0f;
   for (int i = 0; i < 5; i++) {
-    DrawMesh(glm::vec3(cowX, 0.0f, 3.0f), kMetalRough, 1, kMetalColors[i]);
+    DrawMesh(glm::vec3(cowX, 0.0f, 3.0f), param_.metalRough, 1,
+             kMetalColors[i]);
     cowX += kOffsetX;
   }
 }

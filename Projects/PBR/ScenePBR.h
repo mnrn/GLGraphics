@@ -33,11 +33,6 @@ private:
   void DrawMesh(const glm::vec3 &pos, float rough, int metal,
                 const glm::vec3 &color);
 
-  static constexpr inline float kFOVY = 60.0f;
-  static constexpr inline float kMetalRough = 0.43f;
-  static constexpr inline int kNumCows = 9;
-  static constexpr glm::vec3 kBaseCowColor{0.2f, 0.33f, 0.17f};
-
   ShaderProgram prog_;
 
   std::unique_ptr<ObjMesh> mesh_ =
@@ -45,6 +40,11 @@ private:
 
   Teapot teapot_{50, glm::mat4(1.0f)};
   Plane plane_{20, 20, 1, 1};
+
+  struct Param {
+    glm::vec3 dielectricBaseColor{0.2f, 0.33f, 0.17f};
+    float metalRough = 0.43f;
+  } param_;
 
   float tPrev_ = 0.0f;
   float lightAngle_ = 0.0f;
