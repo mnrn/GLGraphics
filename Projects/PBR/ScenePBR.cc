@@ -16,7 +16,13 @@
 // ********************************************************************************
 
 static constexpr float kFOVY = 60.0f;
-static constexpr int kNumCows = 9;
+static const std::vector<glm::vec3> kMetalColors = {
+    glm::vec3(1.0f, 0.71f, 0.29f),    // Gold
+    glm::vec3(0.95f, 0.64f, 0.54f),   // Copper
+    glm::vec3(0.91f, 0.92f, 0.92f),   // Aluminum
+    glm::vec3(0.542f, 0.497, 0.449f), // Titanium
+    glm::vec3(0.95f, 0.93f, 0.88f)    // Silver
+};
 
 // ********************************************************************************
 // Special member functions
@@ -32,7 +38,7 @@ ScenePBR::ScenePBR()
 // ********************************************************************************
 
 void ScenePBR::OnInit() {
-  view_ = glm::lookAt(glm::vec3(0.0f, 4.0f, 7.0f), glm::vec3(0.0f, 0.0f, 0.0f),
+  view_ = glm::lookAt(glm::vec3(0.0f, 2.0f, 7.0f), glm::vec3(0.0f, 0.0f, 0.0f),
                       glm::vec3(0.0f, 1.0f, 0.0f));
   proj_ = glm::perspective(
       glm::radians(kFOVY),
@@ -102,35 +108,23 @@ void ScenePBR::UpdateGUI() {
   GUI::NewFrame();
 
   ImGui::Begin("PBR Config");
+  ImGui::ColorEdit3("Metal Specular",
+                    reinterpret_cast<float *>(&param_.metalSpecular));
   ImGui::SliderFloat("Metal Roughness", &param_.metalRough, 0.0f, 1.0f);
   ImGui::ColorEdit3("Dielectric Base Color (Non-Metal Albedo)",
                     reinterpret_cast<float *>(&param_.dielectricBaseColor));
+  ImGui::SliderFloat("Dielectric Roughness", &param_.dielectricRough, 0.0f,
+                     1.0f);
   ImGui::End();
 }
 
 void ScenePBR::DrawScene() {
   DrawFloor();
 
-  for (int i = 0; i < kNumCows; i++) {
-    const float cowX = static_cast<float>(i) * (10.0f / (kNumCows - 1)) - 5.0f;
-    const float rough = static_cast<float>(i + 1) * (1.0f / kNumCows);
-    DrawMesh(glm::vec3(cowX, 0.0f, 0.0f), rough, 0, param_.dielectricBaseColor);
-  }
-
-  const std::vector<glm::vec3> kMetalColors = {
-      glm::vec3(1.0f, 0.71f, 0.29f),    // Gold
-      glm::vec3(0.95f, 0.64f, 0.54f),   // Copper
-      glm::vec3(0.91f, 0.92f, 0.92f),   // Aluminum
-      glm::vec3(0.542f, 0.497, 0.449f), // Titanium
-      glm::vec3(0.95f, 0.93f, 0.88f)    // Silver
-  };
-  const float kOffsetX = 1.5f;
-  float cowX = -3.0f;
-  for (int i = 0; i < 5; i++) {
-    DrawMesh(glm::vec3(cowX, 0.0f, 3.0f), param_.metalRough, 1,
-             kMetalColors[i]);
-    cowX += kOffsetX;
-  }
+  DrawMesh(glm::vec3(3.0f, 0.0f, 0.0f), param_.dielectricRough, 0,
+           param_.dielectricBaseColor);
+  DrawMesh(glm::vec3(-3.0, 0.0f, 0.0f), param_.metalRough, 1,
+           param_.metalSpecular);
 }
 
 void ScenePBR::DrawFloor() {
@@ -138,7 +132,7 @@ void ScenePBR::DrawFloor() {
   prog_.SetUniform("Material.Roughness", 0.9f);
   prog_.SetUniform("Material.Metallic", 0);
   prog_.SetUniform("Material.Color", glm::vec3(0.0f));
-  model_ = glm::translate(model_, glm::vec3(0.0f, -0.75f, 0.0f));
+  model_ = glm::translate(model_, glm::vec3(0.0f, -3.0f, 0.0f));
   SetMatrices();
 
   plane_.Render();
@@ -146,13 +140,14 @@ void ScenePBR::DrawFloor() {
 
 void ScenePBR::DrawMesh(const glm::vec3 &pos, float rough, int metal,
                         const glm::vec3 &color) {
-  model_ = glm::mat4(1.0f);
   prog_.SetUniform("Material.Roughness", rough);
   prog_.SetUniform("Material.Metallic", metal);
   prog_.SetUniform("Material.Color", color);
-  model_ = glm::translate(model_, pos);
+  model_ = glm::translate(glm::mat4(1.0f), pos);
   model_ =
       glm::rotate(model_, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+  model_ = glm::scale(model_, glm::vec3(3.0f));
+
   SetMatrices();
 
   mesh_->Render();

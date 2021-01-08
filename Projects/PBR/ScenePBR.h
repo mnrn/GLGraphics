@@ -42,8 +42,10 @@ private:
   Plane plane_{20, 20, 1, 1};
 
   struct Param {
+    glm::vec3 metalSpecular{1.0f, 0.71f, 0.29f};
     float metalRough = 0.43f;
     glm::vec3 dielectricBaseColor{0.2f, 0.33f, 0.17f};
+    float dielectricRough = 0.43f;
   } param_;
 
   float tPrev_ = 0.0f;
