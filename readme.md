@@ -1,6 +1,7 @@
 # OpenGL グラフィックメモ
 
-![Launguage-C++](https://img.shields.io/badge/Language-C%2B%2B-F34B7D)
+[![License: MIT](https://img.shields.io/badge/License-MIT-lightgrey.svg)](https://opensource.org/licenses/MIT)
+![Launguage-C++](https://img.shields.io/badge/Language-C%2B%2B-orange)
 
 グラフィックに関する実装をOpenGLで行っていきます。  
 Vulkanでの実装がもう少し楽になりそうならそちらに移行するつもりですが、しばらくはOpenGLのままになりそうです。  

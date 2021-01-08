@@ -64,7 +64,19 @@ void SceneSSAO::OnDestroy() {
   glDeleteBuffers(1, &quadVBO_);
 }
 
-void SceneSSAO::OnUpdate(float) {}
+void SceneSSAO::OnUpdate(float) {
+  GUI::NewFrame();
+
+  ImGui::Begin("SSAO Config");
+  ImGui::RadioButton("RenderType: SSAO", &param_.type, RenderType::RenderSSAO);
+  ImGui::RadioButton("RenderType: Only SSAO", &param_.type,
+                     RenderType::RenderSSAOOnly);
+  ImGui::RadioButton("RenderType: No SSAO", &param_.type,
+                     RenderType::RenderNoSSAO);
+  ImGui::SliderFloat("SSAO Sampling Radius", &param_.radius, 0.1f, 1.0f);
+  ImGui::SliderFloat("AO Parameterization", &param_.ao, 1.0f, 10.0f);
+  ImGui::End();
+}
 
 void SceneSSAO::OnRender() {
   {
@@ -73,7 +85,7 @@ void SceneSSAO::OnRender() {
     Pass3();
     Pass4();
   }
-  DrawGUI();
+  GUI::Render();
 }
 
 void SceneSSAO::OnResize(int w, int h) {
@@ -323,20 +335,4 @@ void SceneSSAO::DrawQuad() {
   glBindVertexArray(quadVAO_);
   glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
   glBindVertexArray(0);
-}
-
-void SceneSSAO::DrawGUI() {
-  GUI::NewFrame();
-
-  ImGui::Begin("SSAO Config");
-  ImGui::RadioButton("RenderType: SSAO", &param_.type, RenderType::RenderSSAO);
-  ImGui::RadioButton("RenderType: Only SSAO", &param_.type,
-                     RenderType::RenderSSAOOnly);
-  ImGui::RadioButton("RenderType: No SSAO", &param_.type,
-                     RenderType::RenderNoSSAO);
-  ImGui::SliderFloat("SSAO Sampling Radius", &param_.radius, 0.1f, 1.0f);
-  ImGui::SliderFloat("AO Parameterization", &param_.ao, 1.0f, 10.0f);
-  ImGui::End();
-
-  GUI::Render();
 }

@@ -12,7 +12,7 @@
 
 #include "SceneMSAA.h"
 
-#include "HID/KeyInput.h"
+#include "GUI/GUI.h"
 #include "UI/Text.h"
 
 // ********************************************************************************
@@ -20,15 +20,6 @@
 // ********************************************************************************
 
 void SceneMSAA::OnInit() {
-  KeyInput::Create();
-  Text::Create();
-  Font::Create();
-
-  if ((fontObj_ = Font::Get().Entry(
-           "./Assets/Fonts/UbuntuMono/UbuntuMono-Regular.ttf"))) {
-    fontObj_->SetupWithSize(20);
-  }
-
   if (const auto msg = CompileAndLinkShader()) {
     std::cerr << msg.value() << std::endl;
     BOOST_ASSERT_MSG(false, "failed to compile or link!");
@@ -36,7 +27,7 @@ void SceneMSAA::OnInit() {
 
   CreateVAO();
 
-#if !NDEBUG
+#if !defined(NDEBUG)
   GLint bufs, samples;
   glGetIntegerv(GL_SAMPLE_BUFFERS, &bufs);
   glGetIntegerv(GL_SAMPLES, &samples);
@@ -51,25 +42,20 @@ void SceneMSAA::OnDestroy() {
 }
 
 void SceneMSAA::OnUpdate(float t) {
+  UpdateGUI();
+
   const float deltaT = tPrev_ == 0.0f ? 0.0f : t - tPrev_;
   tPrev_ = t;
 
-  angle_ += kRotSpeed * deltaT;
+  angle_ += param_.rotSpeed * deltaT;
   if (angle_ > glm::two_pi<float>()) {
     angle_ -= glm::two_pi<float>();
-  }
-
-  if (KeyInput::Get().IsTrg(Key::Left) || KeyInput::Get().IsTrg(Key::Right)) {
-    isEnabledMSAA_ = !isEnabledMSAA_;
-  }
-  if (KeyInput::Get().IsTrg(Key::Up) || KeyInput::Get().IsTrg(Key::Down)) {
-    isEnabledCentroid_ = !isEnabledCentroid_;
   }
 }
 
 void SceneMSAA::OnRender() {
   DrawQuad();
-  DrawText();
+  GUI::Render();
 }
 
 void SceneMSAA::OnResize(int w, int h) {
@@ -127,13 +113,23 @@ void SceneMSAA::CreateVAO() {
   glBindVertexArray(0);
 }
 
+void SceneMSAA::UpdateGUI() {
+  GUI::NewFrame();
+
+  ImGui::Begin("MSAA Config");
+  ImGui::Checkbox("MSAA ON", &param_.isEnabledMSAA);
+  ImGui::Checkbox("Centroid ON", &param_.isEnabledCentroid);
+  ImGui::SliderFloat("Rotate Speed", &param_.rotSpeed, 0.0f, 1.0f);
+  ImGui::End();
+}
+
 // ********************************************************************************
 // Drawing
 // ********************************************************************************
 
 void SceneMSAA::DrawQuad() {
   glEnable(GL_DEPTH_TEST);
-  if (isEnabledMSAA_) {
+  if (param_.isEnabledMSAA) {
     glEnable(GL_MULTISAMPLE);
   }
 
@@ -148,7 +144,7 @@ void SceneMSAA::DrawQuad() {
   model_ = glm::rotate(glm::mat4(1.0f), glm::radians(30.0f),
                        glm::vec3(0.0f, 0.0f, 1.0f));
 
-  if (isEnabledCentroid_) {
+  if (param_.isEnabledCentroid) {
     centroid_.Use();
     centroid_.SetUniform("MVP", proj_ * view_ * model_);
   } else {
@@ -162,38 +158,4 @@ void SceneMSAA::DrawQuad() {
 
   glDisable(GL_MULTISAMPLE);
   glDisable(GL_DEPTH_TEST);
-}
-
-void SceneMSAA::DrawText() {
-  if (!fontObj_) {
-    return;
-  }
-  const float kBaseX = 25.0f;
-  const float kBaseY = static_cast<float>(height_) - 30.0f;
-  const float kOffsetY = -30.0f;
-  const float kOffsetYL2 = -50.0f;
-
-  Text::Get().Begin(width_, height_);
-  {
-    if (isEnabledMSAA_) {
-      Text::Get().Render("MSAA: ON", kBaseX, kBaseY, fontObj_);
-      Text::Get().Render("Press left or right arrow key: Disable MSAA", kBaseX,
-                         kBaseY + kOffsetY, fontObj_);
-    } else {
-      Text::Get().Render("MSAA: OFF", kBaseX, kBaseY, fontObj_);
-      Text::Get().Render("Press left or right arrow key: Enable MSAA", kBaseX,
-                         kBaseY + kOffsetY, fontObj_);
-    }
-    const float kCentroidBaseX = kBaseX + 120.0f;
-    if (isEnabledCentroid_) {
-      Text::Get().Render("Centroid: ON", kCentroidBaseX, kBaseY, fontObj_);
-      Text::Get().Render("Press up or down arrow key: Disable Centroid", kBaseX,
-                         kBaseY + kOffsetYL2, fontObj_);
-    } else {
-      Text::Get().Render("Centroid: OFF", kCentroidBaseX, kBaseY, fontObj_);
-      Text::Get().Render("Press up or down arrow key: Enable Centroid", kBaseX,
-                         kBaseY + kOffsetYL2, fontObj_);
-    }
-  }
-  Text::Get().End();
 }
