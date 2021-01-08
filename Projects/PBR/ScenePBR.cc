@@ -60,13 +60,11 @@ void ScenePBR::OnUpdate(float t) {
   const float deltaT = tPrev_ == 0.0f ? 0.0f : t - tPrev_;
   tPrev_ = t;
 
-  if (IsAnimate()) {
-    lightAngle_ = glm::mod(lightAngle_ + deltaT * lightRotationSpeed_,
-                           glm::two_pi<float>());
-    lightPositions_[0] =
-        glm::vec4(glm::cos(lightAngle_) * 7.0f, 3.0f,
-                  glm::sin(lightAngle_) * 7.0f, lightPositions_[0].w);
-  }
+  lightAngle_ = glm::mod(lightAngle_ + deltaT * lightRotationSpeed_,
+                         glm::two_pi<float>());
+  lightPositions_[0] =
+      glm::vec4(glm::cos(lightAngle_) * 7.0f, 3.0f,
+                glm::sin(lightAngle_) * 7.0f, lightPositions_[0].w);
 }
 
 void ScenePBR::OnRender() {
@@ -109,8 +107,6 @@ void ScenePBR::UpdateGUI() {
                     reinterpret_cast<float *>(&param_.dielectricBaseColor));
   ImGui::End();
 }
-
-bool ScenePBR::IsAnimate() const { return true; }
 
 void ScenePBR::DrawScene() {
   DrawFloor();

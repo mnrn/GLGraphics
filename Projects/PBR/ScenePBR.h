@@ -26,7 +26,6 @@ public:
 
 private:
   std::optional<std::string> CompileAndLinkShader();
-  bool IsAnimate() const;
   void SetMatrices();
   void UpdateGUI();
   void DrawScene();
