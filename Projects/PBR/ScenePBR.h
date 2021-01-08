@@ -28,6 +28,7 @@ private:
   std::optional<std::string> CompileAndLinkShader();
   bool IsAnimate() const;
   void SetMatrices();
+  void UpdateGUI();
   void DrawScene();
   void DrawFloor();
   void DrawMesh(const glm::vec3 &pos, float rough, int metal,
@@ -42,8 +43,8 @@ private:
   Plane plane_{20, 20, 1, 1};
 
   struct Param {
-    glm::vec3 dielectricBaseColor{0.2f, 0.33f, 0.17f};
     float metalRough = 0.43f;
+    glm::vec3 dielectricBaseColor{0.2f, 0.33f, 0.17f};
   } param_;
 
   float tPrev_ = 0.0f;

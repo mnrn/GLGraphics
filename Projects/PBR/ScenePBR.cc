@@ -5,10 +5,11 @@
 #include "ScenePBR.h"
 
 #include <boost/assert.hpp>
-#include <iostream>
-
 #include <glm/gtc/constants.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <iostream>
+
+#include "GUI/GUI.h"
 
 // ********************************************************************************
 // Constant expressions
@@ -54,6 +55,8 @@ void ScenePBR::OnInit() {
 }
 
 void ScenePBR::OnUpdate(float t) {
+  UpdateGUI();
+
   const float deltaT = tPrev_ == 0.0f ? 0.0f : t - tPrev_;
   tPrev_ = t;
 
@@ -70,6 +73,8 @@ void ScenePBR::OnRender() {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   prog_.SetUniform("Light[0].Position", view_ * lightPositions_[0]);
   DrawScene();
+
+  GUI::Render();
 }
 
 void ScenePBR::OnResize(int w, int h) {
@@ -93,6 +98,17 @@ std::optional<std::string> ScenePBR::CompileAndLinkShader() {
   return prog_.CompileAndLink(
       {{"./Assets/Shaders/PBR/PBR.vs.glsl", ShaderType::Vertex},
        {"./Assets/Shaders/PBR/PBR.fs.glsl", ShaderType::Fragment}});
+}
+
+void ScenePBR::UpdateGUI() {
+  GUI::NewFrame();
+
+  ImGui::Begin("PBR Config");
+  ImGui::SliderFloat("Metal Roughness", &param_.metalRough, 0.0f, 1.0f);
+  ImGui::SliderFloat3("Dielectric Base Color (Non-Metal Albedo)",
+                      reinterpret_cast<float *>(&param_.dielectricBaseColor),
+                      0.0f, 1.0f);
+  ImGui::End();
 }
 
 bool ScenePBR::IsAnimate() const { return true; }
