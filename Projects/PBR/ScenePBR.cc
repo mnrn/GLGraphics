@@ -105,9 +105,8 @@ void ScenePBR::UpdateGUI() {
 
   ImGui::Begin("PBR Config");
   ImGui::SliderFloat("Metal Roughness", &param_.metalRough, 0.0f, 1.0f);
-  ImGui::SliderFloat3("Dielectric Base Color (Non-Metal Albedo)",
-                      reinterpret_cast<float *>(&param_.dielectricBaseColor),
-                      0.0f, 1.0f);
+  ImGui::ColorEdit3("Dielectric Base Color (Non-Metal Albedo)",
+                    reinterpret_cast<float *>(&param_.dielectricBaseColor));
   ImGui::End();
 }
 
