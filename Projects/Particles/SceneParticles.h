@@ -1,5 +1,5 @@
 /**
- * @brief
+ * @brief パーティクル
  */
 
 #ifndef SCENE_PARTICLES_H
@@ -12,6 +12,8 @@
 #include "Scene/Scene.h"
 
 #include <array>
+#include <string>
+#include <optional>
 
 #include "Graphics/Shader.h"
 
@@ -29,26 +31,18 @@ public:
 
 private:
   void InitBuffer();
-  bool CompileAndLinkShader();
+  std::optional<std::string> CompileAndLinkShader();
 
-  static constexpr inline int32_t particlesXNum_ = 100;
-  static constexpr inline int32_t particlesYNum_ = 100;
-  static constexpr inline int32_t particlesZNum_ = 100;
-  static constexpr inline int32_t totalParticlesNum_ =
-      particlesXNum_ * particlesYNum_ * particlesZNum_;
-  static constexpr inline int32_t localSizeX_ =
-      1000; //!< コンピュートシェーダーの値と同じにする必要があります。
+  void ComputeParticles();
+  void DrawParticles();
 
-  std::array<GLuint, 2> computeBuffer_;
+  std::array<GLuint, 2> computeBuffer_{};
   GLuint hParticlesVAO_ = 0;
   GLuint hBlackHoleBuffer_ = 0;
   GLuint hBlackHoleVAO_ = 0;
 
-  ShaderProgram render_;
-  ShaderProgram compute_;
-
-  glm::vec4 blackHole1Pos_{5.0f, 0.0f, 0.0f, 1.0f};
-  glm::vec4 blackHole2Pos_{-5.0f, 0.0f, 0.0f, 1.0f};
+  ShaderProgram render_{};
+  ShaderProgram compute_{};
 
   float angle_ = 0.0f;
 };

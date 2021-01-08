@@ -1,5 +1,5 @@
 /**
- * @brief コンピュートシェーダー入門
+ * @brief パーティクル
  */
 
 // ********************************************************************************
@@ -13,19 +13,32 @@
 #include "SceneParticles.h"
 
 // ********************************************************************************
+// Constant expressions
+// ********************************************************************************
+
+static constexpr std::int32_t kParticlesX = 100;
+static constexpr std::int32_t kParticlesY = 100;
+static constexpr std::int32_t kParticlesZ = 100;
+static constexpr std::int32_t kTotalParticles =
+    kParticlesX * kParticlesY * kParticlesZ;
+
+ //!< コンピュートシェーダーの値と同じにする必要があります。
+static constexpr std::int32_t kLocalSizeX = 1000;
+
+static constexpr glm::vec4 kBlackHole1BasePos{5.0f, 0.0f, 0.0f, 1.0f};
+static constexpr glm::vec4 kBlackHole2BasePos{-5.0f, 0.0f, 0.0f, 1.0f};
+
+// ********************************************************************************
 // Overrided functions
 // ********************************************************************************
 
 void SceneParticles::OnInit() {
-  if (CompileAndLinkShader() == false) {
-    std::exit(EXIT_FAILURE);
+  if (const auto msg = CompileAndLinkShader()) {
+    std::cerr << msg.value() << std::endl;
+    BOOST_ASSERT_MSG(false, "failed to compile or link!");
   }
 
   InitBuffer();
-
-  glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-  glEnable(GL_BLEND);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 void SceneParticles::OnDestroy() {
@@ -38,49 +51,15 @@ void SceneParticles::OnDestroy() {
 void SceneParticles::OnUpdate(float deltaSec) { static_cast<void>(deltaSec); }
 
 void SceneParticles::OnRender() {
-  // 重力場の回転
-  const glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), glm::radians(angle_),
-                                         glm::vec3(0.0f, 0.0f, 1.0f));
-  const glm::vec3 blackHole1Pos = glm::vec3(rotation * blackHole1Pos_);
-  const glm::vec3 blackHole2Pos = glm::vec3(rotation * blackHole2Pos_);
+  ComputeParticles();
 
-  // コンピュートシェーダーの実行
-  compute_.Use();
-  compute_.SetUniform("BlackHole1Pos", blackHole1Pos);
-  compute_.SetUniform("BlackHole2Pos", blackHole2Pos);
-  glDispatchCompute(totalParticlesNum_ / localSizeX_, 1, 1);
-  glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
-
-  // シーンの描画準備
-  render_.Use();
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  const glm::mat4 proj = glm::perspective(
-      glm::radians(50.0f),
-      static_cast<float>(width_) / static_cast<float>(height_), 1.0f, 100.0f);
-  const glm::mat4 view =
-      glm::lookAt(glm::vec3(2.0f, 0.0f, 20.0f), glm::vec3(0.0f, 0.0f, 0.0f),
-                  glm::vec3(0.0f, 1.0f, 0.0f));
-  const glm::mat4 model = glm::mat4(1.0f);
-  render_.SetUniform("MVP", proj * view * model);
-
-  // パーティクルの描画
-  glPointSize(1.0f);
-  render_.SetUniform("Color", glm::vec4(0.015f, 0.05f, 0.3f, 0.1f));
-  glBindVertexArray(hParticlesVAO_);
-  glDrawArrays(GL_POINTS, 0, totalParticlesNum_);
-  glBindVertexArray(0);
-
-  // ブラックホールの描画
-  glPointSize(2.5f);
-  GLfloat data[] = {blackHole1Pos.x, blackHole1Pos.y, blackHole1Pos.z,
-                    blackHole1Pos.z, blackHole2Pos.x, blackHole2Pos.y,
-                    blackHole2Pos.z, blackHole2Pos.z};
-  glBindBuffer(GL_ARRAY_BUFFER, hBlackHoleVAO_);
-  glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(GLfloat) * 8, data);
-  render_.SetUniform("Color", glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
-  glBindVertexArray(hBlackHoleVAO_);
-  glDrawArrays(GL_POINTS, 0, 2);
-  glBindVertexArray(0);
+  glClearColor(0.9f, 0.9f, 0.9f, 1.0f);
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  {
+    DrawParticles();
+  }
+  glDisable(GL_BLEND);
 }
 
 void SceneParticles::OnResize(int w, int h) {
@@ -92,52 +71,32 @@ void SceneParticles::OnResize(int w, int h) {
 // Initialize
 // ********************************************************************************
 
-bool SceneParticles::CompileAndLinkShader() {
-
-  // シーン描画用シェーダープログラム
-  if (render_.Compile("./Assets/Shaders/Particles/Particles.vs.glsl",
-                      ShaderType::Vertex) == false) {
-    std::cerr << "vertex shader failed to Compile." << std::endl;
-    std::cerr << render_.GetLog() << std::endl;
-    return false;
+std::optional<std::string> SceneParticles::CompileAndLinkShader() {
+  // Compile and links
+  if (const auto msg = render_.CompileAndLink(
+          {{"./Assets/Shaders/Particles/Particles.vs.glsl", ShaderType::Vertex},
+           {"./Assets/Shaders/Particles/Particles.fs.glsl", ShaderType::Fragment}})) {
+    return msg;
   }
-  if (render_.Compile("./Assets/Shaders/Particles/Particles.fs.glsl",
-                      ShaderType::Fragment) == false) {
-    std::cerr << "fragment shader failed to Compile." << std::endl;
-    std::cerr << render_.GetLog() << std::endl;
-    return false;
-  }
-  if (render_.Link() == false) {
-    std::cerr << "render program failed to Link." << std::endl;
-    std::cerr << render_.GetLog() << std::endl;
-    return false;
-  }
-#ifndef __APPLE__
-  // コンピュートーシェーダープログラム
-  if (compute_.Compile("./Assets/Shaders/Particles/Particles.cs.glsl",
-                       ShaderType::Compute) == false) {
-    std::cerr << "compute shader failed to Compile." << std::endl;
-    std::cerr << compute_.GetLog() << std::endl;
-    return false;
-  }
-  if (compute_.Link() == false) {
-    std::cerr << "compute program failed to Link." << std::endl;
-    std::cerr << compute_.GetLog() << std::endl;
-    return false;
+#if !defined(__APPLE__)
+  if (const auto msg = compute_.CompileAndLink(
+          {{"./Assets/Shaders/Particles/Particles.cs.glsl",
+            ShaderType::Compute}})) {
+    return msg;
   }
 #endif
-  return true;
+  return std::nullopt;
 }
 
 void SceneParticles::InitBuffer() {
 
   // 変数の初期化
   std::vector<GLfloat> initPos;
-  std::vector<GLfloat> initVel(totalParticlesNum_ * 4, 0.0f);
+  std::vector<GLfloat> initVel(kTotalParticles * 4, 0.0f);
   glm::vec4 p(0.0f, 0.0f, 0.0f, 1.0f);
-  const GLfloat dx = 2.0f / (particlesXNum_ - 1);
-  const GLfloat dy = 2.0f / (particlesYNum_ - 1);
-  const GLfloat dz = 2.0f / (particlesZNum_ - 1);
+  const GLfloat dx = 2.0f / (kParticlesX - 1);
+  const GLfloat dy = 2.0f / (kParticlesY - 1);
+  const GLfloat dz = 2.0f / (kParticlesZ - 1);
   const glm::mat4 transform = glm::translate(
       glm::mat4(1.0f), // Identity matrix
       glm::vec3(
@@ -145,9 +104,9 @@ void SceneParticles::InitBuffer() {
           -1.0f)); // 中央のパーティクルが(0, 0, 0)になるように設定します。
 
   // パーティクルの初期位置を設定します。
-  for (int32_t xi = 0; xi < particlesXNum_; xi++) {
-    for (int32_t yi = 0; yi < particlesYNum_; yi++) {
-      for (int32_t zi = 0; zi < particlesZNum_; zi++) {
+  for (int32_t xi = 0; xi < kParticlesX; xi++) {
+    for (int32_t yi = 0; yi < kParticlesY; yi++) {
+      for (int32_t zi = 0; zi < kParticlesZ; zi++) {
 
         p.x = dx * static_cast<float>(xi);
         p.y = dy * static_cast<float>(yi);
@@ -168,7 +127,7 @@ void SceneParticles::InitBuffer() {
   GLuint bufPos = computeBuffer_[0];
   GLuint bufVel = computeBuffer_[1];
 
-  const GLuint bufSize = totalParticlesNum_ * sizeof(GLfloat) * 4;
+  const GLuint bufSize = kTotalParticles * sizeof(GLfloat) * 4;
 
   glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, bufPos);
   glBufferData(GL_SHADER_STORAGE_BUFFER, bufSize, &initPos[0], GL_DYNAMIC_DRAW);
@@ -186,9 +145,9 @@ void SceneParticles::InitBuffer() {
   // ブラックホール用のVBOとVAOを生成し設定します。
   glGenBuffers(1, &hBlackHoleBuffer_);
   glBindBuffer(GL_ARRAY_BUFFER, hBlackHoleBuffer_);
-  GLfloat data[] = {blackHole1Pos_.x, blackHole1Pos_.y, blackHole1Pos_.z,
-                    blackHole1Pos_.w, blackHole2Pos_.x, blackHole2Pos_.y,
-                    blackHole2Pos_.z, blackHole2Pos_.w};
+  GLfloat data[] = {kBlackHole1BasePos.x, kBlackHole1BasePos.y, kBlackHole1BasePos.z,
+                    kBlackHole1BasePos.w, kBlackHole2BasePos.x, kBlackHole2BasePos.y,
+                    kBlackHole2BasePos.z, kBlackHole2BasePos.w};
   glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 8, data, GL_DYNAMIC_DRAW);
   glGenVertexArrays(1, &hBlackHoleVAO_);
   glBindVertexArray(hBlackHoleVAO_);
@@ -196,4 +155,65 @@ void SceneParticles::InitBuffer() {
   glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, nullptr);
   glEnableVertexAttribArray(0);
   glBindVertexArray(0);
+}
+
+// ********************************************************************************
+// Update
+// ********************************************************************************
+
+void SceneParticles::ComputeParticles() {
+  // 重力場の回転
+  const glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), glm::radians(angle_),
+                                         glm::vec3(0.0f, 0.0f, 1.0f));
+  const glm::vec3 blackHole1Pos = glm::vec3(rotation * kBlackHole1BasePos);
+  const glm::vec3 blackHole2Pos = glm::vec3(rotation * kBlackHole2BasePos);
+
+  // コンピュートシェーダーの実行
+  compute_.Use();
+  compute_.SetUniform("BlackHole1Pos", blackHole1Pos);
+  compute_.SetUniform("BlackHole2Pos", blackHole2Pos);
+  glDispatchCompute(kTotalParticles / kLocalSizeX, 1, 1);
+  glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+}
+
+
+// ********************************************************************************
+// Render
+// ********************************************************************************
+
+void SceneParticles::DrawParticles() {
+  // シーンの描画準備
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+  const glm::mat4 proj = glm::perspective(
+      glm::radians(50.0f),
+      static_cast<float>(width_) / static_cast<float>(height_), 1.0f, 100.0f);
+  const glm::mat4 view =
+      glm::lookAt(glm::vec3(2.0f, 0.0f, 20.0f), glm::vec3(0.0f, 0.0f, 0.0f),
+                  glm::vec3(0.0f, 1.0f, 0.0f));
+  const glm::mat4 model = glm::mat4(1.0f);
+
+  render_.Use();
+  render_.SetUniform("MVP", proj * view * model);
+
+  // パーティクルの描画
+  glPointSize(1.0f);
+  render_.SetUniform("Color", glm::vec4(0.015f, 0.05f, 0.3f, 0.1f));
+  glBindVertexArray(hParticlesVAO_);
+  glDrawArrays(GL_POINTS, 0, kTotalParticles);
+  glBindVertexArray(0);
+
+  /*
+  // ブラックホールの描画
+  glPointSize(2.5f);
+  GLfloat data[] = {blackHole1Pos.x, blackHole1Pos.y, blackHole1Pos.z,
+                    blackHole1Pos.z, blackHole2Pos.x, blackHole2Pos.y,
+                    blackHole2Pos.z, blackHole2Pos.z};
+  glBindBuffer(GL_ARRAY_BUFFER, hBlackHoleVAO_);
+  glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(GLfloat) * 8, data);
+  render_.SetUniform("Color", glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+  glBindVertexArray(hBlackHoleVAO_);
+  glDrawArrays(GL_POINTS, 0, 2);
+  glBindVertexArray(0);
+  */
 }
