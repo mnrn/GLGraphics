@@ -46,6 +46,8 @@ private:
     float metalRough = 0.43f;
     glm::vec3 dielectricBaseColor{0.2f, 0.33f, 0.17f};
     float dielectricRough = 0.43f;
+    float dielectricReflectance = 0.5f;
+    float roughnessParameterization = 2.0f;
   } param_;
 
   float tPrev_ = 0.0f;

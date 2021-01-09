@@ -15,13 +15,15 @@ uniform struct LightInfo {
 } Light[kLightMax];
 
 uniform struct MaterialInfo {
-    float Roughness; // 粗さ
-    bool Metallic;   // 金属かどうか true=metal(導体,金属), false=dielectric(誘電体, 非金属)
-    vec3 Color;      // 誘電体(Dielectric)のDiffuse色(Albedo)もしくは金属(Metal)のSpecular色
+    float Roughness;    // 粗さ
+    float Metallic;     // 金属かどうか 1.0=metal(導体,金属), 0.0=dielectric(誘電体, 非金属)
+    float Reflectance;  // 誘電体(Dielectric)の拡散反射率
+    vec3 BaseColor;     // 誘電体(Dielectric)のDiffuse色(Albedo)もしくは金属(Metal)のSpecular色
 } Material;
 
 // ライトの数
 uniform int LightNum = 3;
+uniform float RoughnessParameterization = 2.0f;
 
 /**
  * @brief The GGX distribution (GGX分布関数)
@@ -35,7 +37,7 @@ float D_GGX(float NoH, float roughness) {
 /**
  * @brief The Smith geometric shadowing function (を簡単にした関数です。)
  */
-float V_Smith(float NoV, float NoL, float roughness) {
+float V_SmithFast(float NoV, float NoL, float roughness) {
     float GGXV = NoL * (NoV * (1.0 - roughness) + roughness);
     float GGXL = NoV * (NoL * (1.0 - roughness) + roughness);
     return 0.5 / (GGXV * GGXL);
@@ -54,15 +56,10 @@ vec3 GammaCorrection(vec3 color) {
 
 vec3 MicroFacetModel(int lightIdx, vec3 pos, vec3 n) {
     // 誘電体(非金属)ならDiffuse色(Albedo)取得
-    vec3 diff = vec3(0.0);
-    if (!Material.Metallic) {
-        diff = Material.Color;
-    }
+    vec3 diff = (1.0 - Material.Metallic) * Material.BaseColor;
+
     // 金属(導体)ならSpecular色取得
-    vec3 f0 = vec3(0.04);
-    if (Material.Metallic) {
-        f0 = Material.Color;
-    }
+    vec3 f0 = 0.16 * Material.Reflectance * Material.Reflectance * (1.0 - Material.Metallic) + Material.BaseColor * Material.Metallic;
 
     // ライトに関して。
     vec3 l = vec3(0.0);
@@ -84,12 +81,12 @@ vec3 MicroFacetModel(int lightIdx, vec3 pos, vec3 n) {
     float LoH = dot(l, h);      // clamp(dot(l, h), 0.0, 1.0)
 
     // ラフネスをパラメタ化します。
-    float roughness = Material.Roughness * Material.Roughness;
+    float roughness = pow(Material.Roughness, RoughnessParameterization);
 
     // Specular BRDF
     float D = D_GGX(NoH, roughness);
     vec3 F = F_Schlick(LoH, f0);
-    float V = V_Smith(NoV, NoL, roughness);
+    float V = V_SmithFast(NoV, NoL, roughness);
     vec3 spec = D * V * F;
 
     return (diff + kPI * spec) * lightIntensity * NoL;

@@ -31,7 +31,7 @@ static const std::vector<glm::vec3> kMetalColors = {
 ScenePBR::ScenePBR()
     : lightPositions_{glm::vec4(7.0f, 3.0f, 0.0f, 1.0f),
                       glm::vec4(0.0f, 0.15f, 0.0f, 0.0f),
-                      glm::vec4(-7.0f, 3.0f, 7.0f, 1.0f)} {}
+                      glm::vec4(0.0f, 3.0f, 7.0f, 1.0f)} {}
 
 // ********************************************************************************
 // Override functions
@@ -53,7 +53,7 @@ void ScenePBR::OnInit() {
     prog_.SetUniform("Light[0].Position", view_ * lightPositions_[0]);
     prog_.SetUniform("Light[1].L", glm::vec3(0.3f));
     prog_.SetUniform("Light[1].Position", lightPositions_[1]);
-    prog_.SetUniform("Light[2].L", glm::vec3(45.0f));
+    prog_.SetUniform("Light[2].L", glm::vec3(20.0f));
     prog_.SetUniform("Light[2].Position", view_ * lightPositions_[2]);
   }
 
@@ -111,16 +111,20 @@ void ScenePBR::UpdateGUI() {
   ImGui::ColorEdit3("Metal Specular",
                     reinterpret_cast<float *>(&param_.metalSpecular));
   ImGui::SliderFloat("Metal Roughness", &param_.metalRough, 0.0f, 1.0f);
-  ImGui::ColorEdit3("Dielectric Base Color (Non-Metal Albedo)",
+  ImGui::ColorEdit3("Dielectric Base Color (Non-Metal Diffuse Albedo)",
                     reinterpret_cast<float *>(&param_.dielectricBaseColor));
   ImGui::SliderFloat("Dielectric Roughness", &param_.dielectricRough, 0.0f,
                      1.0f);
+  ImGui::SliderFloat("Dielectric Reflectance", &param_.dielectricReflectance,
+                     0.0f, 1.0f);
   ImGui::End();
 }
 
 void ScenePBR::DrawScene() {
   DrawFloor();
 
+  prog_.SetUniform("RoughnessParameterization",
+                   param_.roughnessParameterization);
   DrawMesh(glm::vec3(3.0f, 0.0f, 0.0f), param_.dielectricRough, 0,
            param_.dielectricBaseColor);
   DrawMesh(glm::vec3(-3.0, 0.0f, 0.0f), param_.metalRough, 1,
@@ -130,8 +134,9 @@ void ScenePBR::DrawScene() {
 void ScenePBR::DrawFloor() {
   model_ = glm::mat4(1.0f);
   prog_.SetUniform("Material.Roughness", 0.9f);
-  prog_.SetUniform("Material.Metallic", 0);
-  prog_.SetUniform("Material.Color", glm::vec3(0.0f));
+  prog_.SetUniform("Material.Metallic", 0.0f);
+  prog_.SetUniform("Material.Reflectance", 0.6f);
+  prog_.SetUniform("Material.BaseColor", glm::vec3(0.0f));
   model_ = glm::translate(model_, glm::vec3(0.0f, -3.0f, 0.0f));
   SetMatrices();
 
@@ -141,8 +146,9 @@ void ScenePBR::DrawFloor() {
 void ScenePBR::DrawMesh(const glm::vec3 &pos, float rough, int metal,
                         const glm::vec3 &color) {
   prog_.SetUniform("Material.Roughness", rough);
-  prog_.SetUniform("Material.Metallic", metal);
-  prog_.SetUniform("Material.Color", color);
+  prog_.SetUniform("Material.Metallic", static_cast<float>(metal));
+  prog_.SetUniform("Material.Reflectance", param_.dielectricReflectance);
+  prog_.SetUniform("Material.BaseColor", color);
   model_ = glm::translate(glm::mat4(1.0f), pos);
   model_ =
       glm::rotate(model_, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
