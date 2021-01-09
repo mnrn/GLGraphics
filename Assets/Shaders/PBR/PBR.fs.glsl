@@ -23,7 +23,6 @@ uniform struct MaterialInfo {
 
 // ライトの数
 uniform int LightNum = 3;
-uniform float RoughnessParameterization = 2.0f;
 
 /**
  * @brief The GGX distribution (GGX分布関数)
@@ -35,12 +34,13 @@ float D_GGX(float NoH, float roughness) {
 }
 
 /**
- * @brief The Smith geometric shadowing function (を簡単にした関数です。)
+ * @brief The Smith geometric shadowing function
  */
-float V_SmithFast(float NoV, float NoL, float roughness) {
-    float GGXV = NoL * (NoV * (1.0 - roughness) + roughness);
-    float GGXL = NoV * (NoL * (1.0 - roughness) + roughness);
-    return 0.5 / (GGXV * GGXL);
+float V_SmithGGX(float NoV, float NoL, float roughness) {
+    float a2 = roughness * roughness;
+    float GGXV = NoL * sqrt(NoV * (-NoV * a2 + NoV) + a2);
+    float GGXL = NoV * sqrt(NoL * (-NoL * a2 + NoL) + a2);
+    return 0.5 / (GGXV + GGXL);
 }
 
 /**
@@ -75,19 +75,19 @@ vec3 MicroFacetModel(int lightIdx, vec3 pos, vec3 n) {
 
     vec3 v = normalize(-pos);   // 視線ベクトル
     vec3 h = normalize(v + l);  // ハーフベクトル(Bling-Phongモデルと同じ)
-    float NoV = dot(n, v);      // abs(dot(n, v)) + 1e-5
-    float NoL = dot(n, l);      // clamp(dot(n, l), 0.0, 1.0)
-    float NoH = dot(n, h);      // clamp(dot(n, h), 0.0, 1.0)
-    float LoH = dot(l, h);      // clamp(dot(l, h), 0.0, 1.0)
+    float NoV = abs(dot(n, v)) + 1e-5;
+    float NoL = clamp(dot(n, l), 0.0, 1.0);
+    float NoH = clamp(dot(n, h), 0.0, 1.0);
+    float LoH = clamp(dot(l, h), 0.0, 1.0);
 
     // ラフネスをパラメタ化します。
-    float roughness = pow(Material.Roughness, RoughnessParameterization);
+    float roughness = Material.Roughness * Material.Roughness;
 
     // Specular BRDF
     float D = D_GGX(NoH, roughness);
     vec3 F = F_Schlick(LoH, f0);
-    float V = V_SmithFast(NoV, NoL, roughness);
-    vec3 spec = D * V * F;
+    float V = V_SmithGGX(NoV, NoL, roughness);
+    vec3 spec = (D * V) * F;
 
     return (diff + kPI * spec) * lightIntensity * NoL;
 }

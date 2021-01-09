@@ -8,6 +8,7 @@
 #include <glm/gtc/constants.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <iostream>
+#include <map>
 
 #include "GUI/GUI.h"
 
@@ -16,12 +17,18 @@
 // ********************************************************************************
 
 static constexpr float kFOVY = 60.0f;
-static const std::vector<glm::vec3> kMetalColors = {
-    glm::vec3(1.0f, 0.71f, 0.29f),    // Gold
-    glm::vec3(0.95f, 0.64f, 0.54f),   // Copper
-    glm::vec3(0.91f, 0.92f, 0.92f),   // Aluminum
-    glm::vec3(0.542f, 0.497, 0.449f), // Titanium
-    glm::vec3(0.95f, 0.93f, 0.88f)    // Silver
+static const std::map<MetalColor, glm::vec3> kMetalLinearRGB{
+    {MetalColor::Nil, glm::vec3(0.0f, 0.0f, 0.0f)},
+    {MetalColor::Iron, glm::vec3(0.560f, 0.570f, 0.580f)},
+    {MetalColor::Silver, glm::vec3(0.972f, 0.960f, 0.915f)},
+    {MetalColor::Aluminum, glm::vec3(0.913f, 0.921f, 0.925f)},
+    {MetalColor::Gold, glm::vec3(1.000f, 0.766f, 0.336f)},
+    {MetalColor::Copper, glm::vec3(0.955f, 0.637f, 0.538f)},
+    {MetalColor::Chromium, glm::vec3(0.550f, 0.556f, 0.556f)},
+    {MetalColor::Nickel, glm::vec3(0.660f, 0.609f, 0.526f)},
+    {MetalColor::Titanium, glm::vec3(0.542f, 0.497f, 0.449f)},
+    {MetalColor::Cobalt, glm::vec3(0.662f, 0.665f, 0.634f)},
+    {MetalColor::Platinum, glm::vec3(0.672f, 0.637f, 0.585f)},
 };
 
 // ********************************************************************************
@@ -30,8 +37,8 @@ static const std::vector<glm::vec3> kMetalColors = {
 
 ScenePBR::ScenePBR()
     : lightPositions_{glm::vec4(7.0f, 3.0f, 0.0f, 1.0f),
-                      glm::vec4(0.0f, 0.15f, 0.0f, 0.0f),
-                      glm::vec4(0.0f, 3.0f, 7.0f, 1.0f)} {}
+                      glm::vec4(0.0f, 1.5f, 0.0f, 0.0f),
+                      glm::vec4(0.0f, 1.5f, 3.0f, 1.0f)} {}
 
 // ********************************************************************************
 // Override functions
@@ -51,9 +58,9 @@ void ScenePBR::OnInit() {
     prog_.Use();
     prog_.SetUniform("Light[0].L", glm::vec3(45.0f));
     prog_.SetUniform("Light[0].Position", view_ * lightPositions_[0]);
-    prog_.SetUniform("Light[1].L", glm::vec3(0.3f));
+    prog_.SetUniform("Light[1].L", glm::vec3(5.0f));
     prog_.SetUniform("Light[1].Position", lightPositions_[1]);
-    prog_.SetUniform("Light[2].L", glm::vec3(20.0f));
+    prog_.SetUniform("Light[2].L", glm::vec3(45.0f));
     prog_.SetUniform("Light[2].Position", view_ * lightPositions_[2]);
   }
 
@@ -62,6 +69,10 @@ void ScenePBR::OnInit() {
 
 void ScenePBR::OnUpdate(float t) {
   UpdateGUI();
+
+  if (param_.metalColor != MetalColor::Nil) {
+    param_.metalSpecular = kMetalLinearRGB.at(param_.metalColor);
+  }
 
   const float deltaT = tPrev_ == 0.0f ? 0.0f : t - tPrev_;
   tPrev_ = t;
@@ -105,11 +116,29 @@ std::optional<std::string> ScenePBR::CompileAndLinkShader() {
 }
 
 void ScenePBR::UpdateGUI() {
+  static const std::map<MetalColor, const char *> kMetalNames{
+      {MetalColor::Nil, "Origin"},         {MetalColor::Silver, "Silver"},
+      {MetalColor::Aluminum, "Aluminium"}, {MetalColor::Titanium, "Titanium"},
+      {MetalColor::Iron, "Iron"},          {MetalColor::Platinum, "Platinum"},
+      {MetalColor::Gold, "Gold"},          {MetalColor::Nickel, "Nickel"},
+      {MetalColor::Copper, "Copper"},      {MetalColor::Chromium, "Chromium"},
+      {MetalColor::Cobalt, "Cobalt"},
+  };
   GUI::NewFrame();
 
   ImGui::Begin("PBR Config");
-  ImGui::ColorEdit3("Metal Specular",
-                    reinterpret_cast<float *>(&param_.metalSpecular));
+  if (ImGui::ColorEdit3("Metal Specular",
+                        reinterpret_cast<float *>(&param_.metalSpecular))) {
+    param_.metalColor = MetalColor::Nil;
+  }
+  ImGui::Text("Select Metal Specular");
+  for (size_t i = 0; i < kMetalLinearRGB.size(); i++) {
+    ImGui::RadioButton(kMetalNames.at(static_cast<MetalColor>(i)),
+                       reinterpret_cast<int *>(&param_.metalColor), i);
+    if (i + 1 != kMetalLinearRGB.size()) {
+      ImGui::SameLine();
+    }
+  }
   ImGui::SliderFloat("Metal Roughness", &param_.metalRough, 0.0f, 1.0f);
   ImGui::ColorEdit3("Dielectric Base Color (Non-Metal Diffuse Albedo)",
                     reinterpret_cast<float *>(&param_.dielectricBaseColor));
@@ -123,8 +152,6 @@ void ScenePBR::UpdateGUI() {
 void ScenePBR::DrawScene() {
   DrawFloor();
 
-  prog_.SetUniform("RoughnessParameterization",
-                   param_.roughnessParameterization);
   DrawMesh(glm::vec3(3.0f, 0.0f, 0.0f), param_.dielectricRough, 0,
            param_.dielectricBaseColor);
   DrawMesh(glm::vec3(-3.0, 0.0f, 0.0f), param_.metalRough, 1,
@@ -133,9 +160,9 @@ void ScenePBR::DrawScene() {
 
 void ScenePBR::DrawFloor() {
   model_ = glm::mat4(1.0f);
-  prog_.SetUniform("Material.Roughness", 0.9f);
+  prog_.SetUniform("Material.Roughness", 1.0f);
   prog_.SetUniform("Material.Metallic", 0.0f);
-  prog_.SetUniform("Material.Reflectance", 0.6f);
+  prog_.SetUniform("Material.Reflectance", 1.0f);
   prog_.SetUniform("Material.BaseColor", glm::vec3(0.0f));
   model_ = glm::translate(model_, glm::vec3(0.0f, -3.0f, 0.0f));
   SetMatrices();

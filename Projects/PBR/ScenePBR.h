@@ -16,6 +16,20 @@
 #include "Primitive/Plane.h"
 #include "Primitive/Teapot.h"
 
+enum struct MetalColor : std::uint32_t {
+  Nil,
+  Iron,
+  Silver,
+  Aluminum,
+  Gold,
+  Copper,
+  Chromium,
+  Nickel,
+  Titanium,
+  Cobalt,
+  Platinum,
+};
+
 class ScenePBR : public Scene {
 public:
   ScenePBR();
@@ -47,7 +61,7 @@ private:
     glm::vec3 dielectricBaseColor{0.2f, 0.33f, 0.17f};
     float dielectricRough = 0.43f;
     float dielectricReflectance = 0.5f;
-    float roughnessParameterization = 2.0f;
+    MetalColor metalColor = MetalColor::Nil;
   } param_;
 
   float tPrev_ = 0.0f;
