@@ -56,7 +56,7 @@ private:
     float gravityAngle = 0.0f;
     float deltaTime = 0.5f;
     float limitRange = 45.0f;
-    glm::vec3 clearColor{0.351f, 0.351f, 0.351f};
+    glm::vec3 clearColor{0.118f, 0.118f, 0.118f};
   } param_{};
 };
 

@@ -20,7 +20,7 @@
 
 static constexpr std::int32_t kParticlesX = 100;
 static constexpr std::int32_t kParticlesY = 100;
-static constexpr std::int32_t kParticlesZ = 100;
+static constexpr std::int32_t kParticlesZ = 80;
 static constexpr std::int32_t kTotalParticles =
     kParticlesX * kParticlesY * kParticlesZ;
 
@@ -127,18 +127,19 @@ void SceneParticles::InitBuffer() {
       }
     }
   }
+  BOOST_ASSERT(initPos.size() == static_cast<size_t>(kTotalParticles * 4));
 
   // コンピュートシェーダー用のバッファを生成し設定します。
-  glGenBuffers(computeBuffer_.size(), computeBuffer_.data());
+  glGenBuffers(static_cast<GLsizei>(computeBuffer_.size()), computeBuffer_.data());
   GLuint bufPos = computeBuffer_[0];
   GLuint bufVel = computeBuffer_[1];
 
-  const GLuint bufSize = kTotalParticles * sizeof(GLfloat) * 4;
+  const GLuint kBufSize = kTotalParticles * sizeof(GLfloat) * 4;
 
   glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, bufPos);
-  glBufferData(GL_SHADER_STORAGE_BUFFER, bufSize, &initPos[0], GL_DYNAMIC_DRAW);
+  glBufferData(GL_SHADER_STORAGE_BUFFER, kBufSize, &initPos[0], GL_DYNAMIC_DRAW);
   glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, bufVel);
-  glBufferData(GL_SHADER_STORAGE_BUFFER, bufSize, &initVel[0], GL_DYNAMIC_COPY);
+  glBufferData(GL_SHADER_STORAGE_BUFFER, kBufSize, &initVel[0], GL_DYNAMIC_COPY);
 
   // パーティクルのVAOを生成し設定します。
   glGenVertexArrays(1, &hParticlesVAO_);
@@ -213,7 +214,7 @@ void SceneParticles::DrawParticles() {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   const glm::mat4 proj = glm::perspective(
-      glm::radians(50.0f),
+      glm::radians(60.0f),
       static_cast<float>(width_) / static_cast<float>(height_), 1.0f, 100.0f);
   const glm::mat4 view =
       glm::lookAt(glm::vec3(2.0f, 0.0f, 20.0f), glm::vec3(0.0f, 0.0f, 0.0f),

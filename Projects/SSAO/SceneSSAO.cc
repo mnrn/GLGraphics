@@ -68,10 +68,14 @@ void SceneSSAO::OnUpdate(float) {
   GUI::NewFrame();
 
   ImGui::Begin("SSAO Config");
-  ImGui::RadioButton("RenderType: SSAO", &param_.type, RenderType::RenderSSAO);
-  ImGui::RadioButton("RenderType: Only SSAO", &param_.type,
+  ImGui::Text("RenderType:");
+  ImGui::SameLine();
+  ImGui::RadioButton("SSAO", &param_.type, RenderType::RenderSSAO);
+  ImGui::SameLine();
+  ImGui::RadioButton("Only SSAO", &param_.type,
                      RenderType::RenderSSAOOnly);
-  ImGui::RadioButton("RenderType: No SSAO", &param_.type,
+  ImGui::SameLine();
+  ImGui::RadioButton("No SSAO", &param_.type,
                      RenderType::RenderNoSSAO);
   ImGui::SliderFloat("SSAO Sampling Radius", &param_.radius, 0.1f, 1.0f);
   ImGui::SliderFloat("AO Parameterization", &param_.ao, 1.0f, 10.0f);
