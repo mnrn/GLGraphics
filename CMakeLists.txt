@@ -12,7 +12,7 @@ project(dummy NONE)
 set(PROJECT_NAME ReGL)
 project(${PROJECT_NAME})
 
-set(PROJECTS_DIR_NAME projects)
+set(PROJECTS_DIR_NAME Projects)
 include_directories(SYSTEM third-party)
 include_directories(Core)
 include_directories(Common)
