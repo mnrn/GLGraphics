@@ -4,13 +4,9 @@
 
 #include "CSM.h"
 
-#include <boost/assert.hpp>
 #include <cmath>
-#include <glm/gtc/constants.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtx/string_cast.hpp>
 #include <iostream>
-#include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/spdlog.h>
 
 #ifdef WIN32
@@ -46,7 +42,7 @@ std::vector<float> CSM::ComputeSplitPlanes(int cascades, float near, float far,
 
 void CSM::UpdateSplitPlanesUniform(
     int cascades, const std::vector<float> &splits, const Camera &camera,
-    std::function<void(int, float)> loopEndCallback) {
+    const std::function<void(int, float)> &loopEndCallback) {
   const glm::mat4 proj = camera.GetProjectionMatrix();
 
   // カメラから見た Split Planes の同次座標系におけるz位置を計算します。
@@ -127,64 +123,4 @@ glm::mat4 CSM::ComputeCropMatrix(const glm::mat4 &view, const glm::mat4 &proj,
   shadow[3][3] += roundOffset.w;
 
   return shadow * view;
-}
-
-// ********************************************************************************
-// Unstable
-// ********************************************************************************
-
-glm::mat4 CSM::ComputeCropMatrix(const glm::vec3 &mini,
-                                 const glm::vec3 &maxi) const {
-  const float sx = 2.0f / (maxi.x - mini.x);
-  const float sy = 2.0f / (maxi.y - mini.y);
-  const float ox = -0.5f * (maxi.x + mini.x) * sx;
-  const float oy = -0.5f * (maxi.y + mini.y) * sy;
-#if true
-  return glm::mat4(
-      glm::vec4(sx, 0.0f, 0.0f, 0.0f), glm::vec4(0.0f, sy, 0.0f, 0.0f),
-      glm::vec4(0.0f, 0.0f, 1.0f, 0.0f), glm::vec4(ox, oy, 0.0f, 1.0f));
-#else
-  const float sz = 1.0f / (maxi.z - mini.z);
-  const float oz = -mini.z * sz;
-  return glm::mat4(
-      glm::vec4(sx, 0.0f, 0.0f, 0.0f), glm::vec4(0.0f, sy, 0.0f, 0.0f),
-      glm::vec4(0.0f, 0.0f, sz, 0.0f), glm::vec4(ox, oy, oz, 1.0f));
-#endif
-}
-
-std::pair<float, float> CSM::FindZRange(const Frustum &frustum,
-                                        const glm::mat4 &mv) const {
-  // ライトから見た錐台のzの範囲を見つけます。
-  glm::vec4 trans = mv * glm::vec4(frustum.GetCorner(0), 1.0f);
-  float minZ = trans.z;
-  float maxZ = trans.z;
-
-  for (int i = 1; i < 8; i++) {
-    trans = mv * glm::vec4(frustum.GetCorner(i), 1.0f);
-    maxZ = glm::max(trans.z, maxZ);
-    minZ = glm::min(trans.z, minZ);
-  }
-  return std::make_pair(minZ, maxZ);
-}
-
-std::pair<glm::vec2, glm::vec2>
-CSM::FindExtendsProj(const Frustum &frustum, const glm::mat4 &mvp) const {
-  float maxX = std::numeric_limits<float>::lowest();
-  float maxY = std::numeric_limits<float>::lowest();
-  float minX = std::numeric_limits<float>::max();
-  float minY = std::numeric_limits<float>::max();
-
-  // ライトの同次座標系に投影された錐台の延長を見つけます。
-  for (int i = 0; i < 8; i++) {
-    const auto corner = glm::vec4(frustum.GetCorner(i), 1.0f);
-    const auto trans = mvp * corner;
-    const auto tX = trans.x / trans.w;
-    const auto tY = trans.y / trans.w;
-
-    maxX = glm::max(tX, maxX);
-    minX = glm::min(tX, minX);
-    maxY = glm::max(tY, maxY);
-    minY = glm::min(tY, minY);
-  }
-  return std::make_pair(glm::vec2(minX, minY), glm::vec2(maxX, maxY));
 }

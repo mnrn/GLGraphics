@@ -14,10 +14,10 @@ public:
   void OnPreRender() const;
   void OnDestroy();
 
-  GLuint GetDeferredFBO() const { return buffers_[DeferredFBO]; }
+  [[nodiscard]] GLuint GetDeferredFBO() const { return buffers_[DeferredFBO]; }
 
 private:
-  GLuint CreateGBufferTexture(GLenum, GLenum);
+  [[nodiscard]] GLuint CreateGBufferTexture(GLenum, GLenum) const;
 
   enum Buffer {
     DeferredFBO,

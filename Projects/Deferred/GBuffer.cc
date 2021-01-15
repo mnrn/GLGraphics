@@ -1,7 +1,5 @@
 #include "GBuffer.h"
 
-#include <iostream>
-
 GBuffer::~GBuffer() { OnDestroy(); }
 
 void GBuffer::OnInit(int w, int h) {
@@ -55,7 +53,7 @@ void GBuffer::OnDestroy() {
   glDeleteFramebuffers(1, &buffers_[DeferredFBO]);
 }
 
-GLuint GBuffer::CreateGBufferTexture(GLenum texUnit, GLenum format) {
+GLuint GBuffer::CreateGBufferTexture(GLenum texUnit, GLenum format) const {
   GLuint texId;
 
   glActiveTexture(texUnit);

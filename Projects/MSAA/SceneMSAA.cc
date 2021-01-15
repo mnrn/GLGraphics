@@ -13,7 +13,6 @@
 #include "SceneMSAA.h"
 
 #include "GUI/GUI.h"
-#include "UI/Text.h"
 
 // ********************************************************************************
 // Override functions
@@ -69,12 +68,12 @@ void SceneMSAA::OnResize(int w, int h) {
 
 std::optional<std::string> SceneMSAA::CompileAndLinkShader() {
   // compile and links
-  if (const auto msg = centroid_.CompileAndLink(
+  if (auto msg = centroid_.CompileAndLink(
           {{"./Assets/Shaders/MSAA/Centroid.vs.glsl", ShaderType::Vertex},
            {"./Assets/Shaders/MSAA/Centroid.fs.glsl", ShaderType::Fragment}})) {
     return msg;
   }
-  if (const auto msg = noCentroid_.CompileAndLink(
+  if (auto msg = noCentroid_.CompileAndLink(
           {{"./Assets/Shaders/MSAA/NoCentroid.vs.glsl", ShaderType::Vertex},
            {"./Assets/Shaders/MSAA/NoCentroid.fs.glsl",
             ShaderType::Fragment}})) {

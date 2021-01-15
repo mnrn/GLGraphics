@@ -94,14 +94,14 @@ void SceneShadowMap::OnResize(int w, int h) {
 
 std::optional<std::string> SceneShadowMap::CompileAndLinkShader() {
   // compile and links
-  if (const auto msg = progs_[kRecordDepth].CompileAndLink(
+  if (auto msg = progs_[kRecordDepth].CompileAndLink(
           {{"./Assets/Shaders/ShadowMap/RecordDepth.vs.glsl",
             ShaderType::Vertex},
            {"./Assets/Shaders/ShadowMap/RecordDepth.fs.glsl",
             ShaderType::Fragment}})) {
     return msg;
   }
-  if (const auto msg = progs_[kShadeWithShadow].CompileAndLink(
+  if (auto msg = progs_[kShadeWithShadow].CompileAndLink(
           {{"./Assets/Shaders/ShadowMap/Simple/ShadowMap.vs.glsl",
             ShaderType::Vertex},
            {"./Assets/Shaders/ShadowMap/Simple/ShadowMap.fs.glsl",
@@ -165,7 +165,7 @@ void SceneShadowMap::SetupFBO() {
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void SceneShadowMap::SetMatrialUniforms(const glm::vec3 &diff,
+void SceneShadowMap::SetMaterialUniforms(const glm::vec3 &diff,
                                         const glm::vec3 &amb,
                                         const glm::vec3 &spec,
                                         float shininess) {
@@ -228,7 +228,7 @@ void SceneShadowMap::DrawScene() {
   const glm::vec3 spec = glm::vec3(0.9f, 0.9f, 0.9f);
 
   // ティーポットの描画
-  SetMatrialUniforms(diff, amb, spec, 150.0f);
+  SetMaterialUniforms(diff, amb, spec, 150.0f);
   model_ = glm::mat4(1.0f);
   model_ =
       glm::rotate(model_, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
@@ -236,7 +236,7 @@ void SceneShadowMap::DrawScene() {
   teapot_.Render();
 
   // トーラスの描画
-  SetMatrialUniforms(diff, amb, spec, 150.0f);
+  SetMaterialUniforms(diff, amb, spec, 150.0f);
   model_ = glm::mat4(1.0f);
   model_ = glm::translate(model_, glm::vec3(0.0f, 2.0f, 5.0f));
   model_ =
@@ -245,9 +245,9 @@ void SceneShadowMap::DrawScene() {
   torus_.Render();
 
   // 平面の描画
-  SetMatrialUniforms(glm::vec3(0.25f, 0.25f, 0.25f),
-                     glm::vec3(0.0f, 0.0f, 0.0f),
-                     glm::vec3(0.05f, 0.05f, 0.05f), 1.0f);
+  SetMaterialUniforms(glm::vec3(0.25f, 0.25f, 0.25f),
+                      glm::vec3(0.0f, 0.0f, 0.0f),
+                      glm::vec3(0.05f, 0.05f, 0.05f), 1.0f);
   model_ = glm::mat4(1.0f);
   SetMatrices();
   plane_.Render();

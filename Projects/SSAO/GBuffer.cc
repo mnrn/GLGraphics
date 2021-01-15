@@ -89,7 +89,7 @@ void GBuffer::InitSSAOBlurFBO() {
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-GLuint GBuffer::CreateGBufferTexture(GLenum format) {
+GLuint GBuffer::CreateGBufferTexture(GLenum format) const {
   GLuint texId;
 
   glGenTextures(1, &texId);

@@ -39,7 +39,7 @@ private:
 
   std::optional<std::string> CompileAndLinkShader();
   void SetMatrices();
-  void SetMatrialUniforms(const glm::vec3 &diff, const glm::vec3 &amb,
+  void SetMaterialUniforms(const glm::vec3 &diff, const glm::vec3 &amb,
                           const glm::vec3 &spec, float shininess);
   void SetupCamera();
 

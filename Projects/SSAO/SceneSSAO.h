@@ -41,7 +41,7 @@ private:
   void Pass4();
 
   void DrawScene();
-  void DrawQuad();
+  void DrawQuad() const;
 
   Plane plane_{10.0f, 10.0f, 1, 1, 10, 7};
   std::unique_ptr<ObjMesh> mesh_ =
@@ -69,7 +69,6 @@ private:
     RenderSSAO,
     RenderSSAOOnly,
     RenderNoSSAO,
-    RenderTypeNum,
   };
 
   struct Param {

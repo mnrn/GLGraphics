@@ -7,22 +7,13 @@
 #include <boost/assert.hpp>
 #include <cmath>
 #include <glm/gtc/constants.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtx/string_cast.hpp>
 #include <iostream>
-#include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/spdlog.h>
 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wunused-macros"
-#define FMT_HEADER_ONLY
-#include <fmt/format.h>
-#pragma clang diagnostic pop
 
 #include "CSM.h"
 #include "GUI/GUI.h"
 #include "HID/KeyInput.h"
-#include "UI/Font.h"
 #include "UI/Text.h"
 
 #ifdef WIN32
@@ -150,14 +141,14 @@ void SceneCSM::OnPreRender() {
 
 std::optional<std::string> SceneCSM::CompileAndLinkShader() {
   // compile and links
-  if (const auto msg = progs_[kRecordDepth].CompileAndLink(
+  if (auto msg = progs_[kRecordDepth].CompileAndLink(
           {{"./Assets/Shaders/ShadowMap/RecordDepth.vs.glsl",
             ShaderType::Vertex},
            {"./Assets/Shaders/ShadowMap/RecordDepth.fs.glsl",
             ShaderType::Fragment}})) {
     return msg;
   }
-  if (const auto msg = progs_[kShadeWithShadow].CompileAndLink(
+  if (auto msg = progs_[kShadeWithShadow].CompileAndLink(
           {{"./Assets/Shaders/ShadowMap/CSM/CSM.vs.glsl", ShaderType::Vertex},
            {"./Assets/Shaders/ShadowMap/CSM/CSM.fs.glsl",
             ShaderType::Fragment}})) {
@@ -187,7 +178,7 @@ void SceneCSM::SetMatrices() {
   }
 }
 
-void SceneCSM::SetMatrialUniforms(const glm::vec3 &diff, const glm::vec3 &amb,
+void SceneCSM::SetMaterialUniforms(const glm::vec3 &diff, const glm::vec3 &amb,
                                   const glm::vec3 &spec, float shininess) {
 
   if (pass_ != kShadeWithShadow) {
@@ -281,15 +272,15 @@ void SceneCSM::DrawScene() {
   const glm::vec3 spec = glm::vec3(0.0f);
 
   // 建物の描画
-  SetMatrialUniforms(diff, amb, spec, 1.0f);
+  SetMaterialUniforms(diff, amb, spec, 1.0f);
   model_ = glm::mat4(1.0f);
   SetMatrices();
   building_->Render();
 
   // 平面の描画
-  SetMatrialUniforms(glm::vec3(0.25f, 0.25f, 0.25f),
-                     glm::vec3(0.0f, 0.0f, 0.0f),
-                     glm::vec3(0.05f, 0.05f, 0.05f), 1.0f);
+  SetMaterialUniforms(glm::vec3(0.25f, 0.25f, 0.25f),
+                      glm::vec3(0.0f, 0.0f, 0.0f),
+                      glm::vec3(0.05f, 0.05f, 0.05f), 1.0f);
   model_ = glm::mat4(1.0f);
   SetMatrices();
   plane_.Render();

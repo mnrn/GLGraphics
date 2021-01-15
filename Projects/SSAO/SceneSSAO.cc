@@ -5,16 +5,12 @@
 #include "SceneSSAO.h"
 
 #include <boost/assert.hpp>
-#include <glm/gtc/constants.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtx/integer.hpp>
 #include <iostream>
-#include <random>
 
 #include "GUI/GUI.h"
 #include "Graphics/Texture.h"
 #include "HID/KeyInput.h"
-#include "Math/UniformDistribution.h"
 #include "SSAO.h"
 
 // ********************************************************************************
@@ -137,22 +133,22 @@ void SceneSSAO::SetMatrices() {
 
 std::optional<std::string> SceneSSAO::CompileAndLinkShader() {
   // Compile and links
-  if (const auto msg = progs_[RecordGBufferPass].CompileAndLink(
+  if (auto msg = progs_[RecordGBufferPass].CompileAndLink(
           {{"./Assets/Shaders/SSAO/GBuffer.vs.glsl", ShaderType::Vertex},
            {"./Assets/Shaders/SSAO/GBuffer.fs.glsl", ShaderType::Fragment}})) {
     return msg;
   }
-  if (const auto msg = progs_[SSAOPass].CompileAndLink(
+  if (auto msg = progs_[SSAOPass].CompileAndLink(
           {{"./Assets/Shaders/SSAO/SSAO.vs.glsl", ShaderType::Vertex},
            {"./Assets/Shaders/SSAO/SSAO.fs.glsl", ShaderType::Fragment}})) {
     return msg;
   }
-  if (const auto msg = progs_[BlurPass].CompileAndLink(
+  if (auto msg = progs_[BlurPass].CompileAndLink(
           {{"./Assets/Shaders/SSAO/SSAO.vs.glsl", ShaderType::Vertex},
            {"./Assets/Shaders/SSAO/Blur.fs.glsl", ShaderType::Fragment}})) {
     return msg;
   }
-  if (const auto msg = progs_[LightingPass].CompileAndLink(
+  if (auto msg = progs_[LightingPass].CompileAndLink(
           {{"./Assets/Shaders/SSAO/SSAO.vs.glsl", ShaderType::Vertex},
            {"./Assets/Shaders/SSAO/Lighting.fs.glsl", ShaderType::Fragment}})) {
     return msg;
@@ -335,7 +331,7 @@ void SceneSSAO::DrawScene() {
   DrawMesh();
 }
 
-void SceneSSAO::DrawQuad() {
+void SceneSSAO::DrawQuad() const {
   glBindVertexArray(quadVAO_);
   glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
   glBindVertexArray(0);

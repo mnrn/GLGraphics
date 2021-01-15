@@ -45,11 +45,11 @@ void SceneDeferred::OnInit() {
   glBindVertexArray(quad_);
 
   glBindBuffer(GL_ARRAY_BUFFER, vbo_[0]);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
   glEnableVertexAttribArray(0); // VertexPosition
 
   glBindBuffer(GL_ARRAY_BUFFER, vbo_[1]);
-  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, 0);
+  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
   glEnableVertexAttribArray(2); // TexCoord
 
   glBindVertexArray(0);

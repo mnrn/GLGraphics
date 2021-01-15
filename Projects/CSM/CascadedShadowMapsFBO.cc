@@ -1,12 +1,5 @@
 #include "CascadedShadowMapsFBO.h"
 
-#include <boost/assert.hpp>
-#include <iostream>
-#include <vector>
-
-#include <glm/gtc/constants.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-
 CascadedShadowMapsFBO::~CascadedShadowMapsFBO() { OnDestroy(); }
 
 bool CascadedShadowMapsFBO::OnInit(int cascades, int w, int h) {

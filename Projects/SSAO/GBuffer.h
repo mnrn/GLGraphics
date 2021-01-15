@@ -13,22 +13,22 @@ public:
   void OnInit(int w, int h);
   void OnDestroy();
 
-  GLuint GetDeferredFBO() const { return fbuffers_[DeferredFBO]; }
-  GLuint GetSSAOFBO() const { return fbuffers_[SSAOFBO]; }
-  GLuint GetSSAOBlurFBO() const { return fbuffers_[SSAOBlurFBO]; }
+  [[nodiscard]] GLuint GetDeferredFBO() const { return fbuffers_[DeferredFBO]; }
+  [[nodiscard]] GLuint GetSSAOFBO() const { return fbuffers_[SSAOFBO]; }
+  [[nodiscard]] GLuint GetSSAOBlurFBO() const { return fbuffers_[SSAOBlurFBO]; }
 
-  GLuint GetPosTex() const { return textures_[PosTex]; }
-  GLuint GetNormTex() const { return textures_[NormTex]; }
-  GLuint GetColorTex() const { return textures_[ColorTex]; }
-  GLuint GetAOTex() const { return textures_[AOTex]; }
-  GLuint GetBlurAOTex() const { return textures_[BlurAOTex]; }
+  [[nodiscard]] GLuint GetPosTex() const { return textures_[PosTex]; }
+  [[nodiscard]] GLuint GetNormTex() const { return textures_[NormTex]; }
+  [[nodiscard]] GLuint GetColorTex() const { return textures_[ColorTex]; }
+  [[nodiscard]] GLuint GetAOTex() const { return textures_[AOTex]; }
+  [[nodiscard]] GLuint GetBlurAOTex() const { return textures_[BlurAOTex]; }
 
 private:
   void InitDeferredFBO();
   void InitSSAOFBO();
   void InitSSAOBlurFBO();
 
-  GLuint CreateGBufferTexture(GLenum);
+  [[nodiscard]] GLuint CreateGBufferTexture(GLenum) const;
 
   enum Framebuffers {
     DeferredFBO,
@@ -49,7 +49,7 @@ private:
     TexturesNum,
   };
 
-  int width_, height_;
+  int width_ = 0, height_ = 0;
   std::array<GLuint, FramebuffersNum> fbuffers_{};
   std::array<GLuint, RenderbuffersNum> rbuffers_{};
   std::array<GLuint, TexturesNum> textures_{};

@@ -2,8 +2,8 @@
  * @brief 遅延レンダリングのテストシーン
  */
 
-#ifndef SCENE_DEFFERED_H
-#define SCENE_DEFFERED_H
+#ifndef SCENE_DEFERRED_H
+#define SCENE_DEFERRED_H
 
 #include "Scene/Scene.h"
 

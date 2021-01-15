@@ -5,9 +5,6 @@
 #include "SSAO.h"
 
 #include <glm/gtc/constants.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtx/integer.hpp>
-#include <iostream>
 
 // ********************************************************************************
 // Sampling for SSAO
@@ -17,7 +14,7 @@ std::vector<float> SSAO::BuildKernel(std::size_t kernelSize) {
   std::vector<float> kern(3 * kernelSize);
   for (size_t i = 0; i < kernelSize; i++) {
     glm::vec3 randDir = dist_.OnHemisphere(engine_);
-    const float kScale = static_cast<float>(i * i) / (kernelSize * kernelSize);
+    const float kScale = static_cast<float>(i * i) / static_cast<float>(kernelSize * kernelSize);
     randDir *= glm::mix(0.1f, 1.0f, kScale);
 
     kern[3 * i + 0] = randDir.x;
