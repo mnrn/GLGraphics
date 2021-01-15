@@ -55,6 +55,8 @@ void SceneDeferred::OnInit() {
   glBindVertexArray(0);
 
   gbuffer_.OnInit(width_, height_);
+
+  glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 }
 
 void SceneDeferred::OnDestroy() {
@@ -141,7 +143,7 @@ void SceneDeferred::Pass1() {
   SetMatrices();
   torus_.Render();
 
-  glDisable(GL_DEPTH_TEST);
+  glFlush();
 }
 
 void SceneDeferred::Pass2() {
@@ -149,7 +151,8 @@ void SceneDeferred::Pass2() {
 
   // デフォルトのフレームバッファに戻します
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
-  glClear(GL_COLOR_BUFFER_BIT);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  glDisable(GL_DEPTH_TEST);
 
   view_ = glm::mat4(1.0f);
   proj_ = glm::mat4(1.0f);

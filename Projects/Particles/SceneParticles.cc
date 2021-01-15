@@ -31,7 +31,7 @@ static constexpr glm::vec4 kBlackHole1BasePos{5.0f, 0.0f, 0.0f, 1.0f};
 static constexpr glm::vec4 kBlackHole2BasePos{-5.0f, 0.0f, 0.0f, 1.0f};
 
 // ********************************************************************************
-// Overrided functions
+// Override functions
 // ********************************************************************************
 
 void SceneParticles::OnInit() {
@@ -50,7 +50,7 @@ void SceneParticles::OnDestroy() {
   glDeleteBuffers(static_cast<GLsizei>(computeBuffer_.size()), computeBuffer_.data());
 }
 
-void SceneParticles::OnUpdate(float t) {
+void SceneParticles::OnUpdate(float) {
   UpdateGUI();
 }
 
@@ -79,13 +79,13 @@ void SceneParticles::OnResize(int w, int h) {
 
 std::optional<std::string> SceneParticles::CompileAndLinkShader() {
   // Compile and links
-  if (const auto msg = render_.CompileAndLink(
+  if (auto msg = render_.CompileAndLink(
           {{"./Assets/Shaders/Particles/Particles.vs.glsl", ShaderType::Vertex},
            {"./Assets/Shaders/Particles/Particles.fs.glsl", ShaderType::Fragment}})) {
     return msg;
   }
 #if !defined(__APPLE__)
-  if (const auto msg = compute_.CompileAndLink(
+  if (auto msg = compute_.CompileAndLink(
           {{"./Assets/Shaders/Particles/Particles.cs.glsl",
             ShaderType::Compute}})) {
     return msg;
