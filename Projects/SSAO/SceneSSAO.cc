@@ -73,6 +73,7 @@ void SceneSSAO::OnUpdate(float) {
   ImGui::SameLine();
   ImGui::RadioButton("No SSAO", &param_.type,
                      RenderType::RenderNoSSAO);
+  ImGui::Checkbox("Use Blur", &param_.useBlur);
   ImGui::SliderFloat("SSAO Sampling Radius", &param_.radius, 0.1f, 1.0f);
   ImGui::SliderFloat("AO Parameterization", &param_.ao, 1.0f, 10.0f);
   ImGui::End();
@@ -231,6 +232,9 @@ void SceneSSAO::Pass2() {
 }
 
 void SceneSSAO::Pass3() {
+  if (!param_.useBlur) {
+    return;
+  }
   glBindFramebuffer(GL_FRAMEBUFFER, gbuffer_.GetSSAOBlurFBO());
   glClear(GL_COLOR_BUFFER_BIT);
 
@@ -253,7 +257,12 @@ void SceneSSAO::Pass4() {
   glActiveTexture(GL_TEXTURE2);
   glBindTexture(GL_TEXTURE_2D, gbuffer_.GetColorTex());
   glActiveTexture(GL_TEXTURE3);
-  glBindTexture(GL_TEXTURE_2D, gbuffer_.GetBlurAOTex());
+  if (param_.useBlur) {
+    glBindTexture(GL_TEXTURE_2D, gbuffer_.GetBlurAOTex());
+  } else {
+    glBindTexture(GL_TEXTURE_2D, gbuffer_.GetAOTex());
+  }
+
 
   progs_[LightingPass].Use();
   progs_[LightingPass].SetUniform("Light.Position",

@@ -75,6 +75,7 @@ private:
     int type = RenderSSAO;
     float radius = 0.55f;
     float ao = 8.0f;
+    bool useBlur = true;
   } param_{};
 };
 
