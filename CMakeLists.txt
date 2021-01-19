@@ -37,6 +37,9 @@ find_library(GLFW_LIBRARIES
     glfw
     glfw3
     glfw3.3
+    libglfw
+    libglfw3
+    libglfw.3.3
   HINTS
     ${CMAKE_SOURCE_DIR}/Lib/glfw
 )
