@@ -5,6 +5,10 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMake")
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED)
 
+if(UNIX AND NOT APPLE)
+    set(LINUX TRUE)
+endif()
+
 project(dummy NONE)
   if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
     set(CMAKE_CXX_COMPILER clang++)
@@ -32,17 +36,11 @@ else()
 endif()
 
 # glfw
-find_library(GLFW_LIBRARIES
-  NAMES
-    glfw
-    glfw3
-    glfw3.3
-    libglfw
-    libglfw3
-    libglfw.3.3
-  HINTS
-    ${CMAKE_SOURCE_DIR}/Lib/glfw
-)
+if (WIN32)
+    set(GLFW_LIBRARIES ${CMAKE_SOURCE_DIR}/Lib/glfw/glfw3dll.lib)
+elseif (APPLE)
+    set(GLFW_LIBRARIES ${CMAKE_SOURCE_DIR}/Lib/glfw/libglfw.3.3.dylib)
+endif()
 message("@@ GLFW_LIBRARIES: ${GLFW_LIBRARIES}")
 
 ## glad
