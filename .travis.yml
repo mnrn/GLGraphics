@@ -5,13 +5,9 @@ jobs:
     - os: osx
       osx_image: xcode12
       dist: trusty
-      env:
-        - LDFLAGS="-L$(brew --prefix llvm)/lib"
-        - CPPFLAGS="-I$(brew --prefix llvm)/include"
       addons:
         homebrew:
           packages:
-            - llvm
             - ninja
             - cmake
       cache:
