@@ -12,8 +12,8 @@
 #include "Scene/Scene.h"
 
 #include <array>
-#include <string>
 #include <optional>
+#include <string>
 
 #include "Graphics/Shader.h"
 
@@ -46,7 +46,6 @@ private:
   ShaderProgram compute_{};
 
   float angle_ = 0.0f;
-  float tPrev_ = 0.0f;
 
   struct Param {
     glm::vec4 particleColor{0.015f, 0.05f, 0.3f, 0.1f};
