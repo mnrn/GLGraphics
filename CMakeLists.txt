@@ -47,20 +47,7 @@ message("@@ GLFW_LIBRARIES: ${GLFW_LIBRARIES}")
 add_subdirectory(Lib/glad)
 set(GLAD_LIBRARIES glad)
 
-# freetype
-if ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
-    set(FREETYPE_LIBRARIES_HINTS ${CMAKE_SOURCE_DIR}/Lib/freetype/debug)
-else ()
-    set(FREETYPE_LIBRARIES_HINTS ${CMAKE_SOURCE_DIR}/Lib/freetype/release)
-endif()
-find_library(FREETYPE_LIBRARIES
-  NAMES
-    freetype
-  HINTS
-    ${FREETYPE_LIBRARIES_HINTS}
-)
-message("@@ FREETYPE_LIBRARIES: ${FREETYPE_LIBRARIES}")
-include_directories(SYSTEM third-party/freetype2)
+# ImGui
 include_directories(SYSTEM third-party/imgui)
 
 
@@ -112,7 +99,6 @@ function(build TARGET_NAME)
         ${CMAKE_THREAD_LIBS_INIT}
         ${GLFW_LIBRARIES}
         ${GLAD_LIBRARIES}
-        ${FREETYPE_LIBRARIES}
     )
 endfunction(build)
 
@@ -126,7 +112,6 @@ endfunction(buildAll)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/Bin/")
 set(TARGETS
     HelloTriangle
-    Text
     GUI
     Diffuse
     Phong

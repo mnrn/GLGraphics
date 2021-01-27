@@ -18,7 +18,6 @@
 #include "Primitive/Plane.h"
 #include "Primitive/Teapot.h"
 #include "Primitive/Torus.h"
-#include "UI/Font.h"
 #include "View/Camera.h"
 #include "View/Frustum.h"
 
@@ -35,7 +34,7 @@ private:
   void SetupFBO();
   void SetMatrices();
   void SetMaterialUniforms(const glm::vec3 &diff, const glm::vec3 &amb,
-                          const glm::vec3 &spec, float shininess);
+                           const glm::vec3 &spec, float shininess);
   void SetupCamera();
   void SetupLight();
 
@@ -43,7 +42,6 @@ private:
   void Pass2();
 
   void DrawScene();
-  void DrawStatus();
 
   Camera camera_;
   Camera lightView_;
@@ -68,8 +66,6 @@ private:
 
   bool isPCF_ = true;
   bool isShadowOnly_ = false;
-
-  std::unique_ptr<FontObj> fontObj_;
 };
 
 #endif

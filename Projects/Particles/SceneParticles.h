@@ -45,8 +45,6 @@ private:
   ShaderProgram render_{};
   ShaderProgram compute_{};
 
-  float angle_ = 0.0f;
-
   struct Param {
     glm::vec4 particleColor{0.015f, 0.05f, 0.3f, 0.1f};
     float particleSize = 1.0f;
