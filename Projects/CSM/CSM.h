@@ -19,7 +19,6 @@
 #include "Primitive/Plane.h"
 #include "Primitive/Teapot.h"
 #include "Primitive/Torus.h"
-#include "UI/Font.h"
 #include "View/Camera.h"
 #include "View/Frustum.h"
 

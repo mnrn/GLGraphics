@@ -20,7 +20,6 @@
 #include "Primitive/Plane.h"
 #include "Primitive/Teapot.h"
 #include "Primitive/Torus.h"
-#include "UI/Font.h"
 #include "View/Camera.h"
 #include "View/Frustum.h"
 
@@ -40,7 +39,7 @@ private:
   std::optional<std::string> CompileAndLinkShader();
   void SetMatrices();
   void SetMaterialUniforms(const glm::vec3 &diff, const glm::vec3 &amb,
-                          const glm::vec3 &spec, float shininess);
+                           const glm::vec3 &spec, float shininess);
   void SetupCamera();
 
   void Pass1();

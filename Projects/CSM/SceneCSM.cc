@@ -10,11 +10,9 @@
 #include <iostream>
 #include <spdlog/spdlog.h>
 
-
 #include "CSM.h"
 #include "GUI/GUI.h"
 #include "HID/KeyInput.h"
-#include "UI/Text.h"
 
 #ifdef WIN32
 #ifdef far
@@ -179,7 +177,7 @@ void SceneCSM::SetMatrices() {
 }
 
 void SceneCSM::SetMaterialUniforms(const glm::vec3 &diff, const glm::vec3 &amb,
-                                  const glm::vec3 &spec, float shininess) {
+                                   const glm::vec3 &spec, float shininess) {
 
   if (pass_ != kShadeWithShadow) {
     return;

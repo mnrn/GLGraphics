@@ -5,6 +5,10 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMake")
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED)
 
+if(UNIX AND NOT APPLE)
+    set(LINUX TRUE)
+endif()
+
 project(dummy NONE)
   if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
     set(CMAKE_CXX_COMPILER clang++)
@@ -32,34 +36,18 @@ else()
 endif()
 
 # glfw
-find_library(GLFW_LIBRARIES
-  NAMES
-    glfw
-    glfw3
-    glfw3.3
-  HINTS
-    ${CMAKE_SOURCE_DIR}/Lib/glfw
-)
+if (WIN32)
+    set(GLFW_LIBRARIES ${CMAKE_SOURCE_DIR}/Lib/glfw/glfw3dll.lib)
+elseif (APPLE)
+    set(GLFW_LIBRARIES ${CMAKE_SOURCE_DIR}/Lib/glfw/libglfw.3.3.dylib)
+endif()
 message("@@ GLFW_LIBRARIES: ${GLFW_LIBRARIES}")
 
 ## glad
 add_subdirectory(Lib/glad)
 set(GLAD_LIBRARIES glad)
 
-# freetype
-if ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
-    set(FREETYPE_LIBRARIES_HINTS ${CMAKE_SOURCE_DIR}/Lib/freetype/debug)
-else ()
-    set(FREETYPE_LIBRARIES_HINTS ${CMAKE_SOURCE_DIR}/Lib/freetype/release)
-endif()
-find_library(FREETYPE_LIBRARIES
-  NAMES
-    freetype
-  HINTS
-    ${FREETYPE_LIBRARIES_HINTS}
-)
-message("@@ FREETYPE_LIBRARIES: ${FREETYPE_LIBRARIES}")
-include_directories(SYSTEM third-party/freetype2)
+# ImGui
 include_directories(SYSTEM third-party/imgui)
 
 
@@ -111,7 +99,6 @@ function(build TARGET_NAME)
         ${CMAKE_THREAD_LIBS_INIT}
         ${GLFW_LIBRARIES}
         ${GLAD_LIBRARIES}
-        ${FREETYPE_LIBRARIES}
     )
 endfunction(build)
 
@@ -125,7 +112,6 @@ endfunction(buildAll)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/Bin/")
 set(TARGETS
     HelloTriangle
-    Text
     GUI
     Diffuse
     Phong

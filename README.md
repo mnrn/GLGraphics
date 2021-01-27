@@ -39,7 +39,6 @@ Vulkanへの移行を始めていますが、OpenGLでの実装も続けてい�
 - [fmt]
 - [stb]
 - [tinyobjloader]
-- [freetype]
 - [spdlog]
 - [imgui]
 

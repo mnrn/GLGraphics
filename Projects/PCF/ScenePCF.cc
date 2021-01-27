@@ -10,8 +10,6 @@
 #include <spdlog/spdlog.h>
 
 #include "HID/KeyInput.h"
-#include "UI/Font.h"
-#include "UI/Text.h"
 
 // ********************************************************************************
 // constexpr variables
@@ -44,13 +42,6 @@ static constexpr glm::vec3 kDefaultLightPosition{-2.5f, 2.0f, -2.5f};
 
 void ScenePCF::OnInit() {
   KeyInput::Create();
-  Text::Create();
-  Font::Create();
-
-  if ((fontObj_ = Font::Get().Entry(
-           "./Assets/Fonts/UbuntuMono/UbuntuMono-Regular.ttf"))) {
-    fontObj_->SetupWithSize(28);
-  }
 
   SetupCamera();
   SetupLight();
@@ -111,8 +102,6 @@ void ScenePCF::OnRender() {
   glBindTexture(GL_TEXTURE_2D, 0);
   glDisable(GL_CULL_FACE);
   glDisable(GL_DEPTH_TEST);
-
-  DrawStatus();
 }
 
 void ScenePCF::OnResize(int w, int h) {
@@ -205,7 +194,7 @@ void ScenePCF::SetupFBO() {
 }
 
 void ScenePCF::SetMaterialUniforms(const glm::vec3 &diff, const glm::vec3 &amb,
-                                  const glm::vec3 &spec, float shininess) {
+                                   const glm::vec3 &spec, float shininess) {
 
   if (pass_ != kShadeWithShadow) {
     return;
@@ -279,39 +268,6 @@ void ScenePCF::DrawScene() {
   model_ = glm::mat4(1.0f);
   SetMatrices();
   plane_.Render();
-}
-
-void ScenePCF::DrawStatus() {
-  if (!fontObj_) {
-    return;
-  }
-  const float kBaseX = 25.0f;
-  const float kBaseY = static_cast<float>(height_) - 40.0f;
-  const float kOffsetY = -36.0f;
-
-  Text::Get().Begin(width_, height_);
-
-  if (isPCF_) {
-    Text::Get().Render("PCF: ON", kBaseX, kBaseY, fontObj_);
-    Text::Get().Render("Press <- or ->: Disable PCF", kBaseX, kBaseY + kOffsetY,
-                       fontObj_);
-  } else {
-    Text::Get().Render("PCF: OFF", kBaseX, kBaseY, fontObj_);
-    Text::Get().Render("Press <- or ->: Enable PCF", kBaseX, kBaseY + kOffsetY,
-                       fontObj_);
-  }
-  const float kShadowX = kBaseX + 150.0f;
-  if (isShadowOnly_) {
-    Text::Get().Render("Shadow Only: ON", kShadowX, kBaseY, fontObj_);
-    Text::Get().Render("Press S: Disable Shadow Only", kBaseX,
-                       kBaseY + kOffsetY * 2.0f, fontObj_);
-  } else {
-    Text::Get().Render("Shadow Only: OFF", kShadowX, kBaseY, fontObj_);
-    Text::Get().Render("Press S: Enable Shadow Only", kBaseX,
-                       kBaseY + kOffsetY * 2.0f, fontObj_);
-  }
-
-  Text::Get().End();
 }
 
 // ********************************************************************************

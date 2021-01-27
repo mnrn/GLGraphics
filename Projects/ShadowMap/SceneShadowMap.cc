@@ -166,9 +166,9 @@ void SceneShadowMap::SetupFBO() {
 }
 
 void SceneShadowMap::SetMaterialUniforms(const glm::vec3 &diff,
-                                        const glm::vec3 &amb,
-                                        const glm::vec3 &spec,
-                                        float shininess) {
+                                         const glm::vec3 &amb,
+                                         const glm::vec3 &spec,
+                                         float shininess) {
 
   if (pass_ != kShadeWithShadow) {
     return;
@@ -279,8 +279,8 @@ void SceneShadowMap::SetupCamera() {
                 kCameraCenter * 11.5f * sin(angle_));
   camera_.SetupOrient(kCamPt, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
   camera_.SetupPerspective(
-      glm::radians(kFOVY), static_cast<float>(width_) / static_cast<float>(height_), 0.1f,
-      100.0f);
+      glm::radians(kFOVY),
+      static_cast<float>(width_) / static_cast<float>(height_), 0.1f, 100.0f);
 }
 
 void SceneShadowMap::SetupLight() {

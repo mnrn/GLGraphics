@@ -32,7 +32,7 @@ private:
   void SetupFBO();
   void SetMatrices();
   void SetMaterialUniforms(const glm::vec3 &diff, const glm::vec3 &amb,
-                          const glm::vec3 &spec, float shininess);
+                           const glm::vec3 &spec, float shininess);
   void SetupCamera();
   void SetupLight();
 

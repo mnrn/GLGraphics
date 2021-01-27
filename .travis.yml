@@ -1,0 +1,24 @@
+language: cpp
+
+jobs:
+  include:
+    - os: osx
+      osx_image: xcode12
+      dist: trusty
+      addons:
+        homebrew:
+          packages:
+            - ninja
+            - cmake
+      cache:
+        #ccache: true
+        directories:
+          - $HOME/Library/Caches/Homebrew
+      script:
+        - cmake -DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=TRUE -DCMAKE_BUILD_TYPE:STRING=Debug -H. -B./build -G "Ninja"
+        - cmake --build ./build
+        - cmake -DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=TRUE -DCMAKE_BUILD_TYPE:STRING=Release -H. -B./build -G "Ninja"
+        - cmake --build ./build
+
+notifications:
+  email: false
