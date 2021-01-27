@@ -8,7 +8,7 @@ jobs:
       addons:
         homebrew:
           packages:
-            - zlib
+            - freetype
             - ninja
             - cmake
       cache:
@@ -16,7 +16,6 @@ jobs:
         directories:
           - $HOME/Library/Caches/Homebrew
       script:
-        - if [ "$TRAVIS_OS_NAME" = "osx" ]; then export CXX=$(brew --prefix llvm)/bin/clang++; fi
         - cmake -DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=TRUE -DCMAKE_BUILD_TYPE:STRING=Debug -H. -B./build -G "Ninja"
         - cmake --build ./build
 
