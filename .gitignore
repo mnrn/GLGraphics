@@ -13,6 +13,5 @@
 /[Ll]ogs
 /ssl
 /scripts
-/doc
 *.heap
 imgui.ini
