@@ -47,7 +47,7 @@ Vulkanへの移行を始めていますが、OpenGLでの実装も続けてい�
 
 ## Features
 
-### 物理ベースレンダリング(Physically Based Rendering)
+### 物理ベースレンダリング (Physically Based Rendering)
 
 ![PBR](https://github.com/mnrn/ReGL/blob/main/Docs/Images/pbr.png)
 
@@ -57,41 +57,44 @@ BRDFによるMicrofacet Modelの描画を行っています。
 
 ---
 
-### 遅延レンダリング(Deferred Rendering)
+### 遅延シェーディング (Deferred Shading)
 
 ![Deferred](https://github.com/mnrn/ReGL/blob/main/Docs/Images/deferred.png)
 
-ゲームではあまり使われないかもしれません。  
-ライティングを多用する場合は候補に入れても良いかもしれません。
+2次元の画面空間上でシェーディングを行う手法です。  
+半透明をうまく扱えない点やメモリを大きく消費する点などからゲームではあまり使われないかもしれません。  
+大量のライトを使う場合は候補に入れても良いかもしれません。
 
 ---
 
-### スクリーンスペースアンビエントオクルージョン(SSAO)
+### スクリーンスペースアンビエントオクルージョン (SSAO)
 
 ![SSAO](https://github.com/mnrn/ReGL/blob/main/Docs/Images/ssao.png)
 
-アンビエントオクルージョン(環境光遮蔽)をスクリーン空間上で考えて計算するシェーディング方法です。  
+アンビエントオクルージョン(環境光遮蔽)をスクリーン空間上で考えて計算するシェーディング手法です。  
 Deferred Renderingで実装しましたが、Forward Renderingでも用いることは可能です。
 
 ![SSAOOnly](https://github.com/mnrn/ReGL/blob/main/Docs/Images/ssao_only.png)
 
-SSAOシーンのみのレンダリング
+SSAOシーンのみをレンダリングした場合です。
 
 ---
 
-### シャドウマップ
+### シャドウマッピング (Shadow Maps)
 
 ![ShadowMap](https://github.com/mnrn/ReGL/blob/main/Docs/Images/shadowmap.png)
 
-1024x1024の解像度のシャドウマップです。  
+シャドウマッピングはライトの視点からシーンを描画し、各フラグメントでデプスの計算を行います。  
+次にシーンを描画するときに先に計算したデプスを考慮して影を描画する手法です。  
+上の画像は1024x1024の解像度のシャドウマップを使用しています。
 
 ---
 
-### 平行分割シャドウマップ
+### 平行分割シャドウマップ (Parallel-Split Shadow Maps)
 
 ![PSSM](https://github.com/mnrn/ReGL/blob/main/Docs/Images/pssm.png)
 
-カメラの視錐台を分割して各視錐台に対してシャドウマップを適用し、影を描画する方法です。  
+カメラの視錐台を分割して各視錐台に対してシャドウマップを適用し、影を描画する手法です。  
 実装していて気づきましたが、パラメータによってだいぶちらつきが発生するため、バウンディングスフィアによる安定化を採用しました。
 
 ![PSSMIndicator3](https://github.com/mnrn/ReGL/blob/main/Docs/Images/pssm_indicator3.png)
@@ -101,7 +104,7 @@ SSAOシーンのみのレンダリング
 
 ---
 
-### コンピュートパーティクル
+### コンピュートパーティクル (Compute Particles)
 
 ![ComputeParticles](https://github.com/mnrn/ReGL/blob/main/Docs/Images/compute_particles.png)
 
