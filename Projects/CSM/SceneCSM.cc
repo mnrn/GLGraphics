@@ -196,7 +196,7 @@ void SceneCSM::UpdateGUI() {
   ImGui::Checkbox("Visible Indicator", &param_.isVisibleIndicator);
   ImGui::Checkbox("Shadow Only", &param_.isShadowOnly);
   ImGui::SliderFloat("Split Scheme Lambda", &param_.schemeLambda, 0.01f, 0.99f);
-  ImGui::Text("Cascades Num = %d", param_.cascades);
+  ImGui::Text("Cascades");
   ImGui::SameLine();
   for (int i = 2; i <= kCascadesMax; i++) {
     ImGui::RadioButton(std::to_string(i).c_str(), &param_.cascades, i);
