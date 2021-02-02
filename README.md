@@ -55,12 +55,16 @@ BRDFによるMicrofacet Modelの描画を行っています。
 このあたりの理論はGoogleの物理ベースレンダリングエンジンFilamentのドキュメントなどを参考にしました。  
 左が金属(Metallic Material)、右が非金属(Dielectric Material)です。
 
+---
+
 ### 遅延レンダリング(Deferred Rendering)
 
 ![Deferred](https://github.com/mnrn/ReGL/blob/main/Docs/Images/deferred.png)
 
 ゲームではあまり使われないかもしれません。  
 ライティングを多用する場合は候補に入れても良いかもしれません。
+
+---
 
 ### スクリーンスペースアンビエントオクルージョン(SSAO)
 
@@ -73,11 +77,15 @@ Deferred Renderingで実装しましたが、Forward Renderingでも用いるこ
 
 SSAOシーンのみのレンダリング
 
+---
+
 ### シャドウマップ
 
 ![ShadowMap](https://github.com/mnrn/ReGL/blob/main/Docs/Images/shadowmap.png)
 
 1024x1024の解像度のシャドウマップです。  
+
+---
 
 ### 平行分割シャドウマップ
 
@@ -91,12 +99,14 @@ SSAOシーンのみのレンダリング
 視錐台を3分割にしてシャドウマップを生成した場合です。  
 手前のほうがくっきりしているのがわかると思います。
 
+---
+
 ### コンピュートパーティクル
 
 ![ComputeParticles](https://github.com/mnrn/ReGL/blob/main/Docs/Images/compute_particles.png)
 
 コンピュートシェーダーによるパーティクルと重力場のシミュレートになります。  
-コンピュートシェーダーを使用しているのでOpenGL4.3以降が必要になるためMacOSでは動作しません。
+コンピュートシェーダーを使用しているのでOpenGL4.3以降が必要になるためMacOSでは動作しないことに注意してください。
 
 ## 参考
 
@@ -104,8 +114,8 @@ SSAOシーンのみのレンダリング
 [HLSL Development Cookbook](https://www.packtpub.com/product/hlsl-development-cookbook/9781849694209)  
 [Unity 2018 Shaders and Effects Cookbook - Third Edition](https://www.packtpub.com/product/unity-2018-shaders-and-effects-cookbook-third-edition/9781788396233)  
 [Physically Based Rendering in Filament](https://google.github.io/filament/Filament.md.html)  
-[Advanced-Lighting - SSAO](https://learnopengl.com/Advanced-Lighting/SSAO)
-[Cascaded Shadow Maps](https://developer.download.nvidia.com/SDK/10.5/opengl/src/cascaded_shadow_maps/doc/cascaded_shadow_maps.pdf)
+[Advanced-Lighting - SSAO](https://learnopengl.com/Advanced-Lighting/SSAO)  
+[Cascaded Shadow Maps](https://developer.download.nvidia.com/SDK/10.5/opengl/src/cascaded_shadow_maps/doc/cascaded_shadow_maps.pdf)  
 [GPU Gems3 Chapter 10. Parallel-Split Shadow Maps on Programmable GPUs](https://developer.nvidia.com/gpugems/gpugems3/part-ii-light-and-shadows/chapter-10-parallel-split-shadow-maps-programmable-gpus)
 
 [boost]:<https://www.boost.org/>
