@@ -37,7 +37,7 @@ endif()
 
 # glfw
 if (WIN32)
-    set(GLFW_LIBRARIES ${CMAKE_SOURCE_DIR}/Lib/glfw/glfw3dll.lib)
+    set(GLFW_LIBRARIES ${CMAKE_SOURCE_DIR}/Lib/glfw/glfw3.lib)
 elseif (APPLE)
     set(GLFW_LIBRARIES ${CMAKE_SOURCE_DIR}/Lib/glfw/libglfw.3.3.dylib)
 endif()
