@@ -36,14 +36,80 @@ Vulkanへの移行を始めていますが、OpenGLでの実装も続けてい�
 - [GLFW]
 - [glad]
 - [GLM]
-- [boost]
-- [fmt]
 - [stb]
 - [tinyobjloader]
-- [spdlog]
 - [imgui]
+- [fmt]
+- [spdlog]
+- [boost]
 
 リポジトリのルートディレクトリにCMakeLists.txtがあるので詳しくはそちらを参照ください。  
+
+## Features
+
+### 物理ベースレンダリング (Physically Based Rendering)
+
+![PBR](https://github.com/mnrn/ReGL/blob/main/Docs/Images/pbr.png)
+
+BRDFによるMicrofacet Modelの描画を行っています。  
+このあたりの理論はGoogleの物理ベースレンダリングエンジンFilamentのドキュメントなどを参考にしました。  
+左が金属(Metallic Material)、右が非金属(Dielectric Material)です。
+
+---
+
+### 遅延シェーディング (Deferred Shading)
+
+![Deferred](https://github.com/mnrn/ReGL/blob/main/Docs/Images/deferred.png)
+
+2次元の画面空間上でシェーディングを行う手法です。  
+半透明をうまく扱えない点やメモリを大きく消費する点などからゲームではあまり使われないかもしれません。  
+大量のライトを使う場合は候補に入れても良いかもしれません。
+
+---
+
+### スクリーンスペースアンビエントオクルージョン (SSAO)
+
+![SSAO](https://github.com/mnrn/ReGL/blob/main/Docs/Images/ssao.png)
+
+アンビエントオクルージョン(環境光遮蔽)をスクリーン空間上で考えて計算するシェーディング手法です。  
+Deferred Renderingで実装しましたが、Forward Renderingでも用いることは可能です。
+
+![SSAOOnly](https://github.com/mnrn/ReGL/blob/main/Docs/Images/ssao_only.png)
+
+SSAOシーンのみをレンダリングした場合です。
+
+---
+
+### シャドウマッピング (Shadow Maps)
+
+![ShadowMap](https://github.com/mnrn/ReGL/blob/main/Docs/Images/shadowmap.png)
+
+シャドウマッピングはライトの視点からシーンを描画し、各フラグメントでデプスの計算を行います。  
+次にシーンを描画するときに先に計算したデプスを考慮して影を描画する手法です。  
+上の画像は1024x1024の解像度のシャドウマップを使用しています。
+
+---
+
+### 平行分割シャドウマップ (Parallel-Split Shadow Maps)
+
+![PSSM](https://github.com/mnrn/ReGL/blob/main/Docs/Images/pssm.png)
+
+カメラの視錐台を分割して各視錐台に対してシャドウマップを適用し、影を描画する手法です。  
+実装していて気づきましたが、パラメータによってだいぶちらつきが発生するため、バウンディングスフィアによる安定化を採用しました。
+
+![PSSMIndicator3](https://github.com/mnrn/ReGL/blob/main/Docs/Images/pssm_indicator3.png)
+
+視錐台を3分割にしてシャドウマップを生成した場合です。  
+手前のほうがくっきりしているのがわかると思います。
+
+---
+
+### コンピュートパーティクル (Compute Particles)
+
+![ComputeParticles](https://github.com/mnrn/ReGL/blob/main/Docs/Images/compute_particles.png)
+
+コンピュートシェーダーによるパーティクルと重力場のシミュレートになります。  
+コンピュートシェーダーを使用しているのでOpenGL4.3以降が必要になるためMacOSでは動作しないことに注意してください。
 
 ## 参考
 
@@ -51,6 +117,9 @@ Vulkanへの移行を始めていますが、OpenGLでの実装も続けてい�
 [HLSL Development Cookbook](https://www.packtpub.com/product/hlsl-development-cookbook/9781849694209)  
 [Unity 2018 Shaders and Effects Cookbook - Third Edition](https://www.packtpub.com/product/unity-2018-shaders-and-effects-cookbook-third-edition/9781788396233)  
 [Physically Based Rendering in Filament](https://google.github.io/filament/Filament.md.html)  
+[Advanced-Lighting - SSAO](https://learnopengl.com/Advanced-Lighting/SSAO)  
+[Cascaded Shadow Maps](https://developer.download.nvidia.com/SDK/10.5/opengl/src/cascaded_shadow_maps/doc/cascaded_shadow_maps.pdf)  
+[GPU Gems3 Chapter 10. Parallel-Split Shadow Maps on Programmable GPUs](https://developer.nvidia.com/gpugems/gpugems3/part-ii-light-and-shadows/chapter-10-parallel-split-shadow-maps-programmable-gpus)
 
 [boost]:<https://www.boost.org/>
 [GLFW]:<https://www.glfw.org/>
