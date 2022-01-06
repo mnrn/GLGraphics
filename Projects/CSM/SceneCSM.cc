@@ -96,7 +96,7 @@ void SceneCSM::OnUpdate(float t) {
 }
 
 void SceneCSM::OnRender() {
-  OnPreRender();
+  RenderPrepare();
 
   glEnable(GL_DEPTH_TEST);
   {
@@ -113,7 +113,7 @@ void SceneCSM::OnResize(int w, int h) {
   glViewport(0, 0, w, h);
 }
 
-void SceneCSM::OnPreRender() {
+void SceneCSM::PrepareRender() {
   CSM csm;
 
   const auto splits = csm.ComputeSplitPlanes(param_.cascades, kCameraNear,
