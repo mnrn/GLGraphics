@@ -10,9 +10,9 @@ class GBuffer {
 public:
   ~GBuffer();
 
-  void OnInit(int w, int h);
-  void OnPreRender() const;
-  void OnDestroy();
+  void Init(int w, int h);
+  void PrepareRender() const;
+  void Destroy();
 
   [[nodiscard]] GLuint GetDeferredFBO() const { return buffers_[DeferredFBO]; }
 

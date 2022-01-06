@@ -1,8 +1,8 @@
 #include "GBuffer.h"
 
-GBuffer::~GBuffer() { OnDestroy(); }
+GBuffer::~GBuffer() { Destroy(); }
 
-void GBuffer::OnInit(int w, int h) {
+void GBuffer::Init(int w, int h) {
   width_ = w;
   height_ = h;
 
@@ -36,7 +36,7 @@ void GBuffer::OnInit(int w, int h) {
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void GBuffer::OnPreRender() const {
+void GBuffer::PrepareRender() const {
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, textures_[PosTex]);
 
@@ -47,7 +47,7 @@ void GBuffer::OnPreRender() const {
   glBindTexture(GL_TEXTURE_2D, textures_[ColorTex]);
 }
 
-void GBuffer::OnDestroy() {
+void GBuffer::Destroy() {
   glDeleteTextures(textures_.size(), textures_.data());
   glDeleteRenderbuffers(1, &buffers_[DepthBuf]);
   glDeleteFramebuffers(1, &buffers_[DeferredFBO]);

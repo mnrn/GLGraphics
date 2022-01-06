@@ -54,7 +54,7 @@ void SceneDeferred::OnInit() {
 
   glBindVertexArray(0);
 
-  gbuffer_.OnInit(width_, height_);
+  gbuffer_.Init(width_, height_);
 
   glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 }
@@ -158,7 +158,7 @@ void SceneDeferred::Pass2() {
   proj_ = glm::mat4(1.0f);
   model_ = glm::mat4(1.0f);
   SetMatrices();
-  gbuffer_.OnPreRender();
+  gbuffer_.PrepareRender();
 
   // 四角形ポリゴンとして描画していく
   glBindVertexArray(quad_);

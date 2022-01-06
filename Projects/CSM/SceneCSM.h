@@ -34,7 +34,7 @@ public:
   void OnResize(int, int) override;
 
 private:
-  void OnPreRender();
+  void PrepareRender();
 
   std::optional<std::string> CompileAndLinkShader();
   void SetMatrices();
