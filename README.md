@@ -43,6 +43,13 @@
 - [spdlog]
 - [boost]
 
+ビルドの例です。
+
+```terminal
+cmake -DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=TRUE -DCMAKE_BUILD_TYPE:STRING=Debug -H/. -B/./Build -G "Ninja"
+cmake --build ./Build --parallel 13
+```
+
 リポジトリのルートディレクトリにCMakeLists.txtがあるので詳しくはそちらを参照ください。  
 
 ## Features
