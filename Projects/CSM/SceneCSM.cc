@@ -96,7 +96,7 @@ void SceneCSM::OnUpdate(float t) {
 }
 
 void SceneCSM::OnRender() {
-  RenderPrepare();
+  PrepareRender();
 
   glEnable(GL_DEPTH_TEST);
   {
